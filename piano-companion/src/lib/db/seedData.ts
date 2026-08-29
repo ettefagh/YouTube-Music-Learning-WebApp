@@ -10,9 +10,11 @@ export const SEED_BOOK: LocalBook = {
 };
 
 export const SEED_LESSONS: LocalLesson[] = [
+  // Original Provider: Anikó Drabon
   {
     id: 'tz1-01-glocken',
     bookId: 'tastenzauberei-1',
+    providerName: 'Anikó Drabon',
     title: 'Glocken (Bells)',
     sequenceIndex: 1,
     youtubeVideoId: 'CUvzy7Tu6TE',
@@ -28,6 +30,7 @@ export const SEED_LESSONS: LocalLesson[] = [
   {
     id: 'tz1-02-karussell',
     bookId: 'tastenzauberei-1',
+    providerName: 'Anikó Drabon',
     title: 'Das Karussell (The Carousel)',
     sequenceIndex: 2,
     youtubeVideoId: 'DPyC2_Q1yhY',
@@ -43,6 +46,7 @@ export const SEED_LESSONS: LocalLesson[] = [
   {
     id: 'tz1-03-alle-zusammen',
     bookId: 'tastenzauberei-1',
+    providerName: 'Anikó Drabon',
     title: 'Alle zusammen (All Together)',
     sequenceIndex: 3,
     youtubeVideoId: 'gTTaiCd8fsQ',
@@ -58,6 +62,7 @@ export const SEED_LESSONS: LocalLesson[] = [
   {
     id: 'tz1-04-fingersport',
     bookId: 'tastenzauberei-1',
+    providerName: 'Anikó Drabon',
     title: 'Fingersport (Finger Exercise)',
     sequenceIndex: 4,
     youtubeVideoId: 'goytUNhbGoM',
@@ -67,6 +72,36 @@ export const SEED_LESSONS: LocalLesson[] = [
       'Lift each finger independently',
       'Keep your wrist completely level',
       'Do not rush—play with a slow, steady pulse'
+    ],
+    isCompleted: false
+  },
+  // New Provider: VikaPiano
+  {
+    id: 'vika-01-glocken',
+    bookId: 'tastenzauberei-1',
+    providerName: 'VikaPiano',
+    title: 'Glocken (Bells) - VikaPiano Cover',
+    sequenceIndex: 1,
+    youtubeVideoId: '0l0sL8r2fXY',
+    startTime: 0.0,
+    endTime: 0.0, // Plays full
+    checkpoints: [
+      'Observe VikaPiano\'s hand posture',
+      'Listen for the dynamics (loud/soft)'
+    ],
+    isCompleted: false
+  },
+  {
+    id: 'vika-02-karussell',
+    bookId: 'tastenzauberei-1',
+    providerName: 'VikaPiano',
+    title: 'Das Karussell - VikaPiano Cover',
+    sequenceIndex: 2,
+    youtubeVideoId: 'DqMOMaWvK04',
+    startTime: 0.0,
+    endTime: 0.0,
+    checkpoints: [
+      'Follow the tempo carefully'
     ],
     isCompleted: false
   }

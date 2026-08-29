@@ -7,8 +7,10 @@
   import MascotPip from '$lib/components/MascotPip.svelte';
   import TeacherGate from '$lib/components/TeacherGate.svelte';
 
+  let allLessons = $state<LocalLesson[]>([]);
   let lessons = $state<LocalLesson[]>([]);
   let currentLesson = $state<LocalLesson | null>(null);
+
   let playbackRate = $state<number>(1.0);
   let isLooping = $state<boolean>(true);
 
@@ -21,20 +23,42 @@
   let mascotMessage = $state<string>('Welcome! Ready to play?');
   let showTeacherGate = $state<boolean>(false);
 
-  // New states for redesign
+  // Layout states
   let isDropdownOpen = $state<boolean>(false);
+
+  // Providers logic
+  let providers = $state<string[]>([]);
+  let selectedProvider = $state<string>('');
+
   let providerMode = $state<'video' | 'playlist'>('video');
   const playlistId = 'PL10p3mlGiANOP_3RdrSZYv3kG5AzDmONh';
 
-  const recorder = new AudioRecorderEngine();
+  // Instantiate two separate recording engines to fix logic flaw
+  const studentRecorder = new AudioRecorderEngine();
+  const teacherRecorder = new AudioRecorderEngine();
 
   onMount(async () => {
     await initDatabase();
-    lessons = await db.lessons.orderBy('sequenceIndex').toArray();
-    if (lessons.length > 0) {
-      selectLesson(lessons[0]);
+    allLessons = await db.lessons.orderBy('sequenceIndex').toArray();
+
+    // Extract unique providers
+    const uniqueProviders = new Set(allLessons.map(l => l.providerName));
+    providers = Array.from(uniqueProviders);
+
+    if (providers.length > 0) {
+      selectProvider(providers[0]);
     }
   });
+
+  function selectProvider(providerName: string) {
+    selectedProvider = providerName;
+    lessons = allLessons.filter(l => l.providerName === providerName);
+    if (lessons.length > 0) {
+      selectLesson(lessons[0]);
+    } else {
+      currentLesson = null;
+    }
+  }
 
   async function selectLesson(lesson: LocalLesson) {
     currentLesson = lesson;
@@ -42,19 +66,22 @@
     mascotState = 'idle';
     mascotMessage = `Let's practice "${lesson.title}"!`;
 
+    // Revoke previous URLs to free memory
     if (studentAudioUrl) URL.revokeObjectURL(studentAudioUrl);
     if (teacherAudioUrl) URL.revokeObjectURL(teacherAudioUrl);
 
-    studentTrack = (await db.audioTracks.where({ lessonId: lesson.id, trackType: 'student' }).first()) ?? null;
-    teacherTrack = (await db.audioTracks.where({ lessonId: lesson.id, trackType: 'teacher' }).first()) ?? null;
+    // Use the new compound index if we were making explicit calls, or multiple `where` clauses
+    // db.audioTracks.where('[lessonId+trackType]').equals([lesson.id, 'student']).first()
+    studentTrack = (await db.audioTracks.where('[lessonId+trackType]').equals([lesson.id, 'student']).first()) ?? null;
+    teacherTrack = (await db.audioTracks.where('[lessonId+trackType]').equals([lesson.id, 'teacher']).first()) ?? null;
 
     studentAudioUrl = studentTrack ? URL.createObjectURL(studentTrack.audioBlob) : null;
     teacherAudioUrl = teacherTrack ? URL.createObjectURL(teacherTrack.audioBlob) : null;
   }
 
   async function toggleStudentRecord() {
-    if (recorder.isRecording) {
-      const { blob, mimeType } = await recorder.stop();
+    if (studentRecorder.isRecording) {
+      const { blob, mimeType } = await studentRecorder.stop();
       mascotState = 'cheering';
       mascotMessage = 'Awesome take! Listen to your sound!';
 
@@ -73,7 +100,7 @@
       if (studentAudioUrl) URL.revokeObjectURL(studentAudioUrl);
       studentAudioUrl = URL.createObjectURL(blob);
     } else {
-      await recorder.start();
+      await studentRecorder.start();
       mascotState = 'listening';
       mascotMessage = 'Pip is listening to your piano!';
     }
@@ -88,8 +115,8 @@
   }
 
   async function startTeacherRecord() {
-    if (recorder.isRecording) {
-      const { blob, mimeType } = await recorder.stop();
+    if (teacherRecorder.isRecording) {
+      const { blob, mimeType } = await teacherRecorder.stop();
       const track: LocalAudioTrack = {
         id: crypto.randomUUID(),
         lessonId: currentLesson!.id,
@@ -104,16 +131,37 @@
       if (teacherAudioUrl) URL.revokeObjectURL(teacherAudioUrl);
       teacherAudioUrl = URL.createObjectURL(blob);
     } else {
-      await recorder.start();
+      await teacherRecorder.start();
     }
   }
 </script>
 
 <div class="cockpit-container">
 
+  <!-- Provider Selector (Lower visual hierarchy, placed above main header) -->
+  <div class="provider-selector">
+    <span class="provider-label">Provider:</span>
+    <div class="provider-pill-group">
+      {#each providers as provider}
+        <button
+          class="provider-pill {selectedProvider === provider ? 'active' : ''}"
+          onclick={() => selectProvider(provider)}
+        >
+          {provider}
+        </button>
+      {/each}
+    </div>
+  </div>
+
   <!-- Neobrutalist Header & Lesson Selector -->
   <header class="neo-header">
-    <div class="header-card" role="button" tabindex="0" onclick={() => isDropdownOpen = !isDropdownOpen} onkeydown={(e) => e.key === 'Enter' && (isDropdownOpen = !isDropdownOpen)}>
+    <div
+      class="header-card"
+      role="button"
+      tabindex="0"
+      onclick={() => isDropdownOpen = !isDropdownOpen}
+      onkeydown={(e) => e.key === 'Enter' && (isDropdownOpen = !isDropdownOpen)}
+    >
       <div class="header-content">
         <span class="icon">🎹</span>
         <div class="title-area">
@@ -144,7 +192,7 @@
 
   {#if currentLesson}
     <main class="practice-body">
-      <!-- Provider Selector Tabs -->
+      <!-- Player Mode Selector Tabs -->
       <div class="provider-tabs neo-tabs">
         <button
           class="tab-btn {providerMode === 'video' ? 'active' : ''}"
@@ -197,9 +245,21 @@
           {:else}
             <p class="empty-state">No reference track yet.</p>
           {/if}
-          <button class="neo-btn outline" onclick={handleTeacherRecord}>
-            {teacherAuth.isUnlocked ? '🎙️ Record Reference' : '🔒 Teacher Unlock'}
+          <button
+            class="neo-btn {teacherRecorder.isRecording ? 'recording' : 'outline'}"
+            onclick={handleTeacherRecord}
+          >
+            {#if teacherRecorder.isRecording}
+               ⏹ Stop Recording
+            {:else}
+               {teacherAuth.isUnlocked ? '🎙️ Record Reference' : '🔒 Teacher Unlock'}
+            {/if}
           </button>
+          {#if teacherRecorder.isRecording}
+            <div class="vu-meter neo-border">
+              <div class="vu-fill" style="width: {teacherRecorder.volumeLevel * 100}%"></div>
+            </div>
+          {/if}
         </div>
 
         <div class="track-card neo-card student-card">
@@ -208,14 +268,14 @@
             <audio src={studentAudioUrl} controls></audio>
           {/if}
           <button
-            class="neo-btn {recorder.isRecording ? 'recording' : 'primary'}"
+            class="neo-btn {studentRecorder.isRecording ? 'recording' : 'primary'}"
             onclick={toggleStudentRecord}
           >
-            {recorder.isRecording ? '⏹ Stop Recording' : '⏺ Record My Take'}
+            {studentRecorder.isRecording ? '⏹ Stop Recording' : '⏺ Record My Take'}
           </button>
-          {#if recorder.isRecording}
+          {#if studentRecorder.isRecording}
             <div class="vu-meter neo-border">
-              <div class="vu-fill" style="width: {recorder.volumeLevel * 100}%"></div>
+              <div class="vu-fill" style="width: {studentRecorder.volumeLevel * 100}%"></div>
             </div>
           {/if}
         </div>
@@ -293,6 +353,53 @@
   .neo-border {
     border: 3px solid #000;
     border-radius: 8px;
+  }
+
+  /* Provider Selector */
+  .provider-selector {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 12px;
+    padding: 0 4px;
+  }
+
+  .provider-label {
+    font-weight: 700;
+    font-size: 0.9rem;
+    color: #666;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  .provider-pill-group {
+    display: flex;
+    gap: 8px;
+    overflow-x: auto;
+    padding-bottom: 4px; /* for focus ring */
+  }
+
+  .provider-pill {
+    background: #E0E0E0;
+    border: 2px solid #9E9E9E;
+    border-radius: 16px;
+    padding: 4px 12px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #424242;
+    cursor: pointer;
+    transition: all 0.2s;
+    white-space: nowrap;
+  }
+
+  .provider-pill:hover {
+    background: #EEEEEE;
+  }
+
+  .provider-pill.active {
+    background: #212121;
+    color: #FFF;
+    border-color: #212121;
   }
 
   /* Header Design */

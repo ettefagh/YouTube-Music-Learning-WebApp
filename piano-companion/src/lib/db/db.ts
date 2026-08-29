@@ -12,6 +12,7 @@ export interface LocalBook {
 export interface LocalLesson {
   id: string;
   bookId: string;
+  providerName: string;
   title: string;
   sequenceIndex: number;
   youtubeVideoId: string;
@@ -39,10 +40,10 @@ export class PianoDatabase extends Dexie {
 
   constructor() {
     super('PianoCompanionDB');
-    this.version(1).stores({
+    this.version(2).stores({ // Bumped version to 2 for schema change
       books: 'id, title, updatedAt',
-      lessons: 'id, bookId, sequenceIndex, isCompleted',
-      audioTracks: 'id, lessonId, trackType, createdAt'
+      lessons: 'id, bookId, providerName, sequenceIndex, isCompleted',
+      audioTracks: 'id, lessonId, [lessonId+trackType], trackType, createdAt' // Added compound index
     });
   }
 }
@@ -57,5 +58,11 @@ export async function initDatabase() {
   if (bookCount === 0) {
     await db.books.put(SEED_BOOK);
     await db.lessons.bulkPut(SEED_LESSONS);
+  } else {
+    // If the database exists but doesn't have the new lessons yet (e.g. user updating app)
+    const vikaCount = await db.lessons.where('providerName').equals('VikaPiano').count();
+    if (vikaCount === 0) {
+       await db.lessons.bulkPut(SEED_LESSONS);
+    }
   }
 }
