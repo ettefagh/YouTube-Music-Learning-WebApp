@@ -21,6 +21,11 @@
   let mascotMessage = $state<string>('Welcome! Ready to play?');
   let showTeacherGate = $state<boolean>(false);
 
+  // New states for redesign
+  let isDropdownOpen = $state<boolean>(false);
+  let providerMode = $state<'video' | 'playlist'>('video');
+  const playlistId = 'PL10p3mlGiANOP_3RdrSZYv3kG5AzDmONh';
+
   const recorder = new AudioRecorderEngine();
 
   onMount(async () => {
@@ -33,10 +38,10 @@
 
   async function selectLesson(lesson: LocalLesson) {
     currentLesson = lesson;
+    isDropdownOpen = false;
     mascotState = 'idle';
     mascotMessage = `Let's practice "${lesson.title}"!`;
 
-    // Revoke previous URLs to free memory
     if (studentAudioUrl) URL.revokeObjectURL(studentAudioUrl);
     if (teacherAudioUrl) URL.revokeObjectURL(teacherAudioUrl);
 
@@ -83,7 +88,6 @@
   }
 
   async function startTeacherRecord() {
-    // Direct teacher recording flow
     if (recorder.isRecording) {
       const { blob, mimeType } = await recorder.stop();
       const track: LocalAudioTrack = {
@@ -106,74 +110,111 @@
 </script>
 
 <div class="cockpit-container">
-  <!-- Top Bar -->
-  <header class="top-nav">
-    <h1>🎹 Tastenzauberei 1</h1>
-    <select onchange={(e) => {
-      const selected = lessons.find(l => l.id === (e.target as HTMLSelectElement).value);
-      if (selected) selectLesson(selected);
-    }}>
-      {#each lessons as l}
-        <option value={l.id}>{l.sequenceIndex}. {l.title}</option>
-      {/each}
-    </select>
+
+  <!-- Neobrutalist Header & Lesson Selector -->
+  <header class="neo-header">
+    <div class="header-card" role="button" tabindex="0" onclick={() => isDropdownOpen = !isDropdownOpen} onkeydown={(e) => e.key === 'Enter' && (isDropdownOpen = !isDropdownOpen)}>
+      <div class="header-content">
+        <span class="icon">🎹</span>
+        <div class="title-area">
+          <span class="subtitle">Tastenzauberei 1</span>
+          <h1 class="lesson-title">{currentLesson ? currentLesson.title : 'Loading...'}</h1>
+        </div>
+        <span class="dropdown-arrow" class:open={isDropdownOpen}>▼</span>
+      </div>
+    </div>
+
+    {#if isDropdownOpen}
+      <div class="lesson-dropdown neo-card">
+        <ul>
+          {#each lessons as l}
+            <li>
+              <button
+                class="lesson-btn {currentLesson?.id === l.id ? 'active' : ''}"
+                onclick={() => selectLesson(l)}
+              >
+                <span class="seq">{l.sequenceIndex}.</span> {l.title}
+              </button>
+            </li>
+          {/each}
+        </ul>
+      </div>
+    {/if}
   </header>
 
   {#if currentLesson}
-    <!-- Video Player Cockpit -->
     <main class="practice-body">
-      <div class="player-wrapper">
-        <div
-          use:youtubeLooper={{
-            videoId: () => currentLesson!.youtubeVideoId,
-            startTime: () => currentLesson!.startTime,
-            endTime: () => currentLesson!.endTime,
-            playbackRate: () => playbackRate,
-            isLooping: () => isLooping,
-            _trigger: [playbackRate, isLooping, currentLesson?.youtubeVideoId]
-          }}
-          class="yt-frame"
-        ></div>
+      <!-- Provider Selector Tabs -->
+      <div class="provider-tabs neo-tabs">
+        <button
+          class="tab-btn {providerMode === 'video' ? 'active' : ''}"
+          onclick={() => providerMode = 'video'}
+        >
+          Single Lesson Video
+        </button>
+        <button
+          class="tab-btn {providerMode === 'playlist' ? 'active' : ''}"
+          onclick={() => providerMode = 'playlist'}
+        >
+          Full Playlist
+        </button>
+      </div>
 
-        <div class="video-controls">
-          <button class:active={isLooping} onclick={() => isLooping = !isLooping}>
-            🔄 Loop {isLooping ? 'ON' : 'OFF'}
-          </button>
-          <div class="speed-toggles">
-            <button class:active={playbackRate === 0.75} onclick={() => playbackRate = 0.75}>0.75x</button>
-            <button class:active={playbackRate === 1.0} onclick={() => playbackRate = 1.0}>1.0x</button>
+      <!-- Video Player Cockpit (Keyed to force total unmount on provider change) -->
+      {#key providerMode}
+        <div class="player-wrapper neo-card">
+          <div
+            use:youtubeLooper={{
+              videoId: providerMode === 'video' ? (() => currentLesson!.youtubeVideoId) : undefined,
+              playlistId: providerMode === 'playlist' ? (() => playlistId) : undefined,
+              startTime: () => currentLesson!.startTime,
+              endTime: providerMode === 'video' ? (() => currentLesson!.endTime) : (() => 0), // Loop full track on playlist
+              playbackRate: () => playbackRate,
+              isLooping: () => isLooping,
+              _trigger: [playbackRate, isLooping, currentLesson?.youtubeVideoId]
+            }}
+            class="yt-frame"
+          ></div>
+
+          <div class="video-controls">
+            <button class="control-btn {isLooping ? 'active' : ''}" onclick={() => isLooping = !isLooping}>
+              🔄 Loop {isLooping ? 'ON' : 'OFF'}
+            </button>
+            <div class="speed-toggles">
+              <button class="control-btn {playbackRate === 0.75 ? 'active' : ''}" onclick={() => playbackRate = 0.75}>0.75x</button>
+              <button class="control-btn {playbackRate === 1.0 ? 'active' : ''}" onclick={() => playbackRate = 1.0}>1.0x</button>
+            </div>
           </div>
         </div>
-      </div>
+      {/key}
 
       <!-- Dual Audio Studio -->
       <section class="audio-studio">
-        <div class="track-card">
+        <div class="track-card neo-card teacher-card">
           <h3>👩‍🏫 Teacher Reference</h3>
           {#if teacherAudioUrl}
             <audio src={teacherAudioUrl} controls></audio>
           {:else}
             <p class="empty-state">No reference track yet.</p>
           {/if}
-          <button class="gate-btn" onclick={handleTeacherRecord}>
+          <button class="neo-btn outline" onclick={handleTeacherRecord}>
             {teacherAuth.isUnlocked ? '🎙️ Record Reference' : '🔒 Teacher Unlock'}
           </button>
         </div>
 
-        <div class="track-card student-card">
+        <div class="track-card neo-card student-card">
           <h3>🧒 My Practice Take</h3>
           {#if studentAudioUrl}
             <audio src={studentAudioUrl} controls></audio>
           {/if}
           <button
-            class="record-btn"
-            class:recording={recorder.isRecording}
+            class="neo-btn {recorder.isRecording ? 'recording' : 'primary'}"
             onclick={toggleStudentRecord}
           >
             {recorder.isRecording ? '⏹ Stop Recording' : '⏺ Record My Take'}
           </button>
           {#if recorder.isRecording}
-            <div class="vu-meter">
+            <div class="vu-meter neo-border">
               <div class="vu-fill" style="width: {recorder.volumeLevel * 100}%"></div>
             </div>
           {/if}
@@ -181,7 +222,7 @@
       </section>
 
       <!-- Checkpoints -->
-      <section class="checkpoints">
+      <section class="checkpoints neo-card highlight">
         <h3>🎯 Learning Points</h3>
         <ul>
           {#each currentLesson.checkpoints as pt}
@@ -207,106 +248,285 @@
 </div>
 
 <style>
+  :global(body) {
+    background-color: #f4f0ec;
+    margin: 0;
+  }
+
   .cockpit-container {
-    max-width: 768px;
+    max-width: 800px;
     margin: 0 auto;
-    padding: 16px;
+    padding: 24px 16px;
     font-family: system-ui, -apple-system, sans-serif;
   }
-  .top-nav {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 16px;
+
+  /* Neo-brutalism Utilities */
+  .neo-card {
+    background: white;
+    border: 4px solid #000;
+    border-radius: 12px;
+    box-shadow: 6px 6px 0px #000;
   }
-  .player-wrapper {
-    background: #000;
-    border-radius: 16px;
-    overflow: hidden;
-    margin-bottom: 16px;
-  }
-  .yt-frame {
-    width: 100%;
-    aspect-ratio: 16 / 9;
-  }
-  .video-controls {
-    display: flex;
-    justify-content: space-between;
-    padding: 10px;
-    background: #212121;
-  }
-  .video-controls button {
-    background: #424242;
-    color: white;
-    border: none;
-    padding: 6px 12px;
+
+  .neo-btn {
+    border: 3px solid #000;
     border-radius: 8px;
+    font-weight: 800;
+    padding: 12px 16px;
     cursor: pointer;
+    box-shadow: 4px 4px 0px #000;
+    transition: transform 0.1s, box-shadow 0.1s;
+    width: 100%;
+    margin-top: 12px;
+    font-size: 1rem;
   }
-  .video-controls button.active {
-    background: #FFB300;
-    color: black;
-    font-weight: bold;
+
+  .neo-btn:active {
+    transform: translate(4px, 4px);
+    box-shadow: 0px 0px 0px #000;
   }
-  .audio-studio {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
+
+  .neo-btn.primary { background: #FFB300; color: #000; }
+  .neo-btn.outline { background: #fff; color: #000; }
+  .neo-btn.recording { background: #FF5252; color: #fff; animation: pulse 1s infinite; }
+
+  .neo-border {
+    border: 3px solid #000;
+    border-radius: 8px;
+  }
+
+  /* Header Design */
+  .neo-header {
+    position: relative;
+    margin-bottom: 24px;
+    z-index: 50;
+  }
+
+  .header-card {
+    background: #E8F5E9;
+    border: 4px solid #000;
+    border-radius: 16px;
+    box-shadow: 8px 8px 0px #000;
+    padding: 16px 24px;
+    cursor: pointer;
+    transition: transform 0.1s;
+  }
+
+  .header-card:active {
+    transform: translate(4px, 4px);
+    box-shadow: 4px 4px 0px #000;
+  }
+
+  .header-content {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+
+  .icon {
+    font-size: 2.5rem;
+  }
+
+  .title-area {
+    flex-grow: 1;
+  }
+
+  .subtitle {
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: #555;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+
+  .lesson-title {
+    margin: 4px 0 0 0;
+    font-size: 1.8rem;
+    font-weight: 900;
+    color: #000;
+  }
+
+  .dropdown-arrow {
+    font-size: 1.5rem;
+    transition: transform 0.2s;
+  }
+  .dropdown-arrow.open {
+    transform: rotate(180deg);
+  }
+
+  .lesson-dropdown {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    margin-top: 12px;
+    background: #FFF9C4;
+    max-height: 300px;
+    overflow-y: auto;
+  }
+
+  .lesson-dropdown ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .lesson-btn {
+    width: 100%;
+    text-align: left;
+    padding: 16px 24px;
+    background: none;
+    border: none;
+    border-bottom: 3px solid #000;
+    font-size: 1.2rem;
+    font-weight: 700;
+    cursor: pointer;
+    display: flex;
+    gap: 12px;
+  }
+  .lesson-dropdown li:last-child .lesson-btn { border-bottom: none; }
+  .lesson-btn:hover { background: #FFF176; }
+  .lesson-btn.active { background: #FFD54F; }
+  .seq { color: #d32f2f; }
+
+  /* Provider Tabs */
+  .provider-tabs {
+    display: flex;
     gap: 12px;
     margin-bottom: 16px;
   }
-  .track-card {
-    background: #F5F5F5;
-    padding: 12px;
-    border-radius: 12px;
-  }
-  .student-card {
-    background: #E8F5E9;
-  }
-  .record-btn {
-    width: 100%;
-    padding: 10px;
-    border: none;
+
+  .tab-btn {
+    flex: 1;
+    background: #E0E0E0;
+    border: 3px solid #000;
     border-radius: 8px;
+    padding: 10px;
+    font-weight: 800;
+    font-size: 1rem;
+    box-shadow: 4px 4px 0px #000;
+    cursor: pointer;
+    transition: transform 0.1s;
+  }
+
+  .tab-btn:active {
+    transform: translate(2px, 2px);
+    box-shadow: 2px 2px 0px #000;
+  }
+
+  .tab-btn.active {
     background: #4CAF50;
     color: white;
-    font-weight: bold;
-    cursor: pointer;
-    margin-top: 8px;
   }
-  .record-btn.recording {
-    background: #E53935;
-    animation: pulse 1s infinite;
+
+  /* Video Player */
+  .player-wrapper {
+    overflow: hidden;
+    margin-bottom: 24px;
+    background: #000;
   }
-  .gate-btn {
+
+  .yt-frame {
     width: 100%;
-    padding: 8px;
-    border: 1px solid #BDBDBD;
-    background: white;
-    border-radius: 8px;
-    cursor: pointer;
-    margin-top: 8px;
+    aspect-ratio: 16 / 9;
+    border-bottom: 4px solid #000;
   }
+
+  .video-controls {
+    display: flex;
+    justify-content: space-between;
+    padding: 12px;
+    background: #FFF;
+  }
+
+  .control-btn {
+    background: #E0E0E0;
+    border: 3px solid #000;
+    border-radius: 6px;
+    padding: 8px 16px;
+    font-weight: 800;
+    cursor: pointer;
+    box-shadow: 2px 2px 0px #000;
+  }
+
+  .control-btn:active {
+    transform: translate(2px, 2px);
+    box-shadow: 0px 0px 0px #000;
+  }
+
+  .control-btn.active {
+    background: #2196F3;
+    color: white;
+  }
+
+  .speed-toggles {
+    display: flex;
+    gap: 8px;
+  }
+
+  /* Audio Studio */
+  .audio-studio {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-bottom: 24px;
+  }
+
+  .track-card {
+    padding: 16px;
+  }
+
+  .teacher-card { background: #E3F2FD; }
+  .student-card { background: #FCE4EC; }
+
+  .track-card h3 {
+    margin-top: 0;
+    margin-bottom: 12px;
+    font-weight: 900;
+  }
+
+  audio { width: 100%; border-radius: 8px; margin-bottom: 8px; }
+  .empty-state { font-style: italic; color: #757575; }
+
   .vu-meter {
-    height: 6px;
-    background: #C8E6C9;
-    border-radius: 3px;
-    margin-top: 8px;
+    height: 12px;
+    background: #fff;
+    margin-top: 12px;
     overflow: hidden;
   }
   .vu-fill {
     height: 100%;
-    background: #43A047;
+    background: #4CAF50;
     transition: width 0.05s ease;
   }
+
+  /* Checkpoints */
   .checkpoints {
-    background: #EDE7F6;
-    padding: 12px 16px;
-    border-radius: 12px;
-    margin-bottom: 16px;
+    padding: 20px;
+    margin-bottom: 24px;
+    background: #D1C4E9;
   }
+  .checkpoints h3 {
+    margin-top: 0;
+    font-weight: 900;
+    font-size: 1.4rem;
+  }
+  .checkpoints ul {
+    margin: 0;
+    padding-left: 20px;
+    font-size: 1.1rem;
+    font-weight: 600;
+  }
+  .checkpoints li { margin-bottom: 8px; }
+
   @keyframes pulse {
-    0% { opacity: 1; }
-    50% { opacity: 0.7; }
-    100% { opacity: 1; }
+    0% { transform: scale(1); box-shadow: 4px 4px 0px #000; }
+    50% { transform: scale(0.98) translate(2px, 2px); box-shadow: 2px 2px 0px #000; background: #D32F2F;}
+    100% { transform: scale(1); box-shadow: 4px 4px 0px #000; }
+  }
+
+  @media (max-width: 600px) {
+    .audio-studio { grid-template-columns: 1fr; }
+    .lesson-title { font-size: 1.4rem; }
   }
 </style>

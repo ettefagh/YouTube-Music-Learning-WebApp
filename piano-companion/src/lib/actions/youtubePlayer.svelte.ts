@@ -1,5 +1,6 @@
 export interface LooperOptions {
-  videoId: () => string;
+  videoId?: () => string | undefined;
+  playlistId?: () => string | undefined;
   startTime: () => number;
   endTime: () => number;
   playbackRate: () => number;
@@ -18,24 +19,32 @@ declare global {
 export function youtubeLooper(node: HTMLElement, options: LooperOptions) {
   let player: any = null;
   let rafId: number | null = null;
-  let isApiLoaded = false;
 
   function loadYouTubeAPI() {
     if (window.YT && window.YT.Player) {
       initPlayer();
       return;
     }
-    const tag = document.createElement('script');
-    tag.src = 'https://www.youtube.com/iframe_api';
-    const firstScriptTag = document.getElementsByTagName('script')[0];
-    firstScriptTag.parentNode?.insertBefore(tag, firstScriptTag);
-    window.onYouTubeIframeAPIReady = () => initPlayer();
+    if (!window.onYouTubeIframeAPIReady) {
+      const tag = document.createElement('script');
+      tag.src = 'https://www.youtube.com/iframe_api';
+      const firstScriptTag = document.getElementsByTagName('script')[0];
+      firstScriptTag.parentNode?.insertBefore(tag, firstScriptTag);
+    }
+
+    // Save previous callback if it exists
+    const previousCallback = window.onYouTubeIframeAPIReady;
+    window.onYouTubeIframeAPIReady = () => {
+        if (previousCallback) previousCallback();
+        initPlayer();
+    };
   }
 
   function initPlayer() {
-    player = new window.YT.Player(node, {
-      videoId: options.videoId(),
-      playerVars: {
+    const vId = options.videoId ? options.videoId() : undefined;
+    const pId = options.playlistId ? options.playlistId() : undefined;
+
+    let playerVars: any = {
         autoplay: 0,
         controls: 0,
         disablekb: 1,
@@ -43,7 +52,16 @@ export function youtubeLooper(node: HTMLElement, options: LooperOptions) {
         modestbranding: 1,
         rel: 0,
         iv_load_policy: 3
-      },
+    };
+
+    if (pId) {
+        playerVars.listType = 'playlist';
+        playerVars.list = pId;
+    }
+
+    player = new window.YT.Player(node, {
+      videoId: vId,
+      playerVars: playerVars,
       events: {
         onReady: () => {
           player.setPlaybackRate(options.playbackRate());
@@ -63,7 +81,6 @@ export function youtubeLooper(node: HTMLElement, options: LooperOptions) {
 
   function startLoopWatcher() {
     if (rafId !== null) return;
-
     const earlySeekThreshold = 0.05;
 
     const checkTime = () => {
@@ -72,7 +89,8 @@ export function youtubeLooper(node: HTMLElement, options: LooperOptions) {
         const start = options.startTime();
         const end = options.endTime();
 
-        if (currentTime >= end - earlySeekThreshold || currentTime < start) {
+        // Prevent seeking if end is 0 (i.e. default or unknown length)
+        if (end > 0 && (currentTime >= end - earlySeekThreshold || currentTime < start)) {
           player.seekTo(start, true);
         }
       }
@@ -100,15 +118,20 @@ export function youtubeLooper(node: HTMLElement, options: LooperOptions) {
 
   return {
     update(newOptions: LooperOptions) {
-      options = newOptions; // Keep reference to latest options
+      options = newOptions;
       if (player && player.setPlaybackRate) {
         player.setPlaybackRate(options.playbackRate());
       }
-      if (player && player.loadVideoById) {
+      if (player && player.loadVideoById && options.videoId && options.videoId()) {
         const currentVideoUrl = player.getVideoUrl();
-        if (!currentVideoUrl || !currentVideoUrl.includes(options.videoId())) {
-            player.loadVideoById(options.videoId());
+        const vId = options.videoId();
+        if (vId && (!currentVideoUrl || !currentVideoUrl.includes(vId))) {
+            player.loadVideoById(vId);
         }
+      }
+      if (player && player.loadPlaylist && options.playlistId && options.playlistId()) {
+          // Playlist updates usually handled by destroying and recreating the iframe
+          // but API provides cuePlaylist/loadPlaylist
       }
     },
     destroy() {

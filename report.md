@@ -47,3 +47,8 @@ The production URL `https://piano-practice-companion.pages.dev/` was tested and 
 
 **Bugfix Deployment:**
 Fixed Svelte 5 action reactivity issues by properly tracking `options` dependencies in `youtubePlayer.svelte.ts` and pushing the update via `update(newOptions)` hook, forcing the component to send an object wrapped in a state trigger. Cloudflare deployment succeeded on the `main` branch.
+
+**Redesign and Playlist Enhancement:**
+Redesigned the header using Neo-brutalist principles (thick black borders, harsh solid colors, button translations with active states) and completely replaced the standard `select` component with an absolutely positioned dropdown list.
+Additionally, added Playlist mode provider functionality to the `youtubeLooper.svelte.ts` action and implemented a tab control to switch between single videos and the full playlist. The Svelte template leverages a `{#key}` block to ensure the YouTube iframe is correctly re-created when switching data providers.
+Cloudflare deployment to the main branch is successful.
