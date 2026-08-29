@@ -30,3 +30,6 @@ Implemented the engineered scope for this issue.
 - `README.md` — reviewed, no change needed
 
 **Deferred:** None
+
+**Deployment:**
+Cloudflare deployment via `npx wrangler pages deploy .svelte-kit/cloudflare --project-name=piano-practice-companion` is configured but failed due to missing `CLOUDFLARE_API_TOKEN` environment variable in the current headless execution environment. The user needs to execute this locally or configure the token.
