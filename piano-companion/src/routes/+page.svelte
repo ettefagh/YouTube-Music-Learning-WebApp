@@ -129,7 +129,8 @@
             startTime: () => currentLesson!.startTime,
             endTime: () => currentLesson!.endTime,
             playbackRate: () => playbackRate,
-            isLooping: () => isLooping
+            isLooping: () => isLooping,
+            _trigger: [playbackRate, isLooping, currentLesson?.youtubeVideoId]
           }}
           class="yt-frame"
         ></div>

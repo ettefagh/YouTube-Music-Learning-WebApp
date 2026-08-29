@@ -44,3 +44,6 @@ Tested the Cloudflare Pages environment. The application correctly renders local
 **Production Deployment:**
 Configured Wrangler and successfully pushed the deployment output to the `main` branch.
 The production URL `https://piano-practice-companion.pages.dev/` was tested and successfully returned the running application with HTTP 200 rather than the 404 placeholder.
+
+**Bugfix Deployment:**
+Fixed Svelte 5 action reactivity issues by properly tracking `options` dependencies in `youtubePlayer.svelte.ts` and pushing the update via `update(newOptions)` hook, forcing the component to send an object wrapped in a state trigger. Cloudflare deployment succeeded on the `main` branch.

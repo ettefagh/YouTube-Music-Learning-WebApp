@@ -5,6 +5,7 @@ export interface LooperOptions {
   playbackRate: () => number;
   isLooping: () => boolean;
   onReady?: () => void;
+  _trigger?: any; // Used to force Svelte update hook
 }
 
 declare global {
@@ -63,7 +64,7 @@ export function youtubeLooper(node: HTMLElement, options: LooperOptions) {
   function startLoopWatcher() {
     if (rafId !== null) return;
 
-    const earlySeekThreshold = 0.05; // 50ms early-seek window
+    const earlySeekThreshold = 0.05;
 
     const checkTime = () => {
       if (player && player.getCurrentTime && options.isLooping()) {
@@ -98,9 +99,16 @@ export function youtubeLooper(node: HTMLElement, options: LooperOptions) {
   loadYouTubeAPI();
 
   return {
-    update() {
-      if (player && player.loadVideoById) {
+    update(newOptions: LooperOptions) {
+      options = newOptions; // Keep reference to latest options
+      if (player && player.setPlaybackRate) {
         player.setPlaybackRate(options.playbackRate());
+      }
+      if (player && player.loadVideoById) {
+        const currentVideoUrl = player.getVideoUrl();
+        if (!currentVideoUrl || !currentVideoUrl.includes(options.videoId())) {
+            player.loadVideoById(options.videoId());
+        }
       }
     },
     destroy() {
