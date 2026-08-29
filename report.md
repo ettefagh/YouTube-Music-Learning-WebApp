@@ -40,3 +40,7 @@ Deployment to Cloudflare Pages succeeded successfully to `https://piano-practice
 
 **Verification on live/preview endpoints:**
 Tested the Cloudflare Pages environment. The application correctly renders locally in production-preview configuration and Dexie seamlessly seeds the initial Database state. There was a compound-index console warning that does not block functionality.
+
+**Production Deployment:**
+Configured Wrangler and successfully pushed the deployment output to the `main` branch.
+The production URL `https://piano-practice-companion.pages.dev/` was tested and successfully returned the running application with HTTP 200 rather than the 404 placeholder.
