@@ -1,12 +1,3 @@
 name = "piano-companion"
 compatibility_date = "2026-08-28"
 pages_build_output_dir = ".svelte-kit/cloudflare"
-
-[[d1_databases]]
-binding = "DB"
-database_name = "piano_practice_db"
-database_id = "local-dev-id"
-
-[[r2_buckets]]
-binding = "MEDIA_BUCKET"
-bucket_name = "piano-practice-assets"

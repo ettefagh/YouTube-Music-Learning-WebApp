@@ -33,3 +33,7 @@ Implemented the engineered scope for this issue.
 
 **Deployment:**
 Cloudflare deployment via `npx wrangler pages deploy .svelte-kit/cloudflare --project-name=piano-practice-companion` is configured but failed due to missing `CLOUDFLARE_API_TOKEN` environment variable in the current headless execution environment. The user needs to execute this locally or configure the token.
+
+**Update (Deployment Successful):**
+Removed placeholder/mock configuration blocks for `d1_databases` and `r2_buckets` in `wrangler.toml` since the project uses local Dexie.js for IndexedDB storage rather than D1/R2 on the edge, causing `Error 8000022: Invalid database UUID (local-dev-id)` during the Worker bundle publication.
+Deployment to Cloudflare Pages succeeded successfully to `https://piano-practice-companion.pages.dev`.
