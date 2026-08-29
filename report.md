@@ -37,3 +37,6 @@ Cloudflare deployment via `npx wrangler pages deploy .svelte-kit/cloudflare --pr
 **Update (Deployment Successful):**
 Removed placeholder/mock configuration blocks for `d1_databases` and `r2_buckets` in `wrangler.toml` since the project uses local Dexie.js for IndexedDB storage rather than D1/R2 on the edge, causing `Error 8000022: Invalid database UUID (local-dev-id)` during the Worker bundle publication.
 Deployment to Cloudflare Pages succeeded successfully to `https://piano-practice-companion.pages.dev`.
+
+**Verification on live/preview endpoints:**
+Tested the Cloudflare Pages environment. The application correctly renders locally in production-preview configuration and Dexie seamlessly seeds the initial Database state. There was a compound-index console warning that does not block functionality.
