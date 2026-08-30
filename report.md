@@ -75,3 +75,11 @@ Implemented a kid-friendly video progress bar under the video, allowing visual t
 Included a new Settings menu (hidden behind the Teacher Verification Gate to prevent accidental resetting). Inside the settings, users can customize the UI theme color which is synced with `localStorage`. Finally, a "Force App Update" feature securely unregisters `vite-plugin-pwa` service workers to allow immediate cache eviction and reloads the browser, solving the strict PWA versioning issue gracefully.
 
 Deployed successfully to Cloudflare Pages `main` branch.
+
+**Refactoring UI & Checkpoint Edit Mode:**
+Re-engineered the teacher gate mechanism inside `teacherAuth.svelte.ts` to implement a strict 2-minute inactivity auto-lock system that refreshes on user interactions (mouse move, key press).
+Removed the old generic Player Mode tabs as the application now manages standard lesson blocks inherently within individual timeline bounds dynamically populated by the seed data.
+Moved the Neobrutalist Settings button from the header to a new static footer. Added a 0.5x speed toggle button for advanced slowing down during playback.
+Finally, added an interactive Checkpoints / Learning Points edit mode. This is safely locked behind the Teacher Gate. Once unlocked, the user can toggle the text view into a `textarea` field, modify the instructions, and persist the updated checkpoints permanently back into Dexie IndexedDB.
+
+Deployed to the main branch via Cloudflare Pages.

@@ -8,7 +8,13 @@ class TeacherAuthStore {
 
   unlock() {
     this.sessionToken = crypto.randomUUID();
-    this.expiresAt = Date.now() + 15 * 60 * 1000; // 15-minute validity
+    this.resetTimer();
+  }
+
+  resetTimer() {
+    if (this.sessionToken) {
+      this.expiresAt = Date.now() + 2 * 60 * 1000; // 2-minute inactivity timer
+    }
   }
 
   lock() {
@@ -18,3 +24,18 @@ class TeacherAuthStore {
 }
 
 export const teacherAuth = new TeacherAuthStore();
+
+// Setup global listeners to reset timer
+if (typeof window !== 'undefined') {
+    const reset = () => teacherAuth.resetTimer();
+    window.addEventListener('mousemove', reset);
+    window.addEventListener('keydown', reset);
+    window.addEventListener('touchstart', reset);
+
+    // Periodically check if timer expired to trigger reactivity if needed
+    setInterval(() => {
+        if (teacherAuth.sessionToken && Date.now() >= teacherAuth.expiresAt) {
+            teacherAuth.lock();
+        }
+    }, 5000);
+}

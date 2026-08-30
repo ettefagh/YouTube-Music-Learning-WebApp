@@ -24,6 +24,28 @@
   let showTeacherGate = $state<boolean>(false);
 
   let showSettingsModal = $state(false);
+
+  let isEditingCheckpoints = $state(false);
+  let editCheckpointsText = $state('');
+
+  function handleEditCheckpoints() {
+      if (!teacherAuth.isUnlocked) {
+          showTeacherGate = true;
+          // After unlock, the UI naturally reflects unlocked state, we just need to re-click or we can auto-trigger
+      } else {
+          isEditingCheckpoints = true;
+          editCheckpointsText = currentLesson?.checkpoints.join('\n') || '';
+      }
+  }
+
+  async function saveCheckpoints() {
+      if (currentLesson) {
+          currentLesson.checkpoints = editCheckpointsText.split('\n').filter(c => c.trim().length > 0);
+          await db.lessons.put($state.snapshot(currentLesson));
+          isEditingCheckpoints = false;
+      }
+  }
+
   let requiresSettingsUnlock = $state(false);
 
   // Settings
@@ -199,9 +221,7 @@
 <div class="cockpit-container">
 
 
-  <div class="top-nav-bar">
-    <button class="neo-btn outline settings-btn" onclick={openSettings}>⚙️ Settings</button>
-  </div>
+
 
   <!-- Provider Selector -->
  (Lower visual hierarchy, placed above main header) -->
@@ -258,31 +278,15 @@
 
   {#if currentLesson}
     <main class="practice-body">
-      <!-- Player Mode Selector Tabs -->
-      <div class="provider-tabs neo-tabs">
-        <button
-          class="tab-btn {providerMode === 'video' ? 'active' : ''}"
-          onclick={() => providerMode = 'video'}
-        >
-          Single Lesson Video
-        </button>
-        <button
-          class="tab-btn {providerMode === 'playlist' ? 'active' : ''}"
-          onclick={() => providerMode = 'playlist'}
-        >
-          Full Playlist
-        </button>
-      </div>
-
       <!-- Video Player Cockpit (Keyed to force total unmount on provider change) -->
-      {#key providerMode}
+
         <div class="player-wrapper neo-card">
           <div
             use:youtubeLooper={{
-              videoId: providerMode === 'video' ? (() => currentLesson!.youtubeVideoId) : undefined,
-              playlistId: providerMode === 'playlist' ? (() => playlistId) : undefined,
+              videoId: () => currentLesson!.youtubeVideoId,
+
               startTime: () => currentLesson!.startTime,
-              endTime: providerMode === 'video' ? (() => currentLesson!.endTime) : (() => 0), // Loop full track on playlist
+              endTime: () => currentLesson!.endTime,
 
               playbackRate: () => playbackRate,
               isLooping: () => isLooping,
@@ -311,13 +315,12 @@
               🔄 Loop {isLooping ? 'ON' : 'OFF'}
             </button>
             <div class="speed-toggles">
+              <button class="control-btn {playbackRate === 0.5 ? 'active' : ''}" onclick={() => playbackRate = 0.5}>0.5x</button>
               <button class="control-btn {playbackRate === 0.75 ? 'active' : ''}" onclick={() => playbackRate = 0.75}>0.75x</button>
               <button class="control-btn {playbackRate === 1.0 ? 'active' : ''}" onclick={() => playbackRate = 1.0}>1.0x</button>
             </div>
           </div>
         </div>
-      {/key}
-
       <!-- Dual Audio Studio -->
       <section class="audio-studio">
         <div class="track-card neo-card teacher-card">
@@ -363,21 +366,43 @@
         </div>
       </section>
 
+
       <!-- Checkpoints -->
       <section class="checkpoints neo-card highlight">
-        <h3>🎯 Learning Points</h3>
-        <ul>
-          {#each currentLesson.checkpoints as pt}
-            <li>{pt}</li>
-          {/each}
-        </ul>
+        <div class="checkpoints-header">
+            <h3>🎯 Learning Points</h3>
+            {#if !isEditingCheckpoints}
+                <button class="neo-btn outline small-btn" onclick={handleEditCheckpoints}>
+                    {teacherAuth.isUnlocked ? '✏️ Edit' : '🔒 Edit'}
+                </button>
+            {/if}
+        </div>
+        {#if isEditingCheckpoints}
+            <textarea bind:value={editCheckpointsText} class="neo-textarea" rows="4"></textarea>
+            <div class="edit-actions">
+                <button class="neo-btn primary small-btn" onclick={saveCheckpoints}>Save</button>
+                <button class="neo-btn outline small-btn" onclick={() => isEditingCheckpoints = false}>Cancel</button>
+            </div>
+        {:else}
+            <ul>
+              {#each currentLesson.checkpoints as pt}
+                <li>{pt}</li>
+              {/each}
+            </ul>
+        {/if}
       </section>
+
 
       <!-- Mascot Guidance -->
       <MascotPip state={mascotState} message={mascotMessage} />
     </main>
   {/if}
 
+
+
+  <footer class="neo-footer">
+      <button class="neo-btn outline settings-btn" onclick={openSettings}>⚙️ Settings</button>
+  </footer>
 
   {#if showSettingsModal}
     <div class="modal-backdrop">
@@ -441,11 +466,7 @@
   }
 
 
-  .top-nav-bar {
-      display: flex;
-      justify-content: flex-end;
-      margin-bottom: 16px;
-  }
+
   .settings-btn {
       width: auto;
       margin-top: 0;
@@ -485,6 +506,43 @@
       border: 3px solid #000;
       border-radius: 50%;
       cursor: pointer;
+  }
+
+
+  .checkpoints-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+  }
+  .checkpoints-header h3 { margin: 0; }
+  .small-btn {
+      width: auto;
+      margin-top: 0;
+      padding: 6px 12px;
+      font-size: 0.85rem;
+  }
+  .neo-textarea {
+      width: 100%;
+      border: 3px solid #000;
+      border-radius: 8px;
+      padding: 12px;
+      font-family: inherit;
+      font-size: 1rem;
+      resize: vertical;
+      box-sizing: border-box;
+  }
+  .edit-actions {
+      display: flex;
+      gap: 8px;
+      justify-content: flex-end;
+      margin-top: 8px;
+  }
+  .neo-footer {
+      margin-top: 32px;
+      text-align: center;
+      border-top: 4px solid #000;
+      padding-top: 24px;
   }
 
   /* Neo-brutalism Utilities */
@@ -663,35 +721,7 @@
   .lesson-btn.active { background: #FFD54F; }
   .seq { color: #d32f2f; }
 
-  /* Provider Tabs */
-  .provider-tabs {
-    display: flex;
-    gap: 12px;
-    margin-bottom: 16px;
-  }
 
-  .tab-btn {
-    flex: 1;
-    background: #E0E0E0;
-    border: 3px solid #000;
-    border-radius: 8px;
-    padding: 10px;
-    font-weight: 800;
-    font-size: 1rem;
-    box-shadow: 4px 4px 0px #000;
-    cursor: pointer;
-    transition: transform 0.1s;
-  }
-
-  .tab-btn:active {
-    transform: translate(2px, 2px);
-    box-shadow: 2px 2px 0px #000;
-  }
-
-  .tab-btn.active {
-    background: #4CAF50;
-    color: white;
-  }
 
 
   /* Progress Bar */
