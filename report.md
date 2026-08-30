@@ -68,3 +68,10 @@ The original static YouTube playlist metadata scraper returned empty lists due t
 
 **Final Cloudflare Deployment Check:**
 Deployed the finalized 48 playlist tracks and multi-provider enhancements to the live Cloudflare environment.
+
+**Custom Components & Version Control Fixes:**
+Added `onTimeUpdate` and `seekTarget` to the YouTube looper action. This exports the raw playback tracking out to the main Svelte context.
+Implemented a kid-friendly video progress bar under the video, allowing visual tracking and dragging across the total video length.
+Included a new Settings menu (hidden behind the Teacher Verification Gate to prevent accidental resetting). Inside the settings, users can customize the UI theme color which is synced with `localStorage`. Finally, a "Force App Update" feature securely unregisters `vite-plugin-pwa` service workers to allow immediate cache eviction and reloads the browser, solving the strict PWA versioning issue gracefully.
+
+Deployed successfully to Cloudflare Pages `main` branch.

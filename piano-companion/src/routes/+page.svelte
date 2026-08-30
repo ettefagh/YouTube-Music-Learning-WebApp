@@ -23,6 +23,48 @@
   let mascotMessage = $state<string>('Welcome! Ready to play?');
   let showTeacherGate = $state<boolean>(false);
 
+  let showSettingsModal = $state(false);
+  let requiresSettingsUnlock = $state(false);
+
+  // Settings
+  let currentThemeColor = $state('#f4f0ec');
+
+  onMount(() => {
+    const savedTheme = localStorage.getItem('themeColor');
+    if (savedTheme) {
+        currentThemeColor = savedTheme;
+        document.body.style.backgroundColor = savedTheme;
+    }
+  });
+
+  function openSettings() {
+     if (!teacherAuth.isUnlocked) {
+        requiresSettingsUnlock = true;
+        showTeacherGate = true;
+     } else {
+        showSettingsModal = true;
+     }
+  }
+
+  function applyTheme(color: string) {
+      currentThemeColor = color;
+      localStorage.setItem('themeColor', color);
+      document.body.style.backgroundColor = color;
+  }
+
+  async function forceUpdateApp() {
+      if ('serviceWorker' in navigator) {
+          const registrations = await navigator.serviceWorker.getRegistrations();
+          for (let registration of registrations) {
+              await registration.unregister();
+          }
+          window.location.reload();
+      } else {
+          window.location.reload();
+      }
+  }
+
+
   // Layout states
   let isDropdownOpen = $state<boolean>(false);
 
@@ -31,6 +73,23 @@
   let selectedProvider = $state<string>('');
 
   let providerMode = $state<'video' | 'playlist'>('video');
+
+  let videoCurrentTime = $state(0);
+  let videoDuration = $state(0);
+  let videoSeekTarget = $state<number | null>(null);
+
+  function handleTimeUpdate(time: number, duration: number) {
+      videoCurrentTime = time;
+      videoDuration = duration;
+  }
+
+  function handleProgressClick(e: MouseEvent) {
+      const rect = (e.currentTarget as HTMLElement).getBoundingClientRect();
+      const clickX = e.clientX - rect.left;
+      const percentage = clickX / rect.width;
+      videoSeekTarget = percentage * videoDuration;
+  }
+
   const playlistId = 'PL10p3mlGiANOP_3RdrSZYv3kG5AzDmONh';
 
   // Instantiate two separate recording engines to fix logic flaw
@@ -108,6 +167,7 @@
 
   function handleTeacherRecord() {
     if (!teacherAuth.isUnlocked) {
+      requiresSettingsUnlock = false;
       showTeacherGate = true;
     } else {
       startTeacherRecord();
@@ -138,7 +198,13 @@
 
 <div class="cockpit-container">
 
-  <!-- Provider Selector (Lower visual hierarchy, placed above main header) -->
+
+  <div class="top-nav-bar">
+    <button class="neo-btn outline settings-btn" onclick={openSettings}>⚙️ Settings</button>
+  </div>
+
+  <!-- Provider Selector -->
+ (Lower visual hierarchy, placed above main header) -->
   <div class="provider-selector">
     <span class="provider-label">Provider:</span>
     <div class="provider-pill-group">
@@ -217,12 +283,28 @@
               playlistId: providerMode === 'playlist' ? (() => playlistId) : undefined,
               startTime: () => currentLesson!.startTime,
               endTime: providerMode === 'video' ? (() => currentLesson!.endTime) : (() => 0), // Loop full track on playlist
+
               playbackRate: () => playbackRate,
               isLooping: () => isLooping,
-              _trigger: [playbackRate, isLooping, currentLesson?.youtubeVideoId]
+              onTimeUpdate: handleTimeUpdate,
+              seekTarget: () => videoSeekTarget,
+              _trigger: [playbackRate, isLooping, currentLesson?.youtubeVideoId, videoSeekTarget]
             }}
             class="yt-frame"
           ></div>
+
+
+          <!-- Custom Kid-friendly Progress Bar -->
+          <div class="progress-container" role="button" tabindex="0" onclick={handleProgressClick} onkeydown={(e) => e.key === 'Enter' && handleProgressClick(e as any)}>
+            <div class="progress-bar-bg">
+                <div class="progress-bar-fill" style="width: {videoDuration ? (videoCurrentTime / videoDuration) * 100 : 0}%"></div>
+                <div class="progress-knob" style="left: {videoDuration ? (videoCurrentTime / videoDuration) * 100 : 0}%"></div>
+            </div>
+            <div class="time-readout">
+                <span>{Math.floor(videoCurrentTime / 60)}:{(Math.floor(videoCurrentTime % 60)).toString().padStart(2, '0')}</span>
+                <span>{Math.floor(videoDuration / 60)}:{(Math.floor(videoDuration % 60)).toString().padStart(2, '0')}</span>
+            </div>
+          </div>
 
           <div class="video-controls">
             <button class="control-btn {isLooping ? 'active' : ''}" onclick={() => isLooping = !isLooping}>
@@ -296,13 +378,51 @@
     </main>
   {/if}
 
+
+  {#if showSettingsModal}
+    <div class="modal-backdrop">
+      <div class="modal-content neo-card">
+        <h2>App Settings</h2>
+
+        <div class="setting-row">
+            <span class="label">Theme Color:</span>
+            <div class="theme-picker">
+                <button class="color-btn" aria-label="Theme Cream" style="background: #f4f0ec" onclick={() => applyTheme('#f4f0ec')}></button>
+                <button class="color-btn" aria-label="Theme Green" style="background: #E8F5E9" onclick={() => applyTheme('#E8F5E9')}></button>
+                <button class="color-btn" aria-label="Theme Blue" style="background: #E3F2FD" onclick={() => applyTheme('#E3F2FD')}></button>
+                <button class="color-btn" aria-label="Theme Pink" style="background: #FCE4EC" onclick={() => applyTheme('#FCE4EC')}></button>
+                <button class="color-btn" aria-label="Theme Yellow" style="background: #FFF9C4" onclick={() => applyTheme('#FFF9C4')}></button>
+            </div>
+        </div>
+
+        <div class="setting-row">
+            <span class="label">Force App Update (Clear Cache):</span>
+            <button class="neo-btn primary" onclick={forceUpdateApp}>Refresh App Version</button>
+        </div>
+
+        <button class="neo-btn outline" onclick={() => showSettingsModal = false}>Close</button>
+      </div>
+    </div>
+  {/if}
+
   {#if showTeacherGate}
     <TeacherGate
+
       onSuccess={() => {
         teacherAuth.unlock();
         showTeacherGate = false;
+        if (requiresSettingsUnlock) {
+            requiresSettingsUnlock = false;
+            showSettingsModal = true;
+        } else {
+            startTeacherRecord();
+        }
       }}
-      onCancel={() => showTeacherGate = false}
+      onCancel={() => {
+          showTeacherGate = false;
+          requiresSettingsUnlock = false;
+      }}
+
     />
   {/if}
 </div>
@@ -318,6 +438,53 @@
     margin: 0 auto;
     padding: 24px 16px;
     font-family: system-ui, -apple-system, sans-serif;
+  }
+
+
+  .top-nav-bar {
+      display: flex;
+      justify-content: flex-end;
+      margin-bottom: 16px;
+  }
+  .settings-btn {
+      width: auto;
+      margin-top: 0;
+      padding: 8px 16px;
+  }
+  .modal-backdrop {
+    position: fixed;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(0,0,0,0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 100;
+  }
+  .modal-content {
+    background: white;
+    padding: 24px;
+    max-width: 400px;
+    width: 90%;
+    font-family: system-ui, sans-serif;
+  }
+  .setting-row {
+      margin: 20px 0;
+  }
+  .setting-row label {
+      display: block;
+      font-weight: bold;
+      margin-bottom: 8px;
+  }
+  .theme-picker {
+      display: flex;
+      gap: 12px;
+  }
+  .color-btn {
+      width: 40px;
+      height: 40px;
+      border: 3px solid #000;
+      border-radius: 50%;
+      cursor: pointer;
   }
 
   /* Neo-brutalism Utilities */
@@ -524,6 +691,44 @@
   .tab-btn.active {
     background: #4CAF50;
     color: white;
+  }
+
+
+  /* Progress Bar */
+  .progress-container {
+    padding: 12px 16px;
+    background: #FFF;
+    border-bottom: 3px solid #000;
+    cursor: pointer;
+  }
+  .progress-bar-bg {
+    height: 16px;
+    background: #E0E0E0;
+    border: 3px solid #000;
+    border-radius: 8px;
+    position: relative;
+  }
+  .progress-bar-fill {
+    height: 100%;
+    background: #4CAF50;
+    width: 0%;
+  }
+  .progress-knob {
+    width: 24px;
+    height: 24px;
+    background: #FFB300;
+    border: 3px solid #000;
+    border-radius: 50%;
+    position: absolute;
+    top: 50%;
+    transform: translate(-50%, -50%);
+  }
+  .time-readout {
+    display: flex;
+    justify-content: space-between;
+    font-weight: 800;
+    margin-top: 8px;
+    font-size: 0.9rem;
   }
 
   /* Video Player */

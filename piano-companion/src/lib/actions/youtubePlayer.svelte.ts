@@ -6,6 +6,8 @@ export interface LooperOptions {
   playbackRate: () => number;
   isLooping: () => boolean;
   onReady?: () => void;
+  onTimeUpdate?: (time: number, duration: number) => void;
+  seekTarget?: () => number | null;
   _trigger?: any; // Used to force Svelte update hook
 }
 
@@ -19,6 +21,7 @@ declare global {
 export function youtubeLooper(node: HTMLElement, options: LooperOptions) {
   let player: any = null;
   let rafId: number | null = null;
+  let lastSeekTarget: number | null = null;
 
   function loadYouTubeAPI() {
     if (window.YT && window.YT.Player) {
@@ -32,7 +35,6 @@ export function youtubeLooper(node: HTMLElement, options: LooperOptions) {
       firstScriptTag.parentNode?.insertBefore(tag, firstScriptTag);
     }
 
-    // Save previous callback if it exists
     const previousCallback = window.onYouTubeIframeAPIReady;
     window.onYouTubeIframeAPIReady = () => {
         if (previousCallback) previousCallback();
@@ -84,14 +86,21 @@ export function youtubeLooper(node: HTMLElement, options: LooperOptions) {
     const earlySeekThreshold = 0.05;
 
     const checkTime = () => {
-      if (player && player.getCurrentTime && options.isLooping()) {
+      if (player && player.getCurrentTime) {
         const currentTime = player.getCurrentTime();
-        const start = options.startTime();
-        const end = options.endTime();
+        const duration = player.getDuration() || 0;
 
-        // Prevent seeking if end is 0 (i.e. default or unknown length)
-        if (end > 0 && (currentTime >= end - earlySeekThreshold || currentTime < start)) {
-          player.seekTo(start, true);
+        if (options.onTimeUpdate) {
+            options.onTimeUpdate(currentTime, duration);
+        }
+
+        if (options.isLooping()) {
+            const start = options.startTime();
+            const end = options.endTime();
+
+            if (end > 0 && (currentTime >= end - earlySeekThreshold || currentTime < start)) {
+              player.seekTo(start, true);
+            }
         }
       }
       rafId = requestAnimationFrame(checkTime);
@@ -119,19 +128,26 @@ export function youtubeLooper(node: HTMLElement, options: LooperOptions) {
   return {
     update(newOptions: LooperOptions) {
       options = newOptions;
+
+      // Handle programmatic seek from parent UI
+      if (options.seekTarget && player && player.seekTo) {
+          const target = options.seekTarget();
+          if (target !== null && target !== lastSeekTarget) {
+              player.seekTo(target, true);
+              lastSeekTarget = target;
+          }
+      }
+
       if (player && player.setPlaybackRate) {
         player.setPlaybackRate(options.playbackRate());
       }
+
       if (player && player.loadVideoById && options.videoId && options.videoId()) {
         const currentVideoUrl = player.getVideoUrl();
         const vId = options.videoId();
         if (vId && (!currentVideoUrl || !currentVideoUrl.includes(vId))) {
             player.loadVideoById(vId);
         }
-      }
-      if (player && player.loadPlaylist && options.playlistId && options.playlistId()) {
-          // Playlist updates usually handled by destroying and recreating the iframe
-          // but API provides cuePlaylist/loadPlaylist
       }
     },
     destroy() {
