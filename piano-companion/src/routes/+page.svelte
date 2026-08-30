@@ -1,6 +1,131 @@
 <script lang="ts">
+
   import { onMount } from 'svelte';
-  import { db, initDatabase, type LocalLesson, type LocalAudioTrack } from '$lib/db/db';
+  import { db, initDatabase, type LocalLesson, type LocalAudioTrack, type LocalBook } from '$lib/db/db';
+
+  let books = $state<LocalBook[]>([]);
+  let selectedBookId = $state<string>('');
+
+  let hideAudioTakes = $state<boolean>(false);
+  let pendingTeacherAction = $state<'edit' | 'record' | null>(null);
+
+  // Default Provider Setting
+  let defaultProvider = $state<string>('');
+
+  // Add Provider States
+  let showAddProviderModal = $state(false);
+  let newProviderName = $state('');
+  let newProviderType = $state<'list' | 'playlist' | 'chapters'>('list');
+  let newProviderInput = $state('');
+  let isAddingProvider = $state(false);
+  let addProviderError = $state('');
+
+  onMount(() => {
+    const savedDefault = localStorage.getItem('defaultProvider');
+    if (savedDefault) {
+        defaultProvider = savedDefault;
+    }
+  });
+
+  async function handleAddProvider() {
+      isAddingProvider = true;
+      addProviderError = '';
+
+      if (!newProviderName.trim() || !newProviderInput.trim() || !selectedBookId) {
+          addProviderError = 'Please fill out all fields.';
+          isAddingProvider = false;
+          return;
+      }
+
+      try {
+          const newLessons: LocalLesson[] = [];
+          const baseLessonParams = {
+              bookId: selectedBookId,
+              providerName: newProviderName,
+              startTime: 0,
+              endTime: 0,
+              checkpoints: ['User generated content'],
+              isCompleted: false
+          };
+
+          if (newProviderType === 'list') {
+              const ids = newProviderInput.split('\n').map(id => id.trim()).filter(id => id);
+              ids.forEach((videoId, index) => {
+                  newLessons.push({
+                      ...baseLessonParams,
+                      id: crypto.randomUUID(),
+                      title: `Custom Track ${index + 1}`,
+                      sequenceIndex: index + 1,
+                      youtubeVideoId: videoId
+                  });
+              });
+          } else if (newProviderType === 'playlist') {
+              const res = await fetch(`https://inv.nadeko.net/api/v1/playlists/${newProviderInput.trim()}`);
+              if (!res.ok) throw new Error('Failed to fetch playlist.');
+              const data = await res.json();
+              if (!data.videos) throw new Error('Playlist has no videos.');
+              data.videos.forEach((v: any, index: number) => {
+                  newLessons.push({
+                      ...baseLessonParams,
+                      id: crypto.randomUUID(),
+                      title: v.title,
+                      sequenceIndex: index + 1,
+                      youtubeVideoId: v.videoId
+                  });
+              });
+          } else if (newProviderType === 'chapters') {
+              const lines = newProviderInput.split('\n').map(l => l.trim()).filter(l => l);
+              const videoId = lines[0];
+              const chapterLines = lines.slice(1);
+
+              const timeToSeconds = (timeStr: string) => {
+                  const parts = timeStr.split(':').map(Number);
+                  if (parts.length === 3) return parts[0] * 3600 + parts[1] * 60 + parts[2];
+                  return parts[0] * 60 + parts[1];
+              };
+
+              const parsedChapters: Array<{time: string, title: string}> = [];
+              const regex = /(\d+:\d{2}(?::\d{2})?)\s+(.*)/;
+              for (const line of chapterLines) {
+                  const match = regex.exec(line);
+                  if (match) {
+                      parsedChapters.push({ time: match[1], title: match[2].trim() });
+                  }
+              }
+
+              parsedChapters.forEach((ch, index) => {
+                  const startTime = timeToSeconds(ch.time);
+                  const nextCh = parsedChapters[index + 1];
+                  const endTime = nextCh ? timeToSeconds(nextCh.time) : startTime + 120;
+                  newLessons.push({
+                      ...baseLessonParams,
+                      id: crypto.randomUUID(),
+                      title: ch.title,
+                      sequenceIndex: index + 1,
+                      youtubeVideoId: videoId,
+                      startTime,
+                      endTime
+                  });
+              });
+          }
+
+          if (newLessons.length > 0) {
+              await db.lessons.bulkPut(newLessons);
+              showAddProviderModal = false;
+              newProviderName = '';
+              newProviderInput = '';
+              await loadDataForSelectedBook();
+              selectProvider(newLessons[0].providerName);
+          } else {
+              addProviderError = 'No valid tracks could be generated.';
+          }
+      } catch (err: any) {
+          addProviderError = err.message || 'An error occurred parsing input.';
+      }
+      isAddingProvider = false;
+  }
+
+
   import { youtubeLooper } from '$lib/actions/youtubePlayer.svelte';
   import { AudioRecorderEngine } from '$lib/audio/audioRecorder.svelte';
   import { teacherAuth } from '$lib/stores/teacherAuth.svelte';
@@ -30,8 +155,8 @@
 
   function handleEditCheckpoints() {
       if (!teacherAuth.isUnlocked) {
+          pendingTeacherAction = 'edit';
           showTeacherGate = true;
-          // After unlock, the UI naturally reflects unlocked state, we just need to re-click or we can auto-trigger
       } else {
           isEditingCheckpoints = true;
           editCheckpointsText = currentLesson?.checkpoints.join('\n') || '';
@@ -118,18 +243,56 @@
   const studentRecorder = new AudioRecorderEngine();
   const teacherRecorder = new AudioRecorderEngine();
 
+
   onMount(async () => {
     await initDatabase();
-    allLessons = await db.lessons.orderBy('sequenceIndex').toArray();
+    books = await db.books.toArray();
+    if (books.length > 0) {
+        selectedBookId = books[0].id;
+    }
 
-    // Extract unique providers
+    const savedHideTakes = localStorage.getItem('hideAudioTakes');
+    if (savedHideTakes !== null) {
+        hideAudioTakes = savedHideTakes === 'true';
+    }
+
+    await loadDataForSelectedBook();
+  });
+
+  async function loadDataForSelectedBook() {
+    allLessons = await db.lessons.where('bookId').equals(selectedBookId).sortBy('sequenceIndex');
+
+    // Extract unique providers for this book
+
     const uniqueProviders = new Set(allLessons.map(l => l.providerName));
     providers = Array.from(uniqueProviders);
 
     if (providers.length > 0) {
-      selectProvider(providers[0]);
+      if (providers.includes(defaultProvider)) {
+          selectProvider(defaultProvider);
+      } else {
+          selectProvider(providers[0]);
+      }
+    } else {
+
+        lessons = [];
+        currentLesson = null;
     }
+  }
+
+  $effect(() => {
+     if (selectedBookId) {
+         loadDataForSelectedBook();
+     }
   });
+
+  function toggleCompletion() {
+      if (currentLesson) {
+          currentLesson.isCompleted = !currentLesson.isCompleted;
+          db.lessons.put($state.snapshot(currentLesson));
+      }
+  }
+
 
   function selectProvider(providerName: string) {
     selectedProvider = providerName;
@@ -189,7 +352,7 @@
 
   function handleTeacherRecord() {
     if (!teacherAuth.isUnlocked) {
-      requiresSettingsUnlock = false;
+      pendingTeacherAction = 'record';
       showTeacherGate = true;
     } else {
       startTeacherRecord();
@@ -252,7 +415,12 @@
         <span class="icon">🎹</span>
         <div class="title-area">
           <span class="subtitle">Tastenzauberei 1</span>
-          <h1 class="lesson-title">{currentLesson ? currentLesson.title : 'Loading...'}</h1>
+
+          <h1 class="lesson-title">
+             <input type="checkbox" class="completion-box" checked={currentLesson?.isCompleted} onclick={toggleCompletion} title="Mark as completed" />
+             {currentLesson ? currentLesson.title : 'Loading...'}
+          </h1>
+
         </div>
         <span class="dropdown-arrow" class:open={isDropdownOpen}>▼</span>
       </div>
@@ -322,6 +490,7 @@
           </div>
         </div>
       <!-- Dual Audio Studio -->
+      {#if !hideAudioTakes}
       <section class="audio-studio">
         <div class="track-card neo-card teacher-card">
           <h3>👩‍🏫 Teacher Reference</h3>
@@ -365,7 +534,7 @@
           {/if}
         </div>
       </section>
-
+      {/if}
 
       <!-- Checkpoints -->
       <section class="checkpoints neo-card highlight">
@@ -404,10 +573,100 @@
       <button class="neo-btn outline settings-btn" onclick={openSettings}>⚙️ Settings</button>
   </footer>
 
+
+  {#if showAddProviderModal}
+    <div class="modal-backdrop">
+      <div class="modal-content neo-card">
+        <h2>Add Custom Provider</h2>
+
+        <div class="setting-row">
+            <span class="label">Provider Name:</span>
+            <input type="text" bind:value={newProviderName} class="neo-input" placeholder="e.g. My Piano Teacher" />
+        </div>
+
+        <div class="setting-row">
+            <span class="label">Source Type:</span>
+            <select bind:value={newProviderType} class="neo-select">
+                <option value="list">List of Video IDs</option>
+                <option value="playlist">YouTube Playlist ID</option>
+                <option value="chapters">Bookmarked Video (Chapters)</option>
+            </select>
+        </div>
+
+        <div class="setting-row">
+            <span class="label">Source Input:</span>
+            {#if newProviderType === 'list'}
+                <p class="help-text">Enter one YouTube Video ID per line.</p>
+            {:else if newProviderType === 'playlist'}
+                <p class="help-text">Enter the YouTube Playlist ID (e.g. PL10p3mlGiAN...).</p>
+            {:else if newProviderType === 'chapters'}
+                <p class="help-text">First line: Video ID.<br/>Next lines: "MM:SS Chapter Title".</p>
+            {/if}
+            <textarea bind:value={newProviderInput} class="neo-textarea" rows="5"></textarea>
+        </div>
+
+        {#if addProviderError}
+            <p class="error">{addProviderError}</p>
+        {/if}
+
+        <div class="edit-actions">
+            <button class="neo-btn primary small-btn" onclick={handleAddProvider} disabled={isAddingProvider}>
+                {isAddingProvider ? 'Adding...' : 'Add Provider'}
+            </button>
+            <button class="neo-btn outline small-btn" onclick={() => showAddProviderModal = false}>Cancel</button>
+        </div>
+      </div>
+    </div>
+  {/if}
+
   {#if showSettingsModal}
     <div class="modal-backdrop">
       <div class="modal-content neo-card">
         <h2>App Settings</h2>
+
+
+        <div class="setting-row">
+            <span class="label">Select Book:</span>
+            <select bind:value={selectedBookId} class="neo-select">
+                {#each books as book}
+                    <option value={book.id}>{book.title}</option>
+                {/each}
+            </select>
+        </div>
+
+
+        <div class="setting-row">
+            <span class="label">Default Provider:</span>
+            <select bind:value={defaultProvider} class="neo-select" onchange={() => localStorage.setItem('defaultProvider', defaultProvider)}>
+                <option value="">(None)</option>
+                {#each providers as provider}
+                    <option value={provider}>{provider}</option>
+                {/each}
+            </select>
+        </div>
+
+        <div class="setting-row">
+            <span class="label">Add Custom Provider:</span>
+            <button class="neo-btn outline" onclick={() => showAddProviderModal = true}>➕ Add New Source</button>
+        </div>
+
+        <div class="setting-row">
+            <span class="label">Hide Audio Takes:</span>
+            <button
+                class="neo-btn {hideAudioTakes ? 'primary' : 'outline'}"
+                onclick={() => { hideAudioTakes = !hideAudioTakes; localStorage.setItem('hideAudioTakes', hideAudioTakes.toString()); }}
+            >
+                {hideAudioTakes ? 'Hidden' : 'Visible'}
+            </button>
+        </div>
+
+        <div class="setting-row">
+            <span class="label">Contact Curator:</span>
+            <p style="font-size: 0.85rem; margin-top: 4px;">Got a bug or a feature request?</p>
+            <a href="https://github.com/google-labs/piano-practice-companion/issues/new" target="_blank" class="neo-btn outline" style="display: block; text-align: center; text-decoration: none;">
+                Submit to GitHub
+            </a>
+        </div>
 
         <div class="setting-row">
             <span class="label">Theme Color:</span>
@@ -433,20 +692,24 @@
   {#if showTeacherGate}
     <TeacherGate
 
+
       onSuccess={() => {
         teacherAuth.unlock();
         showTeacherGate = false;
-        if (requiresSettingsUnlock) {
-            requiresSettingsUnlock = false;
-            showSettingsModal = true;
-        } else {
+
+        if (pendingTeacherAction === 'edit') {
+            isEditingCheckpoints = true;
+            editCheckpointsText = currentLesson?.checkpoints.join('\n') || '';
+        } else if (pendingTeacherAction === 'record') {
             startTeacherRecord();
         }
+        pendingTeacherAction = null;
       }}
       onCancel={() => {
           showTeacherGate = false;
-          requiresSettingsUnlock = false;
+          pendingTeacherAction = null;
       }}
+
 
     />
   {/if}
@@ -545,6 +808,41 @@
       padding-top: 24px;
   }
 
+
+  .neo-select {
+      width: 100%;
+      padding: 10px;
+      font-size: 1rem;
+      border: 3px solid #000;
+      border-radius: 8px;
+      margin-top: 8px;
+      background: white;
+  }
+  .completion-box {
+      width: 24px;
+      height: 24px;
+      cursor: pointer;
+      accent-color: #4CAF50;
+      vertical-align: middle;
+      margin-right: 8px;
+  }
+
+
+  .neo-input {
+      width: 100%;
+      padding: 10px;
+      font-size: 1rem;
+      border: 3px solid #000;
+      border-radius: 8px;
+      margin-top: 8px;
+      box-sizing: border-box;
+  }
+  .help-text {
+      font-size: 0.85rem;
+      color: #666;
+      margin: 4px 0 8px 0;
+  }
+
   /* Neo-brutalism Utilities */
   .neo-card {
     background: white;
@@ -605,7 +903,7 @@
   }
 
   .provider-pill {
-    background: #E0E0E0;
+    background: #212121;
     border: 2px solid #9E9E9E;
     border-radius: 16px;
     padding: 4px 12px;
@@ -733,7 +1031,7 @@
   }
   .progress-bar-bg {
     height: 16px;
-    background: #E0E0E0;
+    background: #212121;
     border: 3px solid #000;
     border-radius: 8px;
     position: relative;
@@ -782,7 +1080,7 @@
   }
 
   .control-btn {
-    background: #E0E0E0;
+    background: #212121;
     border: 3px solid #000;
     border-radius: 6px;
     padding: 8px 16px;

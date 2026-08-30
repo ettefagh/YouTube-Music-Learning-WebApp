@@ -1,5 +1,5 @@
 import Dexie, { type Table } from 'dexie';
-import { SEED_BOOK, SEED_LESSONS } from './seedData';
+import { SEED_BOOKS, SEED_LESSONS } from './seedData';
 
 export interface LocalBook {
   id: string;
@@ -55,14 +55,14 @@ export async function initDatabase() {
     await navigator.storage.persist();
   }
   const bookCount = await db.books.count();
-  if (bookCount === 0) {
-    await db.books.put(SEED_BOOK);
-    await db.lessons.bulkPut(SEED_LESSONS);
-  } else {
-    // If the database exists but doesn't have the new lessons yet (e.g. user updating app)
-    const vikaCount = await db.lessons.where('providerName').equals('VikaPiano').count();
-    if (vikaCount === 0) {
-       await db.lessons.bulkPut(SEED_LESSONS);
-    }
+  if (bookCount < 2) {
+    await db.books.bulkPut(SEED_BOOKS);
+  }
+
+  // Since we added so many tracks, force seed injection if lesson count is low
+  const lessonCount = await db.lessons.count();
+  if (lessonCount < 100) {
+      await db.lessons.clear();
+      await db.lessons.bulkPut(SEED_LESSONS);
   }
 }

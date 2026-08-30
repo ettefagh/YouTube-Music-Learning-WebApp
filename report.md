@@ -83,3 +83,8 @@ Moved the Neobrutalist Settings button from the header to a new static footer. A
 Finally, added an interactive Checkpoints / Learning Points edit mode. This is safely locked behind the Teacher Gate. Once unlocked, the user can toggle the text view into a `textarea` field, modify the instructions, and persist the updated checkpoints permanently back into Dexie IndexedDB.
 
 Deployed to the main branch via Cloudflare Pages.
+
+**Custom Providers & Default Settings Enhancement:**
+Created a comprehensive 'Add Custom Provider' UI in the Settings panel capable of parsing raw YouTube video lists, fetching full playlist configurations dynamically via the public Invidious API, and slicing bookmarked videos by chapter notation into multiple LocalLesson schema rows.
+Additionally, introduced the `defaultProvider` persistence layer utilizing `localStorage` and a new settings dropdown. This setting overrides the fallback ordering mechanism whenever the database re-loads for a selected book.
+Cloudflare deployment succeeded with 0 Svelte compilation errors.
