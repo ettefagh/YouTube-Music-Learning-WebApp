@@ -349,23 +349,20 @@
       mascotMessage = 'Awesome take! Listen to your sound!';
 
       const track: LocalAudioTrack = {
-        id: crypto.randomUUID(),
+        id: teacherTrack ? teacherTrack.id : crypto.randomUUID(),
         lessonId: currentLesson!.id,
-        trackType: 'student',
+        trackType: 'teacher',
         mimeType,
         durationSeconds: 0,
         createdAt: Date.now(),
         audioBlob: blob
       };
-
       await db.audioTracks.put(track);
-      studentTrack = track;
-      if (studentAudioUrl) URL.revokeObjectURL(studentAudioUrl);
-      studentAudioUrl = URL.createObjectURL(blob);
+      teacherTrack = track;
+      if (teacherAudioUrl) URL.revokeObjectURL(teacherAudioUrl);
+      teacherAudioUrl = URL.createObjectURL(blob);
     } else {
-      await studentRecorder.start();
-      mascotState = 'listening';
-      mascotMessage = 'Pip is listening to your piano!';
+      await teacherRecorder.start();
     }
   }
 
@@ -382,7 +379,7 @@
     if (teacherRecorder.isRecording) {
       const { blob, mimeType } = await teacherRecorder.stop();
       const track: LocalAudioTrack = {
-        id: crypto.randomUUID(),
+        id: teacherTrack ? teacherTrack.id : crypto.randomUUID(),
         lessonId: currentLesson!.id,
         trackType: 'teacher',
         mimeType,
@@ -594,7 +591,7 @@
 
 
   <footer class="neo-footer">
-      <button class="neo-btn outline settings-btn" onclick={openSettings}>⚙️ Settings</button>
+      <button class="settings-btn" onclick={openSettings}>⚙️ Settings</button>
   </footer>
 
 
@@ -1084,11 +1081,7 @@
   }
 
   /* Video Player */
-  .player-wrapper {
-    overflow: hidden;
-    margin-bottom: 24px;
-    background: #000;
-  }
+  .player-wrapper { background: #000; border-radius: 16px; overflow: hidden; margin-bottom: 24px; border: 3px solid #000; box-shadow: 4px 4px 0 #000; }
 
   .yt-frame {
     width: 100%;
@@ -1136,12 +1129,10 @@
     margin-bottom: 24px;
   }
 
-  .track-card {
-    padding: 16px;
-  }
+  .track-card { background: #90A4AE; padding: 16px; border-radius: 12px; border: 3px solid #000; box-shadow: 4px 4px 0 #000; display: flex; flex-direction: column; gap: 8px;}
 
   .teacher-card { background: #E3F2FD; }
-  .student-card { background: #FCE4EC; }
+  .student-card { background: #A5D6A7; }
 
   .track-card h3 {
     margin-top: 0;
@@ -1165,11 +1156,7 @@
   }
 
   /* Checkpoints */
-  .checkpoints {
-    padding: 20px;
-    margin-bottom: 24px;
-    background: #D1C4E9;
-  }
+  .checkpoints { background: #E1BEE7; padding: 16px 20px; border-radius: 12px; margin-bottom: 24px; border: 3px solid #000; box-shadow: 4px 4px 0 #000; }
   .checkpoints h3 {
     margin-top: 0;
     font-weight: 900;
@@ -1193,4 +1180,10 @@
     .audio-studio { grid-template-columns: 1fr; }
     .lesson-title { font-size: 1.4rem; }
   }
+
+  .top-nav select { padding: 8px 12px; border-radius: 8px; border: 3px solid #000; font-weight: bold; box-shadow: 2px 2px 0 #000; background: white; cursor: pointer; }
+
+  .settings-section { background: #E0E0E0; padding: 16px 20px; border-radius: 12px; margin-bottom: 24px; border: 3px solid #000; box-shadow: 4px 4px 0 #000; }
+  .settings-btn { width: 100%; padding: 12px; border: 3px solid #000; border-radius: 8px; background: #fff; color: #000; font-weight: bold; cursor: pointer; box-shadow: 2px 2px 0 #000; transition: transform 0.1s, box-shadow 0.1s; display: flex; align-items: center; justify-content: center; gap: 8px; }
+  .settings-btn:active { transform: translate(2px, 2px); box-shadow: 0 0 0 #000; }
 </style>

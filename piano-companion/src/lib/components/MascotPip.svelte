@@ -52,15 +52,7 @@
 </div>
 
 <style>
-  .mascot-card {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    padding: 10px 16px;
-    background: #FFF8E1;
-    border-radius: 20px;
-    border: 2px solid #FFE082;
-  }
+  .mascot-card { display: flex; align-items: center; gap: 16px; padding: 12px 20px; background: #FFF9C4; border-radius: 20px; border: 3px solid #000; box-shadow: 4px 4px 0 #000; margin-bottom: 24px; }
   .pip-svg {
     width: 60px;
     height: 60px;

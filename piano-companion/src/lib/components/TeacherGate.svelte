@@ -46,8 +46,8 @@
 
 <div class="modal-backdrop">
   <div class="modal-content">
-    <h2>Teacher Verification</h2>
-    <p>Please verify you are a teacher to record reference tracks.</p>
+    <h2 style="font-size: 1.5rem; margin-bottom: 8px;">Teacher Verification</h2>
+    <p style="margin-bottom: 24px; color: #333;">Please verify you are a teacher to record reference tracks.</p>
 
     <div class="tabs">
       <button class:active={mode === 'hold'} onclick={() => mode = 'hold'}>3-Second Hold</button>
@@ -94,55 +94,20 @@
   .modal-backdrop {
     position: fixed;
     top: 0; left: 0; width: 100%; height: 100%;
-    background: rgba(0,0,0,0.5);
+    background: rgba(0, 0, 0, 0.4); backdrop-filter: blur(2px);
     display: flex;
     justify-content: center;
     align-items: center;
     z-index: 100;
   }
-  .modal-content {
-    background: white;
-    padding: 24px;
-    border-radius: 12px;
-    max-width: 400px;
-    width: 90%;
-    text-align: center;
-    font-family: system-ui, sans-serif;
-  }
-  .tabs {
-    display: flex;
-    margin-bottom: 16px;
-    background: #f0f0f0;
-    border-radius: 8px;
-    overflow: hidden;
-  }
-  .tabs button {
-    flex: 1;
-    padding: 10px;
-    border: none;
-    background: none;
-    cursor: pointer;
-  }
-  .tabs button.active {
-    background: #FFB300;
-    font-weight: bold;
-  }
+  .modal-content { background: white; padding: 32px 24px; border-radius: 24px; max-width: 400px; width: 90%; text-align: center; font-family: system-ui, sans-serif; border: 3px solid #000; box-shadow: 4px 4px 0 #000; }
+  .tabs { display: flex; margin-bottom: 24px; background: #f0f0f0; border-radius: 12px; overflow: hidden; padding: 4px; gap: 4px; }
+  .tabs button { flex: 1; padding: 12px; border: none; background: transparent; cursor: pointer; border-radius: 8px; font-weight: 500; color: #555; transition: all 0.2s; }
+  .tabs button.active { background: #FFC107; font-weight: 600; color: white; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
   .hold-section, .math-section {
     margin: 20px 0;
   }
-  .hold-btn {
-    width: 100%;
-    padding: 20px;
-    font-size: 1.1rem;
-    background: #2196F3;
-    color: white;
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
-    position: relative;
-    overflow: hidden;
-    user-select: none;
-  }
+  .hold-btn { width: 100%; padding: 20px; font-size: 1.1rem; background: #2196F3; color: white; border: none; border-radius: 12px; cursor: pointer; position: relative; overflow: hidden; user-select: none; font-weight: 500; transition: transform 0.1s; } .hold-btn:active { transform: scale(0.98); }
   .progress-bar {
     position: absolute;
     top: 0; left: 0; height: 100%;

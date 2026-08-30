@@ -1,11 +1,10 @@
-<!doctype html>
-<html lang="en">
-	<head>
-		<meta charset="utf-8" />
-		<meta name="viewport" content="width=device-width, initial-scale=1" />
-		<meta name="text-scale" content="scale" />
-		%sveltekit.head%
+const fs = require('fs');
 
+// Injecting CSS variables for dark mode support in app.html
+let appHtml = fs.readFileSync('piano-companion/src/app.html', 'utf8');
+
+if (!appHtml.includes('--bg-color')) {
+    const styleInject = `
     <style>
       :root {
         --bg-color: #f7f7f7;
@@ -27,8 +26,8 @@
         transition: background-color 0.3s, color 0.3s;
       }
     </style>
-    </head>
-	<body data-sveltekit-preload-data="hover">
-		<div style="display: contents">%sveltekit.body%</div>
-	</body>
-</html>
+    `;
+    appHtml = appHtml.replace('</head>', styleInject + '</head>');
+    fs.writeFileSync('piano-companion/src/app.html', appHtml);
+}
+console.log("Added dark mode CSS vars");
