@@ -88,3 +88,8 @@ Deployed to the main branch via Cloudflare Pages.
 Created a comprehensive 'Add Custom Provider' UI in the Settings panel capable of parsing raw YouTube video lists, fetching full playlist configurations dynamically via the public Invidious API, and slicing bookmarked videos by chapter notation into multiple LocalLesson schema rows.
 Additionally, introduced the `defaultProvider` persistence layer utilizing `localStorage` and a new settings dropdown. This setting overrides the fallback ordering mechanism whenever the database re-loads for a selected book.
 Cloudflare deployment succeeded with 0 Svelte compilation errors.
+
+**PWA Onboarding and Asset Generation:**
+Completed the Progressive Web App requirements by creating valid `icon-192.png`, `icon-512.png` transparent graphics and an SVG generic piano `favicon.svg`.
+Developed the `OnboardingModal.svelte` component presenting a joyful 3-step carousel wizard to newly registered PWA users outlining the UI/UX flows. `localStorage` is used to flag when the modal is completed.
+Cloudflare deployment succeeded with 0 Svelte compilation errors.

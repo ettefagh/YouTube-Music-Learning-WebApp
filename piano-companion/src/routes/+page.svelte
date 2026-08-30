@@ -20,7 +20,9 @@
   let isAddingProvider = $state(false);
   let addProviderError = $state('');
 
+
   onMount(() => {
+
     const savedDefault = localStorage.getItem('defaultProvider');
     if (savedDefault) {
         defaultProvider = savedDefault;
@@ -130,6 +132,7 @@
   import { AudioRecorderEngine } from '$lib/audio/audioRecorder.svelte';
   import { teacherAuth } from '$lib/stores/teacherAuth.svelte';
   import MascotPip from '$lib/components/MascotPip.svelte';
+  import OnboardingModal from '$lib/components/OnboardingModal.svelte';
   import TeacherGate from '$lib/components/TeacherGate.svelte';
 
   let allLessons = $state<LocalLesson[]>([]);
@@ -176,7 +179,9 @@
   // Settings
   let currentThemeColor = $state('#f4f0ec');
 
+
   onMount(() => {
+
     const savedTheme = localStorage.getItem('themeColor');
     if (savedTheme) {
         currentThemeColor = savedTheme;
@@ -244,7 +249,15 @@
   const teacherRecorder = new AudioRecorderEngine();
 
 
+
+  let showOnboarding = $state(false);
+
   onMount(async () => {
+    const onboardingComplete = localStorage.getItem('onboardingComplete');
+    if (!onboardingComplete) {
+      showOnboarding = true;
+    }
+
     await initDatabase();
     books = await db.books.toArray();
     if (books.length > 0) {
@@ -285,6 +298,12 @@
          loadDataForSelectedBook();
      }
   });
+
+
+  function handleOnboardingComplete() {
+    localStorage.setItem('onboardingComplete', 'true');
+    showOnboarding = false;
+  }
 
   function toggleCompletion() {
       if (currentLesson) {
@@ -382,6 +401,11 @@
 </script>
 
 <div class="cockpit-container">
+
+  {#if showOnboarding}
+    <OnboardingModal onComplete={handleOnboardingComplete} />
+  {/if}
+
 
 
 
