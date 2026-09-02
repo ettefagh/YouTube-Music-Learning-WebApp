@@ -1,22 +1,26 @@
 Implemented the engineered scope for this issue.
 
-**Commit:** `9ae38c929f9514be9869049183537e0957dca7d3`
+**Commit:** `9f6e69b0ca2989a0cd67664cd9de3b6cc546eadf`
 
 **Files touched:**
 - `src/routes/+page.svelte`
-- `src/lib/components/TeacherGate.svelte`
-- `src/lib/components/MascotPip.svelte`
+- `src/lib/components/Metronome.svelte`
+- `src/lib/actions/youtubePlayer.svelte.ts`
+- `src/lib/audio/audioRecorder.svelte.ts`
 - `src/app.html`
 
 **Behavior verified:**
-- Added neo-brutalism design with thick borders and solid shadow styling (`box-shadow: 4px 4px 0 #000`) for the player frame, recording studio modules, setting panels, and `TeacherGate.svelte` modal, aligning with the visual design screenshots provided.
-- Adapted kid-friendly color palettes (`#FFB300`, `#90A4AE`, `#A5D6A7`, `#FF5252`, `#E1BEE7`, `#FFF9C4`) directly mapped to visual elements.
-- Implemented Dark Mode (`prefers-color-scheme: dark`) support via inline CSS overrides in `app.html` preserving contrast settings.
-- Corrected database indexing bug where repeated records in the same lesson accumulated untracked IDs; now ensures a strictly bound 1:1 local state map, keeping previous records intact (`studentTrack.id`).
+- **P0 Bug Fix**: Fixed student audio recording in `+page.svelte` that erroneously used teacher recorder engine and saved as teacher track type. Now correctly isolates `studentRecorder` and `studentTrack`.
+- **Practice Metronome**: Built dedicated precision Web Audio API metronome (`Metronome.svelte`) with variable BPM (40-208), tap tempo, time signatures (2/4, 3/4, 4/4, 6/8), and animated visual beat counter.
+- **Video Looper & Transport Bar**: Added Play/Pause toggle, 5s rewind/forward buttons, custom A/B looping markers with visual scrubber highlight, and variable practice speed presets (0.5x, 0.7x, 0.85x, 1.0x, 1.25x).
+- **Curriculum & Navigation**: Added top-level Book tabs (`Tastenzauberei Band 1` / `Band 2`), quick Prev/Next lesson navigation buttons, and a searchable lesson dropdown with completion badges.
+- **Audio Studio & Checkpoints**: Added live elapsed recording timers, track deletion, and interactive practice checkboxes that trigger Pip's celebration.
+- **Code Health**: Consolidated fragmented lifecycles and eliminated all unused CSS warnings.
 
 **Verification passed:**
-- `npm run check` — No typescript/svelte syntax errors.
-- `npm run build` — Successful Cloudflare SSG generation for `piano-practice-companion` project.
+- `npm run check` — 0 errors, 0 warnings.
+- `npm run build` — Successful Cloudflare Pages production bundle generation.
+- Playwright E2E verification — DOM and interaction verified on all components.
 
 **Docs updated:**
 - `README.md` — reviewed, no change needed.

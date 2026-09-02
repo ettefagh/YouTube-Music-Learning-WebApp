@@ -3,9 +3,11 @@ export class AudioRecorderEngine {
   private audioChunks: Blob[] = [];
   private audioCtx: AudioContext | null = null;
   private analyserNode: AnalyserNode | null = null;
+  private timerInterval: ReturnType<typeof setInterval> | null = null;
 
   isRecording = $state(false);
   volumeLevel = $state(0);
+  recordingSeconds = $state(0);
   activeMimeType = $state('audio/webm;codecs=opus');
 
   private detectBestMimeType(): string {
@@ -45,6 +47,14 @@ export class AudioRecorderEngine {
       if (e.data.size > 0) this.audioChunks.push(e.data);
     };
 
+    this.recordingSeconds = 0;
+    if (this.timerInterval) clearInterval(this.timerInterval);
+    this.timerInterval = setInterval(() => {
+      if (this.isRecording) {
+        this.recordingSeconds++;
+      }
+    }, 1000);
+
     this.mediaRecorder.start(100);
     this.isRecording = true;
   }
@@ -64,14 +74,25 @@ export class AudioRecorderEngine {
     requestAnimationFrame(update);
   }
 
-  async stop(): Promise<{ blob: Blob; mimeType: string }> {
+  async stop(): Promise<{ blob: Blob; mimeType: string; durationSeconds: number }> {
     return new Promise((resolve) => {
-      if (!this.mediaRecorder) return;
+      if (this.timerInterval) {
+        clearInterval(this.timerInterval);
+        this.timerInterval = null;
+      }
+      const finalDuration = this.recordingSeconds;
+
+      if (!this.mediaRecorder) {
+        this.isRecording = false;
+        resolve({ blob: new Blob([]), mimeType: this.activeMimeType, durationSeconds: finalDuration });
+        return;
+      }
+
       this.mediaRecorder.onstop = () => {
         const audioBlob = new Blob(this.audioChunks, { type: this.activeMimeType });
         this.isRecording = false;
         this.audioCtx?.close();
-        resolve({ blob: audioBlob, mimeType: this.activeMimeType });
+        resolve({ blob: audioBlob, mimeType: this.activeMimeType, durationSeconds: finalDuration });
       };
       this.mediaRecorder.stop();
       this.mediaRecorder.stream.getTracks().forEach((track) => track.stop());
