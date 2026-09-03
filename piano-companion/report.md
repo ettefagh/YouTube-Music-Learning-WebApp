@@ -1,29 +1,19 @@
 Implemented the engineered scope for this issue.
 
-**Commit:** `38db0efaf8da5a13111009ba557f520e6d86c68c`
+**Commit:** `a7e423537e20d31c6fdbce233cfeb278b33c7e89`
 
 **Files touched:**
+- `piano-companion/wrangler.toml`
 - `piano-companion/package.json`
-- `piano-companion/package-lock.json`
-- `piano-companion/vite.config.ts`
-- `piano-companion/svelte.config.js` (deleted)
-- `piano-companion/tsconfig.json`
-- `piano-companion/.gitignore`
-- `piano-companion/src/routes/+page.svelte`
-- `piano-companion/src/lib/components/ChapterTimeline.svelte`
-- `piano-companion/src/lib/index.ts`
 
 **Behavior verified:**
-- **SvelteKit 3 Upgrade & Architectural Compliance**: Successfully migrated codebase to SvelteKit 3 Release Candidate (`@sveltejs/kit@^3.0.0-next.0`) and Cloudflare Pages adapter (`@sveltejs/adapter-cloudflare@^8.0.0-next.0`).
-- **Unified Vite Configuration**: Eliminated legacy `svelte.config.js` and centralized SvelteKit preprocessing and Cloudflare Pages adapter configurations directly within `vite.config.ts`.
-- **Node.js Subpath Imports**: Migrated all internal module references from `$lib` to native Node.js subpath imports `#lib` in `package.json` and source files.
-- **TypeScript Alignment**: Extended `$app/tsconfig` in `tsconfig.json` for seamless type resolution under SvelteKit 3.
-- **Runtime & PWA Stability**: Maintained full PWA capability, Dexie IndexedDB client storage, Web Audio API synthesis, YouTube looper actions, and responsive layout.
+- **Cloudflare Pages Live Production Deployment**: Deployed fresh SvelteKit 3 production bundle (`.svelte-kit/cloudflare`) to Cloudflare Pages project `piano-practice-companion` on the production branch `main` (`https://piano-practice-companion.pages.dev`).
+- **Configuration & Project Alignment**: Updated `wrangler.toml` project name to `piano-practice-companion` aligning local CLI tooling with Cloudflare Pages project settings, and added a `"deploy"` script to `package.json`.
+- **Live Runtime Integrity & E2E Validation**: Executed automated Playwright E2E browser verification directly against `https://piano-practice-companion.pages.dev/`. Confirmed successful HTTP 200 responses, static bundle preloading, service worker manifest registration, responsive Neo-brutalist cockpit layout, lesson navigation, 54 interactive chapter segments, metronome activation, Teacher Gate math challenge resolution, and channels manager in Companion Settings.
 
 **Verification passed:**
-- `npm run check` — 0 errors, 0 warnings under SvelteKit 3 and Svelte 5.
-- `npm run build` — Clean production build compiled with Cloudflare Pages adapter.
-- Playwright E2E verification (`test-sveltekit3.js`) — Successfully validated header, Chapter Timeline, mode badges, metronome toggle, and Settings modal in the browser.
+- `curl -I -s https://piano-practice-companion.pages.dev` — Returned `HTTP/1.1 200 OK` with Cloudflare edge headers and SvelteKit page indicator (`x-sveltekit-page: true`).
+- `node test-cloudflare-live.js` — Live browser test passed 100% with 0 uncaught exceptions or runtime errors on Cloudflare Pages.
 
 **Docs updated:**
 - `README.md` — reviewed, no change needed.
