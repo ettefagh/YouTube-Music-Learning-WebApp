@@ -28,9 +28,17 @@
   } from '#lib/types/studentProfile.js';
   import { getEducatorInfo } from '#lib/types/educator.js';
 
-  // --- Multi-Screen YouTube Kids-Style Navigation ---
-  type ActiveScreen = 'hub' | 'player' | 'studio' | 'goals';
-  let activeScreen = $state<ActiveScreen>('hub');
+  // --- Sequential YouTube Kids-Style Navigation Flow ---
+  type ActiveScreen =
+    | 'splash'
+    | 'select-profile'
+    | 'select-book'
+    | 'select-teacher'
+    | 'select-lesson'
+    | 'player'
+    | 'studio'
+    | 'goals';
+  let activeScreen = $state<ActiveScreen>('splash');
 
   // --- Kid Profiles State ---
   let studentProfiles = $state<StudentProfile[]>(DEFAULT_STUDENT_PROFILES);
@@ -94,6 +102,12 @@
   let currentIndex = $derived(lessons.findIndex(l => l.id === currentLesson?.id));
   let hasPrevLesson = $derived(currentIndex > 0);
   let hasNextLesson = $derived(currentIndex >= 0 && currentIndex < lessons.length - 1);
+
+  // Per-profile state recall
+  let lastPracticedLesson = $derived.by(() => {
+    if (!activeProfile?.lastLessonId || allLessons.length === 0) return null;
+    return allLessons.find(l => l.id === activeProfile.lastLessonId) ?? null;
+  });
 
   // --- Player & Looper State ---
   let playerController = $state<YouTubePlayerController | null>(null);
@@ -199,11 +213,6 @@
       }
     }
 
-    const savedScreen = localStorage.getItem('activeScreen');
-    if (savedScreen && ['hub', 'player', 'studio', 'goals'].includes(savedScreen)) {
-      activeScreen = savedScreen as ActiveScreen;
-    }
-
     const savedProfiles = localStorage.getItem('student_profiles');
     if (savedProfiles) {
       try {
@@ -218,11 +227,41 @@
       activeProfileId = savedProfileId;
     }
 
+    const validScreens: ActiveScreen[] = [
+      'splash',
+      'select-profile',
+      'select-book',
+      'select-teacher',
+      'select-lesson',
+      'player',
+      'studio',
+      'goals'
+    ];
+    const savedScreen = localStorage.getItem('activeScreen');
+    if (savedScreen && validScreens.includes(savedScreen as ActiveScreen)) {
+      activeScreen = savedScreen as ActiveScreen;
+    } else {
+      activeScreen = 'splash';
+    }
+
     await initDatabase();
     books = await db.books.toArray();
     if (books.length > 0) {
-      selectedBookId = books[0].id;
+      if (activeProfile?.lastBookId && books.some(b => b.id === activeProfile.lastBookId)) {
+        selectedBookId = activeProfile.lastBookId;
+      } else {
+        selectedBookId = books[0].id;
+      }
       await loadDataForSelectedBook();
+      if (activeProfile?.lastProvider && providers.includes(activeProfile.lastProvider)) {
+        selectProvider(activeProfile.lastProvider);
+      }
+      if (activeProfile?.lastLessonId) {
+        const savedL = lessons.find(l => l.id === activeProfile.lastLessonId);
+        if (savedL) {
+          await selectLesson(savedL);
+        }
+      }
     }
 
     if (typeof document !== 'undefined') {
@@ -446,11 +485,72 @@
     }
   }
 
+  function saveProfilesToStorage() {
+    if (typeof localStorage !== 'undefined') {
+      localStorage.setItem('student_profiles', JSON.stringify($state.snapshot(studentProfiles)));
+      localStorage.setItem('active_profile_id', activeProfileId);
+    }
+  }
+
   function selectProfile(profileId: string) {
     activeProfileId = profileId;
     localStorage.setItem('active_profile_id', profileId);
     mascotState = 'cheering';
     mascotMessage = `Hi ${activeProfile.name}! Ready to practice piano? 🎹`;
+
+    if (activeProfile?.lastBookId && books.some(b => b.id === activeProfile.lastBookId)) {
+      selectedBookId = activeProfile.lastBookId;
+      loadDataForSelectedBook().then(() => {
+        if (activeProfile.lastProvider && providers.includes(activeProfile.lastProvider)) {
+          selectProvider(activeProfile.lastProvider);
+        }
+      });
+    }
+  }
+
+  async function selectProfileAndAdvance(profileId: string) {
+    selectProfile(profileId);
+    selectScreen('select-book');
+  }
+
+  async function selectBookAndAdvance(bookId: string) {
+    await selectBook(bookId);
+    if (activeProfile) {
+      activeProfile.lastBookId = bookId;
+      saveProfilesToStorage();
+    }
+    selectScreen('select-teacher');
+  }
+
+  function selectTeacherAndAdvance(provider: string) {
+    selectProvider(provider);
+    if (activeProfile) {
+      activeProfile.lastProvider = provider;
+      saveProfilesToStorage();
+    }
+    selectScreen('select-lesson');
+  }
+
+  async function selectLessonAndPlay(lesson: LocalLesson) {
+    await selectLesson(lesson);
+    if (activeProfile) {
+      activeProfile.lastBookId = selectedBookId;
+      activeProfile.lastProvider = selectedProvider;
+      activeProfile.lastLessonId = lesson.id;
+      activeProfile.lastPracticedAt = Date.now();
+      saveProfilesToStorage();
+    }
+    selectScreen('player');
+  }
+
+  function resumeLastPractice() {
+    if (lastPracticedLesson) {
+      selectLessonAndPlay(lastPracticedLesson);
+    } else if (lessons.length > 0) {
+      selectLessonAndPlay(lessons[0]);
+    } else {
+      selectScreen('select-profile');
+    }
   }
 
   function addStudentProfile() {
@@ -463,15 +563,14 @@
       createdAt: Date.now()
     };
     studentProfiles = [...studentProfiles, newProfile];
-    localStorage.setItem('student_profiles', JSON.stringify(studentProfiles));
+    saveProfilesToStorage();
     selectProfile(newProfile.id);
     newProfileName = '';
     showAddProfileModal = false;
   }
 
   function playLessonFromHub(lesson: LocalLesson) {
-    selectLesson(lesson);
-    selectScreen('player');
+    selectLessonAndPlay(lesson);
   }
 
   function toggleSection(sectionKey: string) {
@@ -843,187 +942,365 @@
     <OnboardingModal onComplete={() => { localStorage.setItem('onboardingComplete', 'true'); showOnboarding = false; }} />
   {/if}
 
-  <!-- Kids Top App Header -->
-  <header class="kids-top-header">
-    <button class="kids-brand-btn" onclick={() => selectScreen('hub')}>
-      <span class="brand-piano-icon">🎹</span>
-      <div class="brand-text-col">
-        <span class="brand-title">Piano Companion</span>
-        <span class="kids-pill-badge">KIDS</span>
-      </div>
-    </button>
-
-    <!-- Active Profile Badge / Switcher -->
-    <button
-      class="active-profile-chip"
-      onclick={() => selectScreen('hub')}
-      title="Switch Kid Profile"
-    >
-      <div class="avatar-bubble" style="background-color: {activeProfile.color}">
-        <span class="avatar-emoji">{getAvatarEmoji(activeProfile.avatarKey)}</span>
-      </div>
-      <div class="profile-info-col">
-        <span class="profile-name">{activeProfile.name}</span>
-        <span class="profile-switch-tag">Switch 🔄</span>
-      </div>
-    </button>
-
-    <div class="top-bar-right">
-      <button class="top-gear-btn" onclick={openSettings} title="Settings & Teacher Controls">
-        ⚙️
+  {#if activeScreen !== 'splash'}
+    <!-- Kids Top App Header -->
+    <header class="kids-top-header">
+      <button class="kids-brand-btn" onclick={() => selectScreen('splash')}>
+        <span class="brand-piano-icon">🎹</span>
+        <div class="brand-text-col">
+          <span class="brand-title">Piano Companion</span>
+          <span class="kids-pill-badge">KIDS</span>
+        </div>
       </button>
-    </div>
-  </header>
 
-  <!-- ================= SCREEN 1: Welcome & Library Hub ================= -->
-  {#if activeScreen === 'hub'}
-    <div class="screen-hub">
-      <!-- Mascot Welcome Banner -->
-      <MascotPip state={mascotState} message={mascotMessage} />
-
-      <!-- Section 1: Who's Practicing? Profile Selector -->
-      <section class="hub-card-section neo-card">
-        <div class="section-title-bar">
-          <span class="section-emoji">👑</span>
-          <h2>Who's Practicing Today?</h2>
+      <!-- Active Profile Badge / Switcher -->
+      <button
+        class="active-profile-chip"
+        onclick={() => selectScreen('select-profile')}
+        title="Switch Kid Profile"
+      >
+        <div class="avatar-bubble" style="background-color: {activeProfile.color}">
+          <span class="avatar-emoji">{getAvatarEmoji(activeProfile.avatarKey)}</span>
         </div>
-        <div class="profiles-carousel">
-          {#each studentProfiles as profile}
-            <button
-              class="profile-bubble-card {activeProfileId === profile.id ? 'active' : ''}"
-              onclick={() => selectProfile(profile.id)}
-            >
-              <div class="bubble-circle" style="background-color: {profile.color}">
-                <span class="bubble-emoji">{getAvatarEmoji(profile.avatarKey)}</span>
-                {#if activeProfileId === profile.id}
-                  <span class="crown-badge">👑</span>
-                {/if}
+        <div class="profile-info-col">
+          <span class="profile-name">{activeProfile.name}</span>
+          <span class="profile-switch-tag">Switch 🔄</span>
+        </div>
+      </button>
+
+      <div class="top-bar-right">
+        <button class="top-gear-btn" onclick={openSettings} title="Settings & Teacher Controls">
+          ⚙️
+        </button>
+      </div>
+    </header>
+
+    <!-- Interactive Top Breadcrumbs Bar -->
+    {#if activeScreen !== 'select-profile'}
+      <nav class="kids-breadcrumbs-bar neo-card">
+        <button class="crumb-chip" onclick={() => selectScreen('select-profile')} title="Switch Kid Profile">
+          <span class="crumb-avatar" style="background-color: {activeProfile.color}">
+            {getAvatarEmoji(activeProfile.avatarKey)}
+          </span>
+          <span class="crumb-text">{activeProfile.name}</span>
+        </button>
+
+        <span class="crumb-arrow">›</span>
+
+        <button
+          class="crumb-chip {activeScreen === 'select-book' ? 'current' : ''}"
+          onclick={() => selectScreen('select-book')}
+          title="Change Book"
+        >
+          <span class="crumb-icon">📖</span>
+          <span class="crumb-text">{currentBook?.title ?? 'Book'}</span>
+        </button>
+
+        {#if selectedProvider}
+          <span class="crumb-arrow">›</span>
+          <button
+            class="crumb-chip {activeScreen === 'select-teacher' ? 'current' : ''}"
+            onclick={() => selectScreen('select-teacher')}
+            title="Change Teacher"
+          >
+            <span class="crumb-icon">📺</span>
+            <span class="crumb-text">{selectedProvider.replace(/\s*\(.*?\)/, '')}</span>
+          </button>
+        {/if}
+
+        {#if currentLesson}
+          <span class="crumb-arrow">›</span>
+          <button
+            class="crumb-chip {activeScreen === 'select-lesson' ? 'current' : ''}"
+            onclick={() => selectScreen('select-lesson')}
+            title="Change Song"
+          >
+            <span class="crumb-icon">🎵</span>
+            <span class="crumb-text">#{currentLesson.sequenceIndex} {currentLesson.title}</span>
+          </button>
+        {/if}
+      </nav>
+    {/if}
+  {/if}
+
+  <!-- ================= SCREEN 0: Splash Intro (Initiate State) ================= -->
+  {#if activeScreen === 'splash'}
+    <div class="screen-splash">
+      <div class="splash-hero-card neo-card">
+        <div class="splash-logo-wrap">
+          <img src="/favicon.svg" alt="Piano Companion Kids" class="splash-app-logo" />
+        </div>
+
+        <h1 class="splash-title">Piano Companion <span class="kids-tag">KIDS</span></h1>
+        <p class="splash-subtitle">Learn piano with fun YouTube masterclasses & practice checkpoints!</p>
+
+        <!-- Mascot Pip Greeting -->
+        <MascotPip
+          state={lastPracticedLesson ? 'cheering' : 'idle'}
+          message={lastPracticedLesson ? `Welcome back, ${activeProfile.name}! 🌟 Ready to practice "${lastPracticedLesson.title}"?` : `Hi! Welcome to Piano Companion. Let's make practice super fun! 🎹`}
+        />
+
+        <!-- Smart 1-Tap Resume Card (State Recall) -->
+        {#if lastPracticedLesson}
+          <div class="resume-hero-box neo-card">
+            <div class="resume-eyebrow-row">
+              <span class="resume-dot-badge"></span>
+              <span class="resume-eyebrow">CONTINUE WHERE YOU LEFT OFF</span>
+            </div>
+            <div class="resume-main-row">
+              <div class="resume-avatar-badge" style="background-color: {activeProfile.color}">
+                {getAvatarEmoji(activeProfile.avatarKey)}
               </div>
-              <span class="bubble-name">{profile.name}</span>
+              <div class="resume-text-col">
+                <h3 class="resume-song-title">#{lastPracticedLesson.sequenceIndex} {lastPracticedLesson.title}</h3>
+                <span class="resume-book-name">{currentBook?.title ?? ''} • {selectedProvider}</span>
+              </div>
+            </div>
+            <button class="resume-action-btn neo-btn" onclick={resumeLastPractice}>
+              <span class="btn-play-icon">▶</span>
+              <span class="btn-main-label">Resume Practice</span>
+              <span class="btn-emoji-tag">🚀</span>
+            </button>
+          </div>
+        {/if}
+
+        <!-- Primary Start / Navigate Funnel Buttons -->
+        <div class="splash-action-row">
+          <button
+            class="start-funnel-btn neo-btn {!lastPracticedLesson ? 'primary-loud' : 'secondary-soft'}"
+            onclick={() => selectScreen('select-profile')}
+          >
+            {#if lastPracticedLesson}
+              📚 Switch Kid / Book / Song
+            {:else}
+              🎹 Let's Start Practicing!
+            {/if}
+          </button>
+        </div>
+      </div>
+    </div>
+
+  <!-- ================= SCREEN 1: Step 1: Who's Practicing? (Profile Picker) ================= -->
+  {:else if activeScreen === 'select-profile'}
+    <div class="screen-step screen-select-profile">
+      <div class="step-nav-bar">
+        <button class="step-back-btn" onclick={() => selectScreen('splash')}>
+          ← Back to Intro
+        </button>
+        <span class="step-counter-pill">Step 1 of 4</span>
+      </div>
+
+      <div class="step-hero-header">
+        <span class="step-emoji-hero">👑</span>
+        <h1 class="step-main-title">Who's Practicing Today?</h1>
+        <p class="step-sub-instruction">Tap your animal avatar to start playing!</p>
+      </div>
+
+      <div class="profiles-full-grid">
+        {#each studentProfiles as profile}
+          <button
+            class="profile-jumbo-card neo-card {activeProfileId === profile.id ? 'selected-kid' : ''}"
+            onclick={() => selectProfileAndAdvance(profile.id)}
+          >
+            <div class="jumbo-bubble-circle" style="background-color: {profile.color}">
+              <span class="jumbo-avatar-emoji">{getAvatarEmoji(profile.avatarKey)}</span>
               {#if activeProfileId === profile.id}
-                <span class="bubble-active-pill">Playing</span>
+                <span class="jumbo-crown-badge">👑</span>
               {/if}
-            </button>
-          {/each}
-
-          <button class="add-kid-btn" onclick={() => showAddProfileModal = true}>
-            <div class="add-circle">➕</div>
-            <span class="bubble-name">Add Kid</span>
+            </div>
+            <h2 class="jumbo-kid-name">{profile.name}</h2>
+            {#if activeProfileId === profile.id}
+              <span class="jumbo-active-pill">Playing Now</span>
+            {:else}
+              <span class="jumbo-tap-pill">Tap to Play</span>
+            {/if}
           </button>
-        </div>
-      </section>
+        {/each}
 
-      <!-- Section 2: Choose Your Piano Book -->
-      <section class="hub-card-section neo-card">
-        <div class="section-title-bar">
-          <span class="section-emoji">📚</span>
-          <h2>1. Choose Your Book</h2>
-        </div>
-        <div class="bookshelf-row">
-          {#each books as book}
-            <button
-              class="book-shelf-card {selectedBookId === book.id ? 'selected' : ''}"
-              onclick={() => selectBook(book.id)}
-            >
-              <div class="book-cover-art">
-                <span class="book-art-icon">📖</span>
-                <span class="book-art-publisher">{book.publisher}</span>
-              </div>
-              <div class="book-meta-col">
-                <h3 class="book-name">{book.title}</h3>
-                <span class="book-song-count">
-                  {allLessons.filter(l => l.bookId === book.id).length} pieces available
-                </span>
-                {#if selectedBookId === book.id}
-                  <span class="book-active-badge">✓ Selected</span>
-                {/if}
-              </div>
-            </button>
-          {/each}
-        </div>
-      </section>
-
-      <!-- Section 3: Pick Your YouTube Teacher -->
-      <section class="hub-card-section neo-card">
-        <div class="section-title-bar between">
-          <div class="title-with-icon">
-            <span class="section-emoji">📺</span>
-            <h2>2. Pick Your YouTube Teacher</h2>
-          </div>
-          <button class="add-source-btn" onclick={() => showAddProviderModal = true}>
-            + Add Channel
-          </button>
-        </div>
-        <div class="educator-grid">
-          {#each providers as provider}
-            {@const pLessons = allLessons.filter(l => l.providerName === provider)}
-            {@const pType = detectListType(pLessons, provider)}
-            {@const ed = getEducatorInfo(provider)}
-            <button
-              class="educator-card {selectedProvider === provider ? 'selected' : ''}"
-              onclick={() => selectProvider(provider)}
-            >
-              <div class="educator-avatar-wrap" style="background-color: {ed.avatarBgColor}">
-                <span class="educator-emoji">{ed.avatarEmoji}</span>
-              </div>
-              <div class="educator-content">
-                <div class="educator-header-row">
-                  <span class="educator-display-name">{ed.educatorName}</span>
-                  <span class="type-pill-badge {pType}">
-                    {pType === 'chapters' ? '🔖 Chapters' : pType === 'playlist' ? '📑 Playlist' : '🎬 Singles'}
-                  </span>
-                </div>
-                <p class="educator-bio-text">{ed.description}</p>
-                <div class="educator-footer-row">
-                  <span class="ed-handle">{ed.channelHandle}</span>
-                  <span class="ed-count">{pLessons.length} lessons</span>
-                </div>
-              </div>
-            </button>
-          {/each}
-        </div>
-      </section>
-
-      <!-- Section 4: Pick a Song to Practice -->
-      <section class="hub-card-section neo-card">
-        <div class="section-title-bar between">
-          <div class="title-with-icon">
-            <span class="section-emoji">🎹</span>
-            <h2>3. Pick a Song to Practice</h2>
-          </div>
-          <span class="songs-total-pill">{lessons.length} Pieces</span>
-        </div>
-
-        <div class="songs-hub-grid">
-          {#each lessons as l}
-            <button
-              class="song-hub-card {currentLesson?.id === l.id ? 'current' : ''}"
-              onclick={() => playLessonFromHub(l)}
-            >
-              <div class="song-num-col">#{l.sequenceIndex}</div>
-              <div class="song-details-col">
-                <h4 class="song-title-text">{l.title}</h4>
-                {#if currentListType === 'chapters' && l.endTime > 0}
-                  <span class="song-time-text">Chapter: {formatTime(l.startTime)} → {formatTime(l.endTime)}</span>
-                {/if}
-              </div>
-              <div class="song-status-col">
-                <span class="song-star">{l.isCompleted ? '⭐' : '○'}</span>
-                <span class="song-play-btn">Play ▶</span>
-              </div>
-            </button>
-          {/each}
-        </div>
-      </section>
+        <!-- Add Kid Card -->
+        <button class="add-kid-jumbo-card neo-card" onclick={() => showAddProfileModal = true}>
+          <div class="add-jumbo-circle">➕</div>
+          <h2 class="jumbo-kid-name">Add Kid</h2>
+          <span class="jumbo-tap-pill">Create Profile</span>
+        </button>
+      </div>
     </div>
 
-  <!-- ================= SCREEN 2: Dedicated Player Stage ================= -->
+  <!-- ================= SCREEN 2: Step 2: Choose Your Book ================= -->
+  {:else if activeScreen === 'select-book'}
+    <div class="screen-step screen-select-book">
+      <div class="step-nav-bar">
+        <button class="step-back-btn" onclick={() => selectScreen('select-profile')}>
+          ← Change Kid ({activeProfile.name})
+        </button>
+        <span class="step-counter-pill">Step 2 of 4</span>
+      </div>
+
+      <div class="step-hero-header">
+        <span class="step-emoji-hero">📚</span>
+        <h1 class="step-main-title">Choose Your Piano Book</h1>
+        <p class="step-sub-instruction">Pick the book that matches the sheet music on your piano!</p>
+      </div>
+
+      <div class="books-full-grid">
+        {#each books as book}
+          <button
+            class="book-jumbo-card neo-card {selectedBookId === book.id ? 'selected-book' : ''}"
+            onclick={() => selectBookAndAdvance(book.id)}
+          >
+            <div class="book-jumbo-cover">
+              <span class="book-icon-hero">📖</span>
+              <span class="book-pub-badge">{book.publisher}</span>
+            </div>
+            <div class="book-jumbo-body">
+              <h2 class="book-jumbo-title">{book.title}</h2>
+              <span class="book-pieces-badge">
+                {allLessons.filter(l => l.bookId === book.id).length} Pieces Available
+              </span>
+              {#if selectedBookId === book.id}
+                <span class="book-selected-pill">✓ Selected Book</span>
+              {:else}
+                <span class="book-tap-pill">Select This Book ➡️</span>
+              {/if}
+            </div>
+          </button>
+        {/each}
+      </div>
+    </div>
+
+  <!-- ================= SCREEN 3: Step 3: Pick Your YouTube Teacher ================= -->
+  {:else if activeScreen === 'select-teacher'}
+    <div class="screen-step screen-select-teacher">
+      <div class="step-nav-bar between">
+        <button class="step-back-btn" onclick={() => selectScreen('select-book')}>
+          ← Change Book ({currentBook?.title ?? 'Book'})
+        </button>
+        <span class="step-counter-pill">Step 3 of 4</span>
+      </div>
+
+      <div class="step-hero-header">
+        <span class="step-emoji-hero">📺</span>
+        <h1 class="step-main-title">Pick Your YouTube Teacher</h1>
+        <p class="step-sub-instruction">Choose your favorite YouTube masterclass instructor!</p>
+      </div>
+
+      <div class="teachers-full-grid">
+        {#each providers as provider}
+          {@const pLessons = allLessons.filter(l => l.providerName === provider)}
+          {@const pType = detectListType(pLessons, provider)}
+          {@const ed = getEducatorInfo(provider)}
+          {@const isPipPick = provider.includes('Anikó Drabon')}
+          <button
+            class="teacher-jumbo-card neo-card {selectedProvider === provider ? 'selected-teacher' : ''} {isPipPick ? 'pip-pick-highlight' : ''}"
+            onclick={() => selectTeacherAndAdvance(provider)}
+          >
+            {#if isPipPick}
+              <div class="pip-pick-banner">⭐ Pip's Recommended Pick</div>
+            {/if}
+            <div class="teacher-avatar-col" style="background-color: {ed.avatarBgColor}">
+              <span class="teacher-avatar-icon">{ed.avatarEmoji}</span>
+            </div>
+            <div class="teacher-jumbo-content">
+              <div class="teacher-title-row">
+                <h3 class="teacher-jumbo-name">{ed.educatorName}</h3>
+                <span class="type-pill-badge {pType}">
+                  {pType === 'chapters' ? '🔖 Bookmarks' : pType === 'playlist' ? '📑 Playlist' : '🎬 Singles'}
+                </span>
+              </div>
+              <p class="teacher-jumbo-bio">{ed.description}</p>
+              <div class="teacher-footer-row">
+                <span class="teacher-handle">{ed.channelHandle}</span>
+                <span class="teacher-lessons-count">{pLessons.length} lessons</span>
+                <span class="teacher-select-pill">Practice with {ed.educatorName.split(' ')[0]} ➡️</span>
+              </div>
+            </div>
+          </button>
+        {/each}
+      </div>
+
+      <div class="add-custom-channel-row">
+        <button class="add-channel-full-btn neo-btn" onclick={() => showAddProviderModal = true}>
+          + Add Custom YouTube Channel or Playlist
+        </button>
+      </div>
+    </div>
+
+  <!-- ================= SCREEN 4: Step 4: Pick a Song to Play ================= -->
+  {:else if activeScreen === 'select-lesson'}
+    <div class="screen-step screen-select-lesson">
+      <div class="step-nav-bar between">
+        <button class="step-back-btn" onclick={() => selectScreen('select-teacher')}>
+          ← Change Teacher ({selectedProvider.replace(/\s*\(.*?\)/, '')})
+        </button>
+        <span class="step-counter-pill">Step 4 of 4</span>
+      </div>
+
+      <div class="step-hero-header">
+        <span class="step-emoji-hero">🎵</span>
+        <h1 class="step-main-title">Pick a Piece to Practice</h1>
+        <p class="step-sub-instruction">{currentBook?.title ?? ''} • {selectedProvider}</p>
+      </div>
+
+      <!-- Continue where you left off hero card if in this list -->
+      {#if lastPracticedLesson && lessons.some(l => l.id === lastPracticedLesson?.id)}
+        <div class="continue-lesson-card neo-card">
+          <div class="continue-badge-row">
+            <span class="continue-badge">⭐ LAST PRACTICED PIECE</span>
+          </div>
+          <div class="continue-content-row">
+            <div class="continue-num">#{lastPracticedLesson.sequenceIndex}</div>
+            <div class="continue-text-col">
+              <h3>{lastPracticedLesson.title}</h3>
+              <span>Ready to keep perfecting this piece?</span>
+            </div>
+            <button class="continue-play-now-btn neo-btn" onclick={() => selectLessonAndPlay(lastPracticedLesson!)}>
+              Continue Playing ▶
+            </button>
+          </div>
+        </div>
+      {/if}
+
+      <!-- Search and Count Row -->
+      <div class="lesson-search-bar-row neo-card">
+        <input
+          type="text"
+          class="lesson-search-input"
+          placeholder="🔍 Search song title or piece #..."
+          bind:value={lessonSearch}
+        />
+        <span class="lesson-count-badge">{filteredLessons.length} Songs</span>
+      </div>
+
+      <!-- Songs List Grid -->
+      <div class="lessons-full-grid">
+        {#each filteredLessons as l}
+          <button
+            class="song-step-card neo-card {currentLesson?.id === l.id ? 'current-song' : ''}"
+            onclick={() => selectLessonAndPlay(l)}
+          >
+            <div class="song-step-num">#{l.sequenceIndex}</div>
+            <div class="song-step-info">
+              <h4 class="song-step-title">{l.title}</h4>
+              {#if currentListType === 'chapters' && l.endTime > 0}
+                <span class="song-step-time">Chapter: {formatTime(l.startTime)} → {formatTime(l.endTime)}</span>
+              {/if}
+            </div>
+            <div class="song-step-action">
+              <span class="song-step-star">{l.isCompleted ? '⭐' : '○'}</span>
+              <span class="song-step-play-btn">Play ▶</span>
+            </div>
+          </button>
+        {/each}
+      </div>
+    </div>
+
+  <!-- ================= SCREEN 5: Dedicated Player Stage ================= -->
   {:else if activeScreen === 'player'}
     <div class="screen-player">
       {#if currentLesson}
         <!-- Top Lesson Header Strip -->
         <div class="player-header-strip neo-card">
-          <button class="back-to-hub-btn" onclick={() => selectScreen('hub')}>
+          <button class="back-to-hub-btn" onclick={() => selectScreen('select-lesson')}>
             ← 📚 Change Song
           </button>
           <div class="player-song-title-wrap">
@@ -1289,7 +1566,7 @@
           <span class="empty-icon">🎹</span>
           <h3>No Song Selected</h3>
           <p>Choose a book and piece from your library to start practicing!</p>
-          <button class="action-btn primary-btn" onclick={() => selectScreen('hub')}>
+          <button class="action-btn primary-btn" onclick={() => selectScreen('select-lesson')}>
             📚 Go to Library
           </button>
         </div>
@@ -1485,7 +1762,7 @@
           <span class="empty-icon">🎯</span>
           <h3>No Song Selected</h3>
           <p>Choose a piece from the library to track your practice goals.</p>
-          <button class="action-btn primary-btn" onclick={() => selectScreen('hub')}>
+          <button class="action-btn primary-btn" onclick={() => selectScreen('select-lesson')}>
             📚 Go to Library
           </button>
         </div>
@@ -1494,52 +1771,54 @@
   {/if}
 
   <!-- Universal Kid-Friendly Bottom Navigation Dock -->
-  <nav class="kids-bottom-dock neo-border">
-    <button
-      class="dock-btn {activeScreen === 'hub' ? 'active' : ''}"
-      onclick={() => selectScreen('hub')}
-    >
-      <span class="dock-icon">📚</span>
-      <span class="dock-label">Library</span>
-    </button>
+  {#if activeScreen !== 'splash'}
+    <nav class="kids-bottom-dock neo-border">
+      <button
+        class="dock-btn {['select-profile', 'select-book', 'select-teacher', 'select-lesson'].includes(activeScreen) ? 'active' : ''}"
+        onclick={() => selectScreen('select-lesson')}
+      >
+        <span class="dock-icon">📚</span>
+        <span class="dock-label">Library</span>
+      </button>
 
-    <button
-      class="dock-btn {activeScreen === 'player' ? 'active' : ''}"
-      onclick={() => selectScreen('player')}
-    >
-      <span class="dock-icon">🎹</span>
-      <span class="dock-label">Practice</span>
-      {#if currentLesson}
-        <span class="dock-pill-indicator"></span>
-      {/if}
-    </button>
-
-    <button
-      class="dock-btn {activeScreen === 'studio' ? 'active' : ''}"
-      onclick={() => selectScreen('studio')}
-    >
-      <span class="dock-icon">🎙️</span>
-      <span class="dock-label">Studio</span>
-      {#if studentTrack}
-        <span class="dock-badge-success">✓</span>
-      {/if}
-    </button>
-
-    <button
-      class="dock-btn {activeScreen === 'goals' ? 'active' : ''}"
-      onclick={() => selectScreen('goals')}
-    >
-      <span class="dock-icon">🎯</span>
-      <span class="dock-label">Goals</span>
-      {#if currentLesson}
-        {@const activeLesson = currentLesson}
-        {@const completedCount = Object.keys(completedCheckpoints).filter(k => k.startsWith(activeLesson.id) && completedCheckpoints[k]).length}
-        {#if completedCount > 0}
-          <span class="dock-badge-stars">{completedCount}⭐</span>
+      <button
+        class="dock-btn {activeScreen === 'player' ? 'active' : ''}"
+        onclick={() => selectScreen('player')}
+      >
+        <span class="dock-icon">🎹</span>
+        <span class="dock-label">Practice</span>
+        {#if currentLesson}
+          <span class="dock-pill-indicator"></span>
         {/if}
-      {/if}
-    </button>
-  </nav>
+      </button>
+
+      <button
+        class="dock-btn {activeScreen === 'studio' ? 'active' : ''}"
+        onclick={() => selectScreen('studio')}
+      >
+        <span class="dock-icon">🎙️</span>
+        <span class="dock-label">Studio</span>
+        {#if studentTrack}
+          <span class="dock-badge-success">✓</span>
+        {/if}
+      </button>
+
+      <button
+        class="dock-btn {activeScreen === 'goals' ? 'active' : ''}"
+        onclick={() => selectScreen('goals')}
+      >
+        <span class="dock-icon">🎯</span>
+        <span class="dock-label">Goals</span>
+        {#if currentLesson}
+          {@const activeLesson = currentLesson}
+          {@const completedCount = Object.keys(completedCheckpoints).filter(k => k.startsWith(activeLesson.id) && completedCheckpoints[k]).length}
+          {#if completedCount > 0}
+            <span class="dock-badge-stars">{completedCount}⭐</span>
+          {/if}
+        {/if}
+      </button>
+    </nav>
+  {/if}
 
   <!-- Footer Controls -->
   <footer class="neo-footer">
@@ -3732,438 +4011,795 @@
     line-height: 1.1;
   }
 
-  .profile-switch-tag {
-    font-size: 0.65rem;
-    font-weight: 800;
-    color: #666;
+  /* ================= TOP BREADCRUMBS BAR ================= */
+  .kids-breadcrumbs-bar {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 14px;
+    background: #ffffff;
+    border-radius: 12px;
+    overflow-x: auto;
+    white-space: nowrap;
+    -webkit-overflow-scrolling: touch;
+    margin-bottom: 4px;
   }
 
-  .top-gear-btn {
+  .crumb-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: #F5F5F5;
+    border: 2px solid #000;
+    border-radius: 8px;
+    padding: 4px 10px;
+    font-size: 0.82rem;
+    font-weight: 800;
+    cursor: pointer;
+    box-shadow: 1.5px 1.5px 0 #000;
+    transition: transform 0.1s ease, background 0.15s ease;
+    flex-shrink: 0;
+  }
+
+  .crumb-chip:active {
+    transform: translate(1px, 1px);
+    box-shadow: 0.5px 0.5px 0 #000;
+  }
+
+  .crumb-chip.current {
+    background: #FFF9C4;
+    border-color: #E65100;
+  }
+
+  .crumb-avatar {
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    border: 1.5px solid #000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.85rem;
+  }
+
+  .crumb-icon {
+    font-size: 0.95rem;
+  }
+
+  .crumb-text {
+    color: #121212;
+    max-width: 140px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .crumb-arrow {
+    font-weight: 900;
+    font-size: 1.1rem;
+    color: #888;
+    user-select: none;
+    flex-shrink: 0;
+  }
+
+  /* ================= SCREEN 0: Splash Intro Styles ================= */
+  .screen-splash {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 72vh;
+    padding: 20px 10px;
+  }
+
+  .splash-hero-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    max-width: 640px;
+    width: 100%;
+    padding: 36px 24px;
+    background: #ffffff;
+    border-radius: 24px;
+    gap: 16px;
+  }
+
+  .splash-logo-wrap {
+    width: 110px;
+    height: 110px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    margin-bottom: 4px;
+  }
+
+  .splash-app-logo {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    filter: drop-shadow(4px 4px 0 #000);
+    animation: bounceLogo 3s infinite ease-in-out;
+  }
+
+  @keyframes bounceLogo {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-8px); }
+  }
+
+  .splash-title {
+    margin: 0;
+    font-size: 2.1rem;
+    font-weight: 900;
+    color: #121212;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .splash-subtitle {
+    margin: 0;
+    font-size: 1rem;
+    color: #555;
+    font-weight: 700;
+    max-width: 480px;
+  }
+
+  .resume-hero-box {
+    width: 100%;
+    background: #E8F5E9;
+    border: 3px solid #2E7D32;
+    border-radius: 16px;
+    padding: 16px 20px;
+    text-align: left;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    box-shadow: 4px 4px 0 #2E7D32;
+    margin-top: 6px;
+  }
+
+  .resume-eyebrow-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .resume-dot-badge {
+    width: 10px;
+    height: 10px;
+    background: #4CAF50;
+    border-radius: 50%;
+    border: 1.5px solid #000;
+    animation: pulseDot 1.5s infinite;
+  }
+
+  @keyframes pulseDot {
+    0%, 100% { transform: scale(1); opacity: 1; }
+    50% { transform: scale(1.3); opacity: 0.7; }
+  }
+
+  .resume-eyebrow {
+    font-size: 0.75rem;
+    font-weight: 900;
+    color: #2E7D32;
+    letter-spacing: 0.05em;
+  }
+
+  .resume-main-row {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+
+  .resume-avatar-badge {
+    width: 52px;
+    height: 52px;
+    border-radius: 50%;
+    border: 2.5px solid #000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.8rem;
+    box-shadow: 2px 2px 0 #000;
+    flex-shrink: 0;
+  }
+
+  .resume-text-col {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+  }
+
+  .resume-song-title {
+    margin: 0 0 2px 0;
+    font-size: 1.2rem;
+    font-weight: 900;
+    color: #121212;
+  }
+
+  .resume-book-name {
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: #444;
+  }
+
+  .resume-action-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    background: #4CAF50;
+    color: #ffffff;
+    font-size: 1.15rem;
+    font-weight: 900;
+    padding: 14px 20px;
+    border-radius: 12px;
+    cursor: pointer;
+    width: 100%;
+    margin-top: 4px;
+    transition: transform 0.1s ease;
+  }
+
+  .resume-action-btn:active {
+    transform: translate(2px, 2px);
+  }
+
+  .splash-action-row {
+    width: 100%;
+    margin-top: 8px;
+  }
+
+  .start-funnel-btn {
+    width: 100%;
+    padding: 14px 20px;
+    border-radius: 12px;
+    font-size: 1.1rem;
+    font-weight: 900;
+    cursor: pointer;
+    transition: transform 0.1s ease;
+  }
+
+  .start-funnel-btn.primary-loud {
+    background: #FFCA28;
+    color: #121212;
+  }
+
+  .start-funnel-btn.secondary-soft {
+    background: #FFF9C4;
+    color: #121212;
+  }
+
+  /* ================= COMMON STEP SCREEN STYLES ================= */
+  .screen-step {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    padding-bottom: 24px;
+    animation: fadeInStep 0.2s ease-out;
+  }
+
+  @keyframes fadeInStep {
+    from { opacity: 0; transform: translateY(6px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .step-nav-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+  }
+
+  .step-back-btn {
     background: #ffffff;
     border: 2px solid #000;
     border-radius: 10px;
-    width: 38px;
-    height: 38px;
-    font-size: 1.1rem;
+    padding: 8px 14px;
+    font-weight: 900;
+    font-size: 0.85rem;
     cursor: pointer;
     box-shadow: 2px 2px 0 #000;
+    transition: transform 0.1s ease;
   }
 
-  .top-gear-btn:active {
+  .step-back-btn:active {
     transform: translate(1px, 1px);
     box-shadow: 1px 1px 0 #000;
   }
 
-  /* ================= SCREEN 1: Hub Styles ================= */
-  .screen-hub {
+  .step-counter-pill {
+    background: #FFF9C4;
+    border: 2px solid #000;
+    border-radius: 20px;
+    padding: 4px 12px;
+    font-size: 0.8rem;
+    font-weight: 900;
+    box-shadow: 1.5px 1.5px 0 #000;
+  }
+
+  .step-hero-header {
+    text-align: center;
+    padding: 10px 0 6px 0;
+  }
+
+  .step-emoji-hero {
+    font-size: 2.4rem;
+    display: inline-block;
+    margin-bottom: 4px;
+  }
+
+  .step-main-title {
+    margin: 0 0 6px 0;
+    font-size: 1.7rem;
+    font-weight: 900;
+    color: #121212;
+  }
+
+  .step-sub-instruction {
+    margin: 0;
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: #555;
+  }
+
+  /* ================= STEP 1: PROFILES GRID ================= */
+  .profiles-full-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 18px;
+  }
+
+  .profile-jumbo-card {
     display: flex;
     flex-direction: column;
-    gap: 20px;
-    padding-bottom: 20px;
+    align-items: center;
+    padding: 24px 16px;
+    border-radius: 18px;
+    background: #ffffff;
+    cursor: pointer;
+    gap: 12px;
+    text-align: center;
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
   }
 
-  .hub-card-section {
-    padding: 18px 20px;
+  .profile-jumbo-card:active {
+    transform: translate(2px, 2px);
+    box-shadow: 2px 2px 0 #000;
   }
 
-  .section-title-bar {
+  .profile-jumbo-card.selected-kid {
+    background: #FFF8E1;
+    border-color: #E65100;
+    box-shadow: 5px 5px 0 #E65100;
+  }
+
+  .jumbo-bubble-circle {
+    width: 88px;
+    height: 88px;
+    border-radius: 50%;
+    border: 4px solid #000;
     display: flex;
     align-items: center;
-    gap: 10px;
-    margin-bottom: 14px;
+    justify-content: center;
+    position: relative;
+    box-shadow: 3px 3px 0 #000;
   }
 
-  .section-title-bar.between {
-    justify-content: space-between;
-    flex-wrap: wrap;
-    gap: 8px;
+  .jumbo-avatar-emoji {
+    font-size: 2.8rem;
   }
 
-  .title-with-icon {
-    display: flex;
-    align-items: center;
-    gap: 10px;
+  .jumbo-crown-badge {
+    position: absolute;
+    top: -10px;
+    right: -8px;
+    font-size: 1.4rem;
+    filter: drop-shadow(1px 1px 0 #000);
   }
 
-  .section-title-bar h2 {
+  .jumbo-kid-name {
     margin: 0;
     font-size: 1.25rem;
     font-weight: 900;
     color: #121212;
   }
 
-  .section-emoji {
-    font-size: 1.4rem;
-  }
-
-  .add-source-btn {
-    background: #FFF9C4;
-    border: 2px solid #000;
-    border-radius: 8px;
-    font-weight: 800;
-    font-size: 0.8rem;
-    padding: 6px 12px;
-    cursor: pointer;
-    box-shadow: 1.5px 1.5px 0 #000;
-  }
-
-  .songs-total-pill {
-    background: #E8F5E9;
-    border: 1.5px solid #2E7D32;
-    color: #2E7D32;
-    border-radius: 8px;
-    font-size: 0.75rem;
-    font-weight: 800;
-    padding: 4px 10px;
-  }
-
-  /* Profile Carousel */
-  .profiles-carousel {
-    display: flex;
-    gap: 18px;
-    overflow-x: auto;
-    padding: 8px 4px 12px 4px;
-    align-items: flex-start;
-  }
-
-  .profile-bubble-card {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 6px;
-    background: none;
-    border: none;
-    cursor: pointer;
-    padding: 4px;
-    flex-shrink: 0;
-  }
-
-  .bubble-circle {
-    width: 68px;
-    height: 68px;
-    border-radius: 50%;
-    border: 3.5px solid #000;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 2.2rem;
-    position: relative;
-    box-shadow: 3px 3px 0 #000;
-    transition: transform 0.15s ease, box-shadow 0.15s ease;
-  }
-
-  .profile-bubble-card.active .bubble-circle {
-    transform: scale(1.08);
-    box-shadow: 0 0 0 4px #FFD54F, 4px 4px 0 #000;
-  }
-
-  .crown-badge {
-    position: absolute;
-    top: -8px;
-    right: -6px;
-    font-size: 1.2rem;
-    filter: drop-shadow(1px 1px 0 #000);
-  }
-
-  .bubble-name {
-    font-weight: 900;
-    font-size: 0.95rem;
-    color: #121212;
-  }
-
-  .bubble-active-pill {
-    font-size: 0.65rem;
-    font-weight: 900;
+  .jumbo-active-pill {
     background: #4CAF50;
     color: #ffffff;
-    padding: 2px 8px;
-    border-radius: 8px;
-    border: 1px solid #000;
+    border: 1.5px solid #000;
+    border-radius: 12px;
+    padding: 4px 12px;
+    font-size: 0.75rem;
+    font-weight: 900;
   }
 
-  .add-kid-btn {
+  .jumbo-tap-pill {
+    background: #F0F0F0;
+    color: #333;
+    border: 1.5px solid #000;
+    border-radius: 12px;
+    padding: 4px 12px;
+    font-size: 0.75rem;
+    font-weight: 800;
+  }
+
+  .add-kid-jumbo-card {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 6px;
-    background: none;
-    border: none;
+    justify-content: center;
+    padding: 24px 16px;
+    border-radius: 18px;
+    background: #FAFAFA;
+    border: 3px dashed #666;
     cursor: pointer;
-    padding: 4px;
-    flex-shrink: 0;
+    gap: 12px;
+    text-align: center;
   }
 
-  .add-circle {
-    width: 68px;
-    height: 68px;
+  .add-jumbo-circle {
+    width: 88px;
+    height: 88px;
     border-radius: 50%;
     border: 3px dashed #666;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 1.8rem;
-    background: #F5F5F5;
+    font-size: 2.4rem;
+    background: #ffffff;
   }
 
-  /* Bookshelf */
-  .bookshelf-row {
+  /* ================= STEP 2: BOOKS GRID ================= */
+  .books-full-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-    gap: 16px;
+    gap: 20px;
   }
 
-  .book-shelf-card {
+  .book-jumbo-card {
     display: flex;
-    gap: 16px;
-    background: #FFF8E1;
-    border: 3px solid #000;
-    border-radius: 14px;
-    padding: 14px;
+    gap: 18px;
+    padding: 20px;
+    border-radius: 18px;
+    background: #ffffff;
     cursor: pointer;
-    box-shadow: 4px 4px 0 #000;
     text-align: left;
-    transition: transform 0.1s ease, background 0.15s ease;
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
   }
 
-  .book-shelf-card:active {
+  .book-jumbo-card:active {
     transform: translate(2px, 2px);
     box-shadow: 2px 2px 0 #000;
   }
 
-  .book-shelf-card.selected {
-    background: #FFF59D;
+  .book-jumbo-card.selected-book {
+    background: #FFF8E1;
     border-color: #E65100;
-    box-shadow: 4px 4px 0 #E65100;
+    box-shadow: 5px 5px 0 #E65100;
   }
 
-  .book-cover-art {
-    width: 68px;
-    height: 88px;
+  .book-jumbo-cover {
+    width: 84px;
+    height: 110px;
     background: #FF7043;
-    border: 2.5px solid #000;
-    border-radius: 8px;
+    border: 3px solid #000;
+    border-radius: 10px;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    padding: 6px;
+    padding: 8px;
     color: #fff;
     text-align: center;
-    box-shadow: 2px 2px 0 #000;
+    box-shadow: 2.5px 2.5px 0 #000;
     flex-shrink: 0;
   }
 
-  .book-art-icon {
-    font-size: 1.8rem;
+  .book-icon-hero {
+    font-size: 2.4rem;
   }
 
-  .book-art-publisher {
-    font-size: 0.55rem;
-    font-weight: 800;
+  .book-pub-badge {
+    font-size: 0.6rem;
+    font-weight: 900;
     text-transform: uppercase;
     margin-top: 4px;
     line-height: 1.1;
   }
 
-  .book-meta-col {
+  .book-jumbo-body {
     display: flex;
     flex-direction: column;
     justify-content: center;
+    gap: 6px;
     min-width: 0;
   }
 
-  .book-name {
-    margin: 0 0 4px 0;
-    font-size: 1.1rem;
+  .book-jumbo-title {
+    margin: 0;
+    font-size: 1.3rem;
     font-weight: 900;
     color: #121212;
   }
 
-  .book-song-count {
-    font-size: 0.8rem;
+  .book-pieces-badge {
+    font-size: 0.85rem;
     font-weight: 800;
     color: #555;
   }
 
-  .book-active-badge {
-    display: inline-block;
-    margin-top: 8px;
-    font-size: 0.75rem;
-    font-weight: 900;
+  .book-selected-pill {
     background: #4CAF50;
-    color: #fff;
-    padding: 2px 8px;
-    border-radius: 6px;
-    border: 1px solid #000;
+    color: #ffffff;
+    border: 1.5px solid #000;
+    border-radius: 8px;
+    padding: 4px 10px;
+    font-size: 0.8rem;
+    font-weight: 900;
     width: fit-content;
+    margin-top: 4px;
   }
 
-  /* Educator Grid */
-  .educator-grid {
+  .book-tap-pill {
+    background: #FFCA28;
+    color: #121212;
+    border: 1.5px solid #000;
+    border-radius: 8px;
+    padding: 4px 10px;
+    font-size: 0.8rem;
+    font-weight: 900;
+    width: fit-content;
+    margin-top: 4px;
+  }
+
+  /* ================= STEP 3: TEACHERS GRID ================= */
+  .teachers-full-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(290px, 1fr));
-    gap: 14px;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: 18px;
   }
 
-  .educator-card {
+  .teacher-jumbo-card {
     display: flex;
-    gap: 14px;
+    gap: 16px;
+    padding: 20px;
+    border-radius: 18px;
     background: #ffffff;
-    border: 2.5px solid #000;
-    border-radius: 14px;
-    padding: 14px;
     cursor: pointer;
-    box-shadow: 3px 3px 0 #000;
     text-align: left;
-    transition: transform 0.1s ease;
+    position: relative;
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
   }
 
-  .educator-card:active {
-    transform: translate(1px, 1px);
+  .teacher-jumbo-card:active {
+    transform: translate(2px, 2px);
     box-shadow: 2px 2px 0 #000;
   }
 
-  .educator-card.selected {
-    background: #E8F5E9;
-    border-color: #2E7D32;
-    box-shadow: 4px 4px 0 #2E7D32;
+  .teacher-jumbo-card.pip-pick-highlight {
+    background: #FFFDE7;
+    border-color: #F57F17;
   }
 
-  .educator-avatar-wrap {
-    width: 56px;
-    height: 56px;
+  .pip-pick-banner {
+    position: absolute;
+    top: -12px;
+    right: 18px;
+    background: #FFD54F;
+    border: 2px solid #000;
+    border-radius: 12px;
+    padding: 2px 10px;
+    font-size: 0.75rem;
+    font-weight: 900;
+    box-shadow: 1.5px 1.5px 0 #000;
+  }
+
+  .teacher-avatar-col {
+    width: 64px;
+    height: 64px;
     border-radius: 50%;
-    border: 2.5px solid #000;
+    border: 3px solid #000;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 1.8rem;
-    box-shadow: 2px 2px 0 #000;
+    font-size: 2rem;
+    box-shadow: 2.5px 2.5px 0 #000;
     flex-shrink: 0;
   }
 
-  .educator-content {
+  .teacher-jumbo-content {
     display: flex;
     flex-direction: column;
-    min-width: 0;
     flex: 1;
+    min-width: 0;
   }
 
-  .educator-header-row {
+  .teacher-title-row {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    gap: 6px;
-    margin-bottom: 4px;
+    gap: 8px;
+    margin-bottom: 6px;
   }
 
-  .educator-display-name {
+  .teacher-jumbo-name {
+    margin: 0;
+    font-size: 1.15rem;
     font-weight: 900;
-    font-size: 0.95rem;
     color: #121212;
   }
 
-  .educator-bio-text {
-    font-size: 0.75rem;
+  .teacher-jumbo-bio {
+    margin: 0 0 10px 0;
+    font-size: 0.8rem;
     color: #555;
-    margin: 0 0 6px 0;
-    line-height: 1.3;
+    line-height: 1.35;
     font-weight: 600;
   }
 
-  .educator-footer-row {
+  .teacher-footer-row {
     display: flex;
+    align-items: center;
     justify-content: space-between;
-    font-size: 0.7rem;
-    font-weight: 800;
-    color: #777;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-top: auto;
   }
 
-  .type-pill-badge {
-    font-size: 0.65rem;
+  .teacher-handle {
+    font-size: 0.75rem;
+    font-weight: 800;
+    color: #666;
+  }
+
+  .teacher-lessons-count {
+    font-size: 0.75rem;
     font-weight: 900;
-    padding: 2px 6px;
+    color: #2E7D32;
+    background: #E8F5E9;
+    padding: 2px 8px;
     border-radius: 6px;
     border: 1px solid #000;
   }
 
-  .type-pill-badge.chapters {
+  .teacher-select-pill {
+    font-size: 0.75rem;
+    font-weight: 900;
+    color: #121212;
     background: #FFF9C4;
-    color: #F57F17;
+    padding: 3px 8px;
+    border-radius: 6px;
+    border: 1.5px solid #000;
   }
 
-  .type-pill-badge.playlist {
-    background: #E1BEE7;
-    color: #7B1FA2;
+  .add-custom-channel-row {
+    display: flex;
+    justify-content: center;
+    margin-top: 4px;
   }
 
-  .type-pill-badge.singles {
-    background: #E0F2F1;
-    color: #00796B;
+  .add-channel-full-btn {
+    background: #ffffff;
+    font-size: 0.95rem;
+    font-weight: 800;
+    padding: 12px 20px;
+    border-radius: 12px;
+    cursor: pointer;
   }
 
-  /* Songs Hub Grid */
-  .songs-hub-grid {
+  /* ================= STEP 4: SONGS LIST GRID ================= */
+  .continue-lesson-card {
+    background: #E8F5E9;
+    border: 2.5px solid #2E7D32;
+    border-radius: 16px;
+    padding: 14px 18px;
+    box-shadow: 3.5px 3.5px 0 #2E7D32;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .continue-badge {
+    background: #2E7D32;
+    color: #ffffff;
+    font-size: 0.7rem;
+    font-weight: 900;
+    padding: 2px 8px;
+    border-radius: 6px;
+  }
+
+  .continue-content-row {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    flex-wrap: wrap;
+  }
+
+  .continue-num {
+    font-size: 1.4rem;
+    font-weight: 900;
+    background: #C8E6C9;
+    border: 2px solid #000;
+    border-radius: 8px;
+    padding: 4px 10px;
+  }
+
+  .continue-text-col {
+    flex: 1;
+    min-width: 160px;
+  }
+
+  .continue-text-col h3 {
+    margin: 0;
+    font-size: 1.15rem;
+    font-weight: 900;
+  }
+
+  .continue-text-col span {
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: #444;
+  }
+
+  .continue-play-now-btn {
+    background: #4CAF50;
+    color: #ffffff;
+    font-size: 0.95rem;
+    font-weight: 900;
+    padding: 10px 16px;
+    border-radius: 10px;
+    cursor: pointer;
+  }
+
+  .lesson-search-bar-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 16px;
+    background: #ffffff;
+    border-radius: 14px;
+  }
+
+  .lesson-search-input {
+    flex: 1;
+    border: 2px solid #000;
+    border-radius: 10px;
+    padding: 8px 12px;
+    font-size: 0.95rem;
+    font-weight: 700;
+    outline: none;
+  }
+
+  .lesson-count-badge {
+    background: #E8F5E9;
+    border: 1.5px solid #2E7D32;
+    color: #2E7D32;
+    border-radius: 8px;
+    font-size: 0.8rem;
+    font-weight: 900;
+    padding: 6px 12px;
+    white-space: nowrap;
+  }
+
+  .lessons-full-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-    gap: 10px;
+    gap: 12px;
   }
 
-  .song-hub-card {
+  .song-step-card {
     display: flex;
     align-items: center;
     gap: 12px;
     background: #ffffff;
-    border: 2px solid #000;
-    border-radius: 12px;
+    border: 2.5px solid #000;
+    border-radius: 14px;
     padding: 12px 14px;
     cursor: pointer;
-    box-shadow: 2px 2px 0 #000;
-    text-align: left;
-    transition: transform 0.1s ease;
-  }
-
-  .song-hub-card:active {
-    transform: translate(1px, 1px);
-    box-shadow: 1px 1px 0 #000;
-  }
-
-  .song-hub-card.current {
-    background: #FFFDE7;
-    border-color: #E65100;
-  }
-
-  .song-num-col {
-    font-size: 1rem;
-    font-weight: 900;
-    color: #666;
-    width: 32px;
-    flex-shrink: 0;
-  }
-
-  .song-details-col {
-    flex: 1;
-    min-width: 0;
-  }
-
-  .song-title-text {
-    margin: 0;
-    font-size: 0.95rem;
-    font-weight: 900;
-    color: #121212;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-
-  .song-time-text {
-    font-size: 0.7rem;
-    font-weight: 700;
-    color: #888;
-  }
-
-  .song-status-col {
-    display: flex;
     align-items: center;
     gap: 8px;
     flex-shrink: 0;

@@ -26,6 +26,11 @@ export interface StudentProfile {
   avatarKey: KidAvatarKey;
   color: string;
   createdAt: number;
+  // Per-profile session recall pointers
+  lastBookId?: string;
+  lastProvider?: string;
+  lastLessonId?: string;
+  lastPracticedAt?: number;
 }
 
 export const DEFAULT_STUDENT_PROFILES: StudentProfile[] = [
