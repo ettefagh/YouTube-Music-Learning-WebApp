@@ -1,28 +1,27 @@
 Implemented the engineered scope for this issue.
 
-**Commit:** `9f6e69b0ca2989a0cd67664cd9de3b6cc546eadf`
+**Commit:** `4ca231f6ab4e7fa50202678e6c6783c21c98840e`
 
 **Files touched:**
-- `src/routes/+page.svelte`
-- `src/lib/components/Metronome.svelte`
-- `src/lib/actions/youtubePlayer.svelte.ts`
-- `src/lib/audio/audioRecorder.svelte.ts`
-- `src/app.html`
+- `piano-companion/src/lib/db/db.ts`
+- `piano-companion/src/lib/actions/youtubePlayer.svelte.ts`
+- `piano-companion/src/lib/components/ChapterTimeline.svelte`
+- `piano-companion/src/routes/+page.svelte`
 
 **Behavior verified:**
-- **P0 Bug Fix**: Fixed student audio recording in `+page.svelte` that erroneously used teacher recorder engine and saved as teacher track type. Now correctly isolates `studentRecorder` and `studentTrack`.
-- **Practice Metronome**: Built dedicated precision Web Audio API metronome (`Metronome.svelte`) with variable BPM (40-208), tap tempo, time signatures (2/4, 3/4, 4/4, 6/8), and animated visual beat counter.
-- **Video Looper & Transport Bar**: Added Play/Pause toggle, 5s rewind/forward buttons, custom A/B looping markers with visual scrubber highlight, and variable practice speed presets (0.5x, 0.7x, 0.85x, 1.0x, 1.25x).
-- **Curriculum & Navigation**: Added top-level Book tabs (`Tastenzauberei Band 1` / `Band 2`), quick Prev/Next lesson navigation buttons, and a searchable lesson dropdown with completion badges.
-- **Audio Studio & Checkpoints**: Added live elapsed recording timers, track deletion, and interactive practice checkboxes that trigger Pip's celebration.
-- **Code Health**: Consolidated fragmented lifecycles and eliminated all unused CSS warnings.
+- **Lesson List Types Architecture**: Implemented robust type definition `LessonListType` (`'singles' | 'playlist' | 'chapters'`) and `detectListType` heuristic detection across curriculum books and custom sources.
+- **Instant Chapter Seeking (Zero Iframe Reload)**: Enhanced `youtubePlayer.svelte.ts` looper action to detect chapter switches on the same video ID and immediately invoke `player.seekTo(startTime, true)` without reloading the YouTube player, completely eliminating buffering lag between chapters.
+- **Interactive Chapter Timeline Ribbon**: Created `ChapterTimeline.svelte` showing proportional visual chapter segments along the timeline, highlighting active chapter, showing time spans, and enabling single-click seeking across all chapters.
+- **Continuous Recital / Auto-Advance Mode**: Added `onSegmentComplete` boundary detection and `autoAdvance` toggle in transport bar to allow students to choose between looping a single piece or automatically proceeding to the next piece in a playlist or chapter sequence.
+- **Channel & Provider UI Polish**: Added distinct visual icons to provider pills (`🔖` Bookmarked Chapters, `🎬` Singles, `📑` Playlist) and updated the "Add Source" dialog with dedicated templates and guidance for each list type.
 
 **Verification passed:**
 - `npm run check` — 0 errors, 0 warnings.
-- `npm run build` — Successful Cloudflare Pages production bundle generation.
-- Playwright E2E verification — DOM and interaction verified on all components.
+- `npm run build` — Clean Cloudflare Pages production bundle generated in 1m 1s.
+- Playwright E2E browser verification (`test-list-types.js`) — Successfully verified DOM badges (`🔖 Bookmarked Video`, `🎬 Individual Videos`, `📑 YouTube Playlist`), 54 chapter ribbon segments, and captured full-page screenshot.
 
 **Docs updated:**
 - `README.md` — reviewed, no change needed.
+- `piano-companion/report.md` — updated with completion record.
 
 **Deferred:** None
