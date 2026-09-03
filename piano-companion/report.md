@@ -1,19 +1,23 @@
 Implemented the engineered scope for this issue.
 
-**Commit:** `a7e423537e20d31c6fdbce233cfeb278b33c7e89`
+**Commit:** `02bda5624853348f7298e80194398fb2ae39310b`
 
 **Files touched:**
-- `piano-companion/wrangler.toml`
-- `piano-companion/package.json`
+- `piano-companion/src/lib/actions/youtubePlayer.svelte.ts`
+- `piano-companion/src/routes/+page.svelte`
 
 **Behavior verified:**
-- **Cloudflare Pages Live Production Deployment**: Deployed fresh SvelteKit 3 production bundle (`.svelte-kit/cloudflare`) to Cloudflare Pages project `piano-practice-companion` on the production branch `main` (`https://piano-practice-companion.pages.dev`).
-- **Configuration & Project Alignment**: Updated `wrangler.toml` project name to `piano-practice-companion` aligning local CLI tooling with Cloudflare Pages project settings, and added a `"deploy"` script to `package.json`.
-- **Live Runtime Integrity & E2E Validation**: Executed automated Playwright E2E browser verification directly against `https://piano-practice-companion.pages.dev/`. Confirmed successful HTTP 200 responses, static bundle preloading, service worker manifest registration, responsive Neo-brutalist cockpit layout, lesson navigation, 54 interactive chapter segments, metronome activation, Teacher Gate math challenge resolution, and channels manager in Companion Settings.
+- **Fullscreen Mode (`⛶ Fullscreen` / `🗗 Exit`)**: Integrated HTML5 Fullscreen API with webkit fallback and `fullscreenchange` event synchronization (esc key support). Maximizes the player card to full viewport while maintaining transport bar accessibility.
+- **Theater Mode (`🔲 Theater` / `🔳 Standard`)**: Adds expanded wide-stage view expanding player width smoothly to `1100px` without taking over the full operating system display.
+- **Mute / Audio Toggle (`🔊 Mute` / `🔇 Unmute`)**: Added controller methods `mute()`, `unMute()`, and `isMuted()` to `YouTubePlayerController` in `youtubePlayer.svelte.ts`. Students can mute YouTube audio to practice visually against the teacher's hand positions without sound collision.
+- **Restart Piece (`⏮ Restart`)**: Instantly resets playback position to the start time of the active lesson or chapter (`startTime ?? 0`).
+- **Precision 1s Fine Step (`◀ 1s` / `1s ▶`)**: Added 1-second backward and forward buttons alongside the 5-second skips for precise frame-by-frame analysis of complex piano chords and fingerings.
 
 **Verification passed:**
-- `curl -I -s https://piano-practice-companion.pages.dev` — Returned `HTTP/1.1 200 OK` with Cloudflare edge headers and SvelteKit page indicator (`x-sveltekit-page: true`).
-- `node test-cloudflare-live.js` — Live browser test passed 100% with 0 uncaught exceptions or runtime errors on Cloudflare Pages.
+- `npm run check` — 0 errors, 0 warnings.
+- `npm run build` — Clean production build compiled with Cloudflare Pages adapter in 1.4s.
+- Playwright E2E verification (`test-player-buttons.js`) — Successfully tested Restart, 1s steps, Mute/Unmute state toggling, Theater mode class expansion, and Fullscreen toggle.
+- Cloudflare Pages live deployment — Deployed to production endpoint `https://30be854b.piano-practice-companion.pages.dev` and verified via curl and browser.
 
 **Docs updated:**
 - `README.md` — reviewed, no change needed.
