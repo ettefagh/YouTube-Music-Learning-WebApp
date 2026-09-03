@@ -19,6 +19,7 @@ export interface LooperOptions {
   isLooping: () => boolean;
   onReady?: (controller: YouTubePlayerController) => void;
   onPlayerStateChange?: (state: 'unstarted' | 'ended' | 'playing' | 'paused' | 'buffering' | 'cued') => void;
+  onSegmentComplete?: () => void;
   onTimeUpdate?: (time: number, duration: number) => void;
   seekTarget?: () => number | null;
   _trigger?: any; // Used to force Svelte update hook
@@ -35,6 +36,9 @@ export function youtubeLooper(node: HTMLElement, options: LooperOptions) {
   let player: any = null;
   let rafId: number | null = null;
   let lastSeekTarget: number | null = null;
+  let lastStartTime: number | null = null;
+  let lastVideoId: string | undefined = undefined;
+  let segmentEndedFired = false;
 
   const controller: YouTubePlayerController = {
     play: () => {
@@ -94,6 +98,9 @@ export function youtubeLooper(node: HTMLElement, options: LooperOptions) {
     const vId = options.videoId ? options.videoId() : undefined;
     const pId = options.playlistId ? options.playlistId() : undefined;
 
+    lastVideoId = vId;
+    lastStartTime = options.startTime();
+
     const playerVars: any = {
       autoplay: 0,
       controls: 0,
@@ -115,6 +122,9 @@ export function youtubeLooper(node: HTMLElement, options: LooperOptions) {
       events: {
         onReady: () => {
           player.setPlaybackRate(options.playbackRate());
+          if (options.startTime() > 0 && player.seekTo) {
+            player.seekTo(options.startTime(), true);
+          }
           options.onReady?.(controller);
           startLoopWatcher();
         },
@@ -123,7 +133,10 @@ export function youtubeLooper(node: HTMLElement, options: LooperOptions) {
           if (window.YT) {
             if (event.data === window.YT.PlayerState.PLAYING) stateName = 'playing';
             else if (event.data === window.YT.PlayerState.PAUSED) stateName = 'paused';
-            else if (event.data === window.YT.PlayerState.ENDED) stateName = 'ended';
+            else if (event.data === window.YT.PlayerState.ENDED) {
+              stateName = 'ended';
+              options.onSegmentComplete?.();
+            }
             else if (event.data === window.YT.PlayerState.BUFFERING) stateName = 'buffering';
             else if (event.data === window.YT.PlayerState.CUED) stateName = 'cued';
           }
@@ -141,7 +154,7 @@ export function youtubeLooper(node: HTMLElement, options: LooperOptions) {
 
   function startLoopWatcher() {
     if (rafId !== null) return;
-    const earlySeekThreshold = 0.05;
+    const earlySeekThreshold = 0.08;
 
     const checkTime = () => {
       if (player && player.getCurrentTime) {
@@ -152,15 +165,25 @@ export function youtubeLooper(node: HTMLElement, options: LooperOptions) {
           options.onTimeUpdate(currentTime, duration);
         }
 
+        const customStart = options.customLoopStart ? options.customLoopStart() : null;
+        const customEnd = options.customLoopEnd ? options.customLoopEnd() : null;
+
+        const start = (customStart !== null && customStart !== undefined) ? customStart : options.startTime();
+        const end = (customEnd !== null && customEnd !== undefined) ? customEnd : options.endTime();
+
         if (options.isLooping()) {
-          const customStart = options.customLoopStart ? options.customLoopStart() : null;
-          const customEnd = options.customLoopEnd ? options.customLoopEnd() : null;
-
-          const start = (customStart !== null && customStart !== undefined) ? customStart : options.startTime();
-          const end = (customEnd !== null && customEnd !== undefined) ? customEnd : options.endTime();
-
           if (end > 0 && (currentTime >= end - earlySeekThreshold || currentTime < start)) {
             player.seekTo(start, true);
+          }
+        } else {
+          // Looping is OFF: Segment or Chapter completion handler
+          if (end > 0 && currentTime >= end - earlySeekThreshold) {
+            if (!segmentEndedFired) {
+              segmentEndedFired = true;
+              options.onSegmentComplete?.();
+            }
+          } else if (currentTime < end - 1) {
+            segmentEndedFired = false;
           }
         }
       }
@@ -203,11 +226,27 @@ export function youtubeLooper(node: HTMLElement, options: LooperOptions) {
         player.setPlaybackRate(options.playbackRate());
       }
 
-      if (player && player.loadVideoById && options.videoId && options.videoId()) {
-        const currentVideoUrl = player.getVideoUrl();
-        const vId = options.videoId();
-        if (vId && (!currentVideoUrl || !currentVideoUrl.includes(vId))) {
-          player.loadVideoById(vId);
+      const newVId = options.videoId ? options.videoId() : undefined;
+      const newStart = options.startTime();
+
+      if (player && newVId) {
+        const currentVideoUrl = player.getVideoUrl ? player.getVideoUrl() : '';
+        if (newVId !== lastVideoId && (!currentVideoUrl || !currentVideoUrl.includes(newVId))) {
+          // Different video: load new video
+          lastVideoId = newVId;
+          lastStartTime = newStart;
+          segmentEndedFired = false;
+          if (player.loadVideoById) {
+            player.loadVideoById({
+              videoId: newVId,
+              startSeconds: newStart
+            });
+          }
+        } else if (newStart !== lastStartTime && player.seekTo) {
+          // Same video ID: user switched chapters! Zero-reload instant jump!
+          lastStartTime = newStart;
+          segmentEndedFired = false;
+          player.seekTo(newStart, true);
         }
       }
     },

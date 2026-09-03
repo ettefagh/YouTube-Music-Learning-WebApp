@@ -1,11 +1,20 @@
 <script lang="ts">
   import { onMount } from 'svelte';
-  import { db, initDatabase, type LocalLesson, type LocalAudioTrack, type LocalBook } from '$lib/db/db';
+  import {
+    db,
+    initDatabase,
+    detectListType,
+    type LocalLesson,
+    type LocalAudioTrack,
+    type LocalBook,
+    type LessonListType
+  } from '$lib/db/db';
   import { youtubeLooper, type YouTubePlayerController } from '$lib/actions/youtubePlayer.svelte';
   import { AudioRecorderEngine } from '$lib/audio/audioRecorder.svelte';
   import { teacherAuth } from '$lib/stores/teacherAuth.svelte';
   import MascotPip from '$lib/components/MascotPip.svelte';
   import Metronome from '$lib/components/Metronome.svelte';
+  import ChapterTimeline from '$lib/components/ChapterTimeline.svelte';
   import OnboardingModal from '$lib/components/OnboardingModal.svelte';
   import TeacherGate from '$lib/components/TeacherGate.svelte';
 
@@ -21,6 +30,9 @@
   let allLessons = $state<LocalLesson[]>([]);
   let lessons = $state<LocalLesson[]>([]);
   let currentLesson = $state<LocalLesson | null>(null);
+
+  // Lesson list type detection
+  let currentListType = $derived<LessonListType>(detectListType(lessons, selectedProvider));
 
   // Search & Navigation
   let lessonSearch = $state<string>('');
@@ -42,6 +54,7 @@
   let isVideoPlaying = $state<boolean>(false);
   let playbackRate = $state<number>(1.0);
   let isLooping = $state<boolean>(true);
+  let autoAdvance = $state<boolean>(false);
 
   let videoCurrentTime = $state<number>(0);
   let videoDuration = $state<number>(0);
@@ -83,7 +96,7 @@
 
   // Add Provider State
   let newProviderName = $state<string>('');
-  let newProviderType = $state<'list' | 'playlist' | 'chapters'>('list');
+  let newProviderType = $state<'singles' | 'playlist' | 'chapters'>('singles');
   let newProviderInput = $state<string>('');
   let isAddingProvider = $state<boolean>(false);
   let addProviderError = $state<string>('');
@@ -190,6 +203,20 @@
 
   function handlePlayerStateChange(state: 'unstarted' | 'ended' | 'playing' | 'paused' | 'buffering' | 'cued') {
     isVideoPlaying = state === 'playing';
+  }
+
+  function handleSegmentComplete() {
+    if (autoAdvance && hasNextLesson) {
+      mascotState = 'cheering';
+      mascotMessage = `Great work! Auto-advancing to next song: "${lessons[currentIndex + 1].title}"! 🌟`;
+      nextLesson();
+      setTimeout(() => {
+        playerController?.play();
+      }, 400);
+    } else if (!isLooping) {
+      mascotState = 'cheering';
+      mascotMessage = 'Piece completed! Play again or tap Next!';
+    }
   }
 
   function togglePlayVideo() {
@@ -409,10 +436,11 @@
         startTime: 0,
         endTime: 0,
         checkpoints: ['Master note accuracy', 'Keep a steady rhythm'],
-        isCompleted: false
+        isCompleted: false,
+        listType: newProviderType
       };
 
-      if (newProviderType === 'list') {
+      if (newProviderType === 'singles') {
         const ids = newProviderInput.split('\n').map(id => id.trim()).filter(id => id);
         ids.forEach((videoId, index) => {
           newLessons.push({
@@ -525,15 +553,18 @@
     </button>
   </nav>
 
-  <!-- Provider Pill Bar -->
+  <!-- Provider Pill Bar with List Type Indicators -->
   <div class="provider-bar">
     <span class="provider-badge">Channel:</span>
     <div class="provider-pill-scroll">
       {#each providers as provider}
+        {@const pLessons = allLessons.filter(l => l.providerName === provider)}
+        {@const pType = detectListType(pLessons, provider)}
         <button
           class="provider-pill {selectedProvider === provider ? 'active' : ''}"
           onclick={() => selectProvider(provider)}
         >
+          <span class="type-icon">{pType === 'chapters' ? '🔖' : pType === 'playlist' ? '📑' : '🎬'}</span>
           {provider}
         </button>
       {/each}
@@ -542,7 +573,7 @@
         onclick={() => showAddProviderModal = true}
         title="Add custom provider"
       >
-        + Add
+        + Add Source
       </button>
     </div>
   </div>
@@ -553,7 +584,18 @@
       <div class="header-left">
         <span class="header-icon">🎹</span>
         <div class="header-info">
-          <div class="book-label">{currentBook?.title ?? 'Piano Practice'}</div>
+          <div class="meta-row">
+            <span class="book-label">{currentBook?.title ?? 'Piano Practice'}</span>
+            <!-- List Type Status Badge -->
+            {#if currentListType === 'chapters'}
+              <span class="mode-badge chapters">🔖 Bookmarked Video</span>
+            {:else if currentListType === 'playlist'}
+              <span class="mode-badge playlist">📑 YouTube Playlist</span>
+            {:else}
+              <span class="mode-badge singles">🎬 Individual Videos</span>
+            {/if}
+          </div>
+
           <div class="title-row">
             <button
               class="completion-btn {currentLesson?.isCompleted ? 'completed' : ''}"
@@ -577,7 +619,7 @@
         </div>
       </div>
 
-      <!-- Quick Nav Buttons -->
+      <!-- Quick Nav Buttons & Playlist Position -->
       <div class="lesson-nav-actions">
         <button
           class="nav-btn prev-btn"
@@ -621,6 +663,9 @@
                 <span class="item-status">{l.isCompleted ? '✅' : '⚪'}</span>
                 <span class="item-seq">#{l.sequenceIndex}</span>
                 <span class="item-title">{l.title}</span>
+                {#if currentListType === 'chapters' && l.endTime > 0}
+                  <span class="item-timestamp">({formatTime(l.startTime)} – {formatTime(l.endTime)})</span>
+                {/if}
               </button>
             </li>
           {/each}
@@ -639,6 +684,17 @@
 
   {#if currentLesson}
     <main class="practice-cockpit">
+      <!-- Specialized Chapter Timeline for Bookmarked Video Mode -->
+      {#if currentListType === 'chapters'}
+        <ChapterTimeline
+          {lessons}
+          currentLessonId={currentLesson.id}
+          {videoCurrentTime}
+          {videoDuration}
+          onSelectChapter={selectLesson}
+        />
+      {/if}
+
       <!-- Video Player Card -->
       <div class="player-card neo-card">
         <!-- YouTube Frame with Looper Action -->
@@ -656,15 +712,16 @@
                 playerController = controller;
               },
               onPlayerStateChange: handlePlayerStateChange,
+              onSegmentComplete: handleSegmentComplete,
               onTimeUpdate: handleTimeUpdate,
               seekTarget: () => videoSeekTarget,
-              _trigger: [playbackRate, isLooping, currentLesson?.youtubeVideoId, videoSeekTarget, customLoopA, customLoopB]
+              _trigger: [playbackRate, isLooping, currentLesson?.youtubeVideoId, videoSeekTarget, customLoopA, customLoopB, autoAdvance]
             }}
             class="yt-frame"
           ></div>
         {/key}
 
-        <!-- Interactive Progress Scrubber with A/B Loop Markers -->
+        <!-- Interactive Progress Scrubber with A/B Loop Markers & Chapter Boundaries -->
         <div
           class="scrubber-track"
           role="slider"
@@ -676,8 +733,8 @@
           onkeydown={(e) => e.key === 'Enter' && handleProgressClick(e as any)}
         >
           <div class="scrubber-bar-bg">
-            <!-- Active Loop Region Highlight -->
-            {#if isLooping && videoDuration > 0}
+            <!-- Active Loop / Chapter Region Highlight -->
+            {#if videoDuration > 0}
               {@const startSec = customLoopA ?? currentLesson.startTime ?? 0}
               {@const endSec = (customLoopB ?? (currentLesson.endTime > 0 ? currentLesson.endTime : videoDuration))}
               {@const leftPct = (startSec / videoDuration) * 100}
@@ -721,9 +778,17 @@
 
           <div class="scrubber-times">
             <span class="time-current">{formatTime(videoCurrentTime)}</span>
-            {#if customLoopA !== null || customLoopB !== null}
+            {#if currentListType === 'chapters' && currentLesson.endTime > 0}
+              <span class="chapter-readout">
+                Chapter: {formatTime(currentLesson.startTime)} → {formatTime(currentLesson.endTime)} ({currentLesson.endTime - currentLesson.startTime}s)
+              </span>
+            {:else if customLoopA !== null || customLoopB !== null}
               <span class="loop-badge">
-                Loop: {formatTime(customLoopA ?? currentLesson.startTime)} → {formatTime(customLoopB ?? (currentLesson.endTime > 0 ? currentLesson.endTime : videoDuration))}
+                A/B: {formatTime(customLoopA ?? currentLesson.startTime)} → {formatTime(customLoopB ?? (currentLesson.endTime > 0 ? currentLesson.endTime : videoDuration))}
+              </span>
+            {:else if currentListType === 'playlist'}
+              <span class="playlist-badge">
+                Track {currentIndex + 1} of {lessons.length}
               </span>
             {/if}
             <span class="time-duration">{formatTime(videoDuration)}</span>
@@ -747,9 +812,19 @@
           <div class="transport-middle">
             <button
               class="loop-toggle-btn {isLooping ? 'active' : ''}"
-              onclick={() => isLooping = !isLooping}
+              onclick={() => { isLooping = !isLooping; if (isLooping) autoAdvance = false; }}
+              title="Loop current piece continuously"
             >
               🔄 Loop {isLooping ? 'ON' : 'OFF'}
+            </button>
+
+            <!-- Auto Advance / Continuous Play Toggle -->
+            <button
+              class="auto-advance-btn {autoAdvance ? 'active' : ''}"
+              onclick={() => { autoAdvance = !autoAdvance; if (autoAdvance) isLooping = false; }}
+              title={currentListType === 'chapters' ? 'Auto-advance to next chapter bookmark on finish' : 'Auto-advance to next song on finish'}
+            >
+              {autoAdvance ? '⏩ Continuous ON' : '⏭️ Auto-Next OFF'}
             </button>
 
             <!-- A/B Marker Controls -->
@@ -940,24 +1015,56 @@
         </div>
 
         <div class="form-group">
-          <span class="form-label">Source Format:</span>
-          <select bind:value={newProviderType} class="neo-select">
-            <option value="list">List of YouTube Video IDs</option>
-            <option value="playlist">YouTube Playlist ID</option>
-            <option value="chapters">Single Video with Chapters</option>
-          </select>
+          <span class="form-label">Lesson List Type:</span>
+          <div class="type-selector-pills">
+            <button
+              class="type-pill {newProviderType === 'singles' ? 'active' : ''}"
+              onclick={() => newProviderType = 'singles'}
+            >
+              🎬 Individual Videos
+            </button>
+            <button
+              class="type-pill {newProviderType === 'playlist' ? 'active' : ''}"
+              onclick={() => newProviderType = 'playlist'}
+            >
+              📑 YouTube Playlist
+            </button>
+            <button
+              class="type-pill {newProviderType === 'chapters' ? 'active' : ''}"
+              onclick={() => newProviderType = 'chapters'}
+            >
+              🔖 Video with Bookmarks
+            </button>
+          </div>
         </div>
 
         <div class="form-group">
-          <span class="form-label">Source Data:</span>
-          {#if newProviderType === 'list'}
-            <p class="field-hint">Paste one YouTube Video ID per line.</p>
+          <span class="form-label">Source Input:</span>
+          {#if newProviderType === 'singles'}
+            <p class="field-hint">Paste one YouTube Video ID per line (e.g. <code>CUvzy7Tu6TE</code>).</p>
+            <textarea
+              bind:value={newProviderInput}
+              class="neo-textarea"
+              rows="4"
+              placeholder="CUvzy7Tu6TE&#10;DPyC2_Q1yhY&#10;gTTaiCd8fsQ"
+            ></textarea>
           {:else if newProviderType === 'playlist'}
-            <p class="field-hint">Paste the YouTube Playlist ID (e.g. PL10p3mlGiAN...).</p>
+            <p class="field-hint">Paste the YouTube Playlist ID (e.g. <code>PL10p3mlGiANOP_3RdrSZYv3kG5AzDmONh</code>).</p>
+            <textarea
+              bind:value={newProviderInput}
+              class="neo-textarea"
+              rows="2"
+              placeholder="PL10p3mlGiANOP_3RdrSZYv3kG5AzDmONh"
+            ></textarea>
           {:else if newProviderType === 'chapters'}
             <p class="field-hint">Line 1: Video ID. Following lines: "MM:SS Chapter Title".</p>
+            <textarea
+              bind:value={newProviderInput}
+              class="neo-textarea"
+              rows="5"
+              placeholder="lguxe5bEqXo&#10;0:00 Schaukeln&#10;1:08 Gespräch in der Höhle&#10;1:44 Gespenster?"
+            ></textarea>
           {/if}
-          <textarea bind:value={newProviderInput} class="neo-textarea" rows="4"></textarea>
         </div>
 
         {#if addProviderError}
@@ -1185,6 +1292,9 @@
     white-space: nowrap;
     box-shadow: 2px 2px 0 #000;
     transition: transform 0.08s;
+    display: flex;
+    align-items: center;
+    gap: 4px;
   }
 
   .provider-pill:active {
@@ -1195,6 +1305,10 @@
   .provider-pill.active {
     background: #42A5F5;
     color: #ffffff;
+  }
+
+  .type-icon {
+    font-size: 0.85rem;
   }
 
   .provider-add-pill {
@@ -1242,12 +1356,44 @@
     flex: 1;
   }
 
+  .meta-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 2px;
+    flex-wrap: wrap;
+  }
+
   .book-label {
     font-size: 0.75rem;
     font-weight: 800;
     text-transform: uppercase;
     letter-spacing: 1px;
     color: #2E7D32;
+  }
+
+  .mode-badge {
+    font-size: 0.7rem;
+    font-weight: 800;
+    padding: 1px 6px;
+    border: 1.5px solid #000;
+    border-radius: 6px;
+    text-transform: uppercase;
+  }
+
+  .mode-badge.chapters {
+    background: #FFE082;
+    color: #000;
+  }
+
+  .mode-badge.playlist {
+    background: #BBDEFB;
+    color: #000;
+  }
+
+  .mode-badge.singles {
+    background: #C8E6C9;
+    color: #000;
   }
 
   .title-row {
@@ -1419,6 +1565,12 @@
     color: #121212;
   }
 
+  .item-timestamp {
+    font-size: 0.75rem;
+    color: #666;
+    font-weight: 700;
+  }
+
   .no-matches {
     padding: 16px;
     text-align: center;
@@ -1515,6 +1667,25 @@
     font-size: 0.8rem;
     font-weight: 800;
     margin-top: 6px;
+    gap: 8px;
+  }
+
+  .chapter-readout {
+    background: #FFF9C4;
+    border: 1px solid #000;
+    border-radius: 6px;
+    padding: 2px 8px;
+    font-size: 0.75rem;
+    color: #333;
+  }
+
+  .playlist-badge {
+    background: #E3F2FD;
+    border: 1px solid #000;
+    border-radius: 6px;
+    padding: 2px 8px;
+    font-size: 0.75rem;
+    color: #1565C0;
   }
 
   .loop-badge {
@@ -1588,6 +1759,22 @@
 
   .loop-toggle-btn.active {
     background: #2196F3;
+    color: #ffffff;
+  }
+
+  .auto-advance-btn {
+    background: #ffffff;
+    border: 2px solid #000;
+    border-radius: 8px;
+    font-weight: 800;
+    font-size: 0.8rem;
+    padding: 8px 10px;
+    cursor: pointer;
+    box-shadow: 1px 1px 0 #000;
+  }
+
+  .auto-advance-btn.active {
+    background: #9C27B0;
     color: #ffffff;
   }
 
@@ -1909,7 +2096,7 @@
   .modal-card {
     background: #ffffff;
     padding: 24px;
-    max-width: 440px;
+    max-width: 480px;
     width: 90%;
     box-sizing: border-box;
   }
@@ -1930,6 +2117,28 @@
     font-size: 0.85rem;
     margin-bottom: 6px;
     color: #222;
+  }
+
+  .type-selector-pills {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+  }
+
+  .type-pill {
+    border: 2px solid #000;
+    border-radius: 16px;
+    background: #fff;
+    padding: 6px 12px;
+    font-weight: 800;
+    font-size: 0.8rem;
+    cursor: pointer;
+    box-shadow: 2px 2px 0 #000;
+  }
+
+  .type-pill.active {
+    background: #FFCA28;
+    border-width: 3px;
   }
 
   .neo-input, .neo-select {
