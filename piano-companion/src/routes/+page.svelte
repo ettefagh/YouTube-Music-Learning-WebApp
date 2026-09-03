@@ -17,6 +17,7 @@
   import ChapterTimeline from '#lib/components/ChapterTimeline.svelte';
   import OnboardingModal from '#lib/components/OnboardingModal.svelte';
   import TeacherGate from '#lib/components/TeacherGate.svelte';
+  import { longpress } from '#lib/actions/longpress.js';
 
   // --- Curriculum & Book State ---
   let books = $state<LocalBook[]>([]);
@@ -122,6 +123,20 @@
   let pendingTeacherAction = $state<'edit' | 'record' | 'settings' | null>(null);
   let currentThemeColor = $state<string>('#f5f0ea');
 
+  // --- Practice Lab Modal & Count-In Pre-Roll ---
+  let showPracticeLabModal = $state<boolean>(false);
+  let countInTimer = $state<number | null>(null);
+  let countInTarget = $state<'play' | 'record' | null>(null);
+  let countInInterval: any = null;
+
+  // --- Collapsible Cards State ---
+  let collapsedSections = $state<Record<string, boolean>>({
+    timeline: false,
+    metronome: false,
+    studio: false,
+    checkpoints: false
+  });
+
   // Add Provider State
   let newProviderName = $state<string>('');
   let newProviderType = $state<'singles' | 'playlist' | 'chapters'>('singles');
@@ -150,6 +165,15 @@
     if (savedTheme) {
       currentThemeColor = savedTheme;
       document.body.style.backgroundColor = savedTheme;
+    }
+
+    const savedCollapsed = localStorage.getItem('collapsedSections');
+    if (savedCollapsed) {
+      try {
+        collapsedSections = { ...collapsedSections, ...JSON.parse(savedCollapsed) };
+      } catch (e) {
+        console.warn('Failed to parse collapsedSections:', e);
+      }
     }
 
     await initDatabase();
@@ -356,6 +380,70 @@
     if (playerController) {
       playerController.seekTo(startTime);
     }
+  }
+
+  function deepReset() {
+    restartPiece();
+    resetLoopAB();
+    mascotState = 'cheering';
+    mascotMessage = 'Fresh start! Song restarted & loop markers cleared.';
+  }
+
+  function toggleSection(sectionKey: string) {
+    collapsedSections[sectionKey] = !collapsedSections[sectionKey];
+    localStorage.setItem('collapsedSections', JSON.stringify(collapsedSections));
+  }
+
+  function startCountIn(target: 'play' | 'record') {
+    if (countInTimer !== null) return;
+    countInTarget = target;
+    countInTimer = 3;
+
+    if (countInInterval) clearInterval(countInInterval);
+    countInInterval = setInterval(() => {
+      if (countInTimer === null) {
+        clearInterval(countInInterval);
+        return;
+      }
+      if (countInTimer > 1) {
+        countInTimer -= 1;
+      } else {
+        clearInterval(countInInterval);
+        const action = countInTarget;
+        countInTimer = null;
+        countInTarget = null;
+        if (action === 'play') {
+          playerController?.play();
+        } else if (action === 'record') {
+          studentRecorder.start();
+          mascotState = 'listening';
+          mascotMessage = 'Pip is listening to your piano!';
+        }
+      }
+    }, 1000);
+  }
+
+  function cancelCountIn() {
+    if (countInInterval) clearInterval(countInInterval);
+    countInTimer = null;
+    countInTarget = null;
+  }
+
+  function nudgeLoopA(delta: number) {
+    const current = customLoopA ?? currentLesson?.startTime ?? 0;
+    const next = Math.max(0, current + delta);
+    customLoopA = Math.round(next * 10) / 10;
+    if (customLoopB !== null && customLoopA >= customLoopB) {
+      customLoopB = customLoopA + 1;
+    }
+    isLooping = true;
+  }
+
+  function nudgeLoopB(delta: number) {
+    const current = customLoopB ?? (currentLesson?.endTime && currentLesson.endTime > 0 ? currentLesson.endTime : videoDuration);
+    const next = Math.max((customLoopA ?? 0) + 0.5, current + delta);
+    customLoopB = Math.round(next * 10) / 10;
+    isLooping = true;
   }
 
   // --- Dual Audio Recording Studio ---
@@ -819,20 +907,52 @@
 
   <!-- Built-in Metronome Widget -->
   {#if showMetronome}
-    <Metronome />
+    <div class="cockpit-card-wrap">
+      <button
+        class="section-collapse-header"
+        onclick={() => toggleSection('metronome')}
+        aria-expanded={!collapsedSections.metronome}
+      >
+        <div class="collapse-title-row">
+          <span class="collapse-chevron">{collapsedSections.metronome ? '▶' : '▼'}</span>
+          <span class="collapse-title">⏱️ Interactive Metronome</span>
+        </div>
+        <span class="collapse-summary-badge">Rhythm Practice</span>
+      </button>
+      {#if !collapsedSections.metronome}
+        <Metronome />
+      {/if}
+    </div>
   {/if}
 
   {#if currentLesson}
     <main class="practice-cockpit">
       <!-- Specialized Chapter Timeline for Bookmarked Video Mode -->
       {#if currentListType === 'chapters'}
-        <ChapterTimeline
-          {lessons}
-          currentLessonId={currentLesson.id}
-          {videoCurrentTime}
-          {videoDuration}
-          onSelectChapter={selectLesson}
-        />
+        <div class="cockpit-card-wrap">
+          <button
+            class="section-collapse-header"
+            onclick={() => toggleSection('timeline')}
+            aria-expanded={!collapsedSections.timeline}
+          >
+            <div class="collapse-title-row">
+              <span class="collapse-chevron">{collapsedSections.timeline ? '▶' : '▼'}</span>
+              <span class="collapse-title">📖 Chapter Timeline</span>
+            </div>
+            <span class="collapse-summary-badge">
+              {currentLesson.title} ({formatTime(currentLesson.startTime)} → {formatTime(currentLesson.endTime)})
+            </span>
+          </button>
+          {#if !collapsedSections.timeline}
+            <ChapterTimeline
+              {lessons}
+              currentLessonId={currentLesson.id}
+              {videoCurrentTime}
+              {videoDuration}
+              onSelectChapter={selectLesson}
+            />
+          {/if}
+        </div>
       {/if}
 
       <!-- Video Player Card -->
@@ -938,21 +1058,45 @@
           </div>
         </div>
 
-        <!-- Master Transport Controls Bar -->
+        <!-- Master Kid-First Transport Controls Bar -->
         <div class="transport-bar">
           <div class="transport-left">
             <button
               class="play-toggle-btn {isVideoPlaying ? 'playing' : ''}"
-              onclick={togglePlayVideo}
-              aria-label={isVideoPlaying ? 'Pause video' : 'Play video'}
+              use:longpress={{
+                duration: 500,
+                onLongPress: () => { if (!isVideoPlaying) startCountIn('play'); },
+                onClick: togglePlayVideo
+              }}
+              aria-label={isVideoPlaying ? 'Pause video' : 'Play video (Hold for 3s count-in)'}
+              title="Tap to Play/Pause • Hold for 3s Count-in"
             >
               {isVideoPlaying ? '⏸ Pause' : '▶ Play'}
             </button>
-            <button class="skip-btn restart-btn" onclick={restartPiece} title="Restart piece from beginning">⏮ Restart</button>
-            <button class="skip-btn fine-step-btn" onclick={() => seekBy(-1)} title="Step back 1 second">◀ 1s</button>
+
+            {#if !isVideoPlaying}
+              <button
+                class="count-in-quick-btn"
+                onclick={() => startCountIn('play')}
+                title="Start playback with a 3-second visual count-in to get hands on the piano keys"
+              >
+                ⏳ 3s Play
+              </button>
+            {/if}
+
+            <button
+              class="skip-btn restart-btn"
+              use:longpress={{
+                duration: 500,
+                onLongPress: deepReset,
+                onClick: restartPiece
+              }}
+              title="Tap to restart lesson • Hold for Deep Reset (restart + clear loop points)"
+            >
+              ⏮ Restart
+            </button>
             <button class="skip-btn" onclick={() => seekBy(-5)} title="Rewind 5 seconds">⏪ 5s</button>
             <button class="skip-btn" onclick={() => seekBy(5)} title="Forward 5 seconds">5s ⏩</button>
-            <button class="skip-btn fine-step-btn" onclick={() => seekBy(1)} title="Step forward 1 second">1s ▶</button>
           </div>
 
           <div class="transport-middle">
@@ -964,36 +1108,14 @@
               🔄 Loop {isLooping ? 'ON' : 'OFF'}
             </button>
 
-            <!-- Auto Advance / Continuous Play Toggle -->
+            <!-- Practice Lab Modal Trigger Button -->
             <button
-              class="auto-advance-btn {autoAdvance ? 'active' : ''}"
-              onclick={() => { autoAdvance = !autoAdvance; if (autoAdvance) isLooping = false; }}
-              title={currentListType === 'chapters' ? 'Auto-advance to next chapter bookmark on finish' : 'Auto-advance to next song on finish'}
+              class="practice-lab-trigger-btn"
+              onclick={() => showPracticeLabModal = true}
+              title="Open Practice Lab for speed, A/B looping, and stage modes"
             >
-              {autoAdvance ? '⏩ Continuous ON' : '⏭️ Auto-Next OFF'}
+              🎛️ Practice Lab ({playbackRate}x)
             </button>
-
-            <!-- A/B Marker Controls -->
-            <button class="ab-btn {customLoopA !== null ? 'set' : ''}" onclick={setLoopA} title="Set Loop Start at current time">
-              🚩 {customLoopA !== null ? `A: ${formatTime(customLoopA)}` : 'Set A'}
-            </button>
-            <button class="ab-btn {customLoopB !== null ? 'set' : ''}" onclick={setLoopB} title="Set Loop End at current time">
-              🏁 {customLoopB !== null ? `B: ${formatTime(customLoopB)}` : 'Set B'}
-            </button>
-            {#if customLoopA !== null || customLoopB !== null}
-              <button class="ab-reset-btn" onclick={resetLoopAB} title="Clear A/B loop points">✖</button>
-            {/if}
-          </div>
-
-          <div class="speed-selector">
-            {#each [0.5, 0.7, 0.85, 1.0, 1.25] as rate}
-              <button
-                class="speed-chip {playbackRate === rate ? 'active' : ''}"
-                onclick={() => changePlaybackRate(rate)}
-              >
-                {rate}x
-              </button>
-            {/each}
           </div>
 
           <div class="transport-right">
@@ -1004,15 +1126,6 @@
               title={isMuted ? 'Unmute video audio' : 'Mute video audio (practice visually with hands)'}
             >
               {isMuted ? '🔇 Unmute' : '🔊 Mute'}
-            </button>
-
-            <!-- Theater Mode Toggle -->
-            <button
-              class="utility-btn theater-btn {isTheaterMode ? 'active' : ''}"
-              onclick={toggleTheaterMode}
-              title={isTheaterMode ? 'Standard cockpit view' : 'Wide theater stage'}
-            >
-              {isTheaterMode ? '🔳 Standard' : '🔲 Theater'}
             </button>
 
             <!-- Fullscreen Toggle -->
@@ -1032,137 +1145,193 @@
 
       <!-- Dual Audio Recording Studio -->
       {#if !hideAudioTakes}
-        <section class="audio-studio-grid">
-          <!-- Student Practice Take Card -->
-          <div class="studio-card student-card neo-card">
-            <div class="studio-header">
-              <div class="title-wrap">
-                <span class="studio-icon">🧒</span>
-                <h3>My Practice Take</h3>
-              </div>
-              {#if studentTrack}
-                <button
-                  class="trash-btn"
-                  onclick={() => deleteTrack('student')}
-                  title="Delete take"
-                >
-                  🗑️
-                </button>
-              {/if}
+        <div class="cockpit-card-wrap">
+          <button
+            class="section-collapse-header"
+            onclick={() => toggleSection('studio')}
+            aria-expanded={!collapsedSections.studio}
+          >
+            <div class="collapse-title-row">
+              <span class="collapse-chevron">{collapsedSections.studio ? '▶' : '▼'}</span>
+              <span class="collapse-title">🎙️ Audio Recording Studio</span>
             </div>
+            <span class="collapse-summary-badge {studentTrack ? 'badge-success' : ''}">
+              {studentTrack ? '✅ Take Recorded' : 'No take yet'}
+            </span>
+          </button>
 
-            {#if studentAudioUrl}
-              <audio src={studentAudioUrl} controls class="audio-player"></audio>
-              {#if studentTrack?.durationSeconds}
-                <div class="take-meta">Take length: {formatTime(studentTrack.durationSeconds)}</div>
-              {/if}
-            {:else}
-              <p class="empty-state">No take recorded yet. Press below to start!</p>
-            {/if}
+          {#if !collapsedSections.studio}
+            <section class="audio-studio-grid">
+              <!-- Student Practice Take Card -->
+              <div class="studio-card student-card neo-card">
+                <div class="studio-header">
+                  <div class="title-wrap">
+                    <span class="studio-icon">🧒</span>
+                    <h3>My Practice Take</h3>
+                  </div>
+                  {#if studentTrack}
+                    <button
+                      class="trash-btn"
+                      onclick={() => deleteTrack('student')}
+                      title="Delete take"
+                    >
+                      🗑️
+                    </button>
+                  {/if}
+                </div>
 
-            <button
-              class="record-btn student {studentRecorder.isRecording ? 'recording' : ''}"
-              onclick={toggleStudentRecord}
-            >
-              {#if studentRecorder.isRecording}
-                ⏹ Stop Recording ({formatTime(studentRecorder.recordingSeconds)})
-              {:else}
-                🎙️ {studentAudioUrl ? 'Re-record My Take' : 'Record My Take'}
-              {/if}
-            </button>
+                {#if studentAudioUrl}
+                  <audio src={studentAudioUrl} controls class="audio-player"></audio>
+                  {#if studentTrack?.durationSeconds}
+                    <div class="take-meta">Take length: {formatTime(studentTrack.durationSeconds)}</div>
+                  {/if}
+                {:else}
+                  <p class="empty-state">No take recorded yet. Press below to start!</p>
+                {/if}
 
-            {#if studentRecorder.isRecording}
-              <div class="vu-wrapper neo-border">
-                <div class="vu-fill student" style="width: {studentRecorder.volumeLevel * 100}%"></div>
+                <div class="record-btn-row">
+                  <button
+                    class="record-btn student {studentRecorder.isRecording ? 'recording' : ''}"
+                    use:longpress={{
+                      duration: 500,
+                      onLongPress: () => { if (!studentRecorder.isRecording) startCountIn('record'); },
+                      onClick: toggleStudentRecord
+                    }}
+                    title="Tap to record • Hold for 3s count-in pre-roll"
+                  >
+                    {#if studentRecorder.isRecording}
+                      ⏹ Stop Recording ({formatTime(studentRecorder.recordingSeconds)})
+                    {:else}
+                      🎙️ {studentAudioUrl ? 'Re-record Take' : 'Record My Take'}
+                    {/if}
+                  </button>
+
+                  {#if !studentRecorder.isRecording}
+                    <button
+                      class="count-in-record-btn"
+                      onclick={() => startCountIn('record')}
+                      title="Start recording with 3-second pre-roll to get hands on the piano keys"
+                    >
+                      ⏳ 3s Pre-Roll
+                    </button>
+                  {/if}
+                </div>
+
+                {#if studentRecorder.isRecording}
+                  <div class="vu-wrapper neo-border">
+                    <div class="vu-fill student" style="width: {studentRecorder.volumeLevel * 100}%"></div>
+                  </div>
+                {/if}
               </div>
-            {/if}
-          </div>
 
-          <!-- Teacher Reference Card -->
-          <div class="studio-card teacher-card neo-card">
-            <div class="studio-header">
-              <div class="title-wrap">
-                <span class="studio-icon">👩‍🏫</span>
-                <h3>Teacher Reference</h3>
-              </div>
-              {#if teacherTrack && teacherAuth.isUnlocked}
+              <!-- Teacher Reference Card -->
+              <div class="studio-card teacher-card neo-card">
+                <div class="studio-header">
+                  <div class="title-wrap">
+                    <span class="studio-icon">👩‍🏫</span>
+                    <h3>Teacher Reference</h3>
+                  </div>
+                  {#if teacherTrack && teacherAuth.isUnlocked}
+                    <button
+                      class="trash-btn"
+                      onclick={() => deleteTrack('teacher')}
+                      title="Delete reference"
+                    >
+                      🗑️
+                    </button>
+                  {/if}
+                </div>
+
+                {#if teacherAudioUrl}
+                  <audio src={teacherAudioUrl} controls class="audio-player"></audio>
+                  {#if teacherTrack?.durationSeconds}
+                    <div class="take-meta">Reference: {formatTime(teacherTrack.durationSeconds)}</div>
+                  {/if}
+                {:else}
+                  <p class="empty-state">No master reference track recorded.</p>
+                {/if}
+
                 <button
-                  class="trash-btn"
-                  onclick={() => deleteTrack('teacher')}
-                  title="Delete reference"
+                  class="record-btn teacher {teacherRecorder.isRecording ? 'recording' : ''}"
+                  onclick={handleTeacherRecord}
                 >
-                  🗑️
+                  {#if teacherRecorder.isRecording}
+                    ⏹ Stop Recording ({formatTime(teacherRecorder.recordingSeconds)})
+                  {:else}
+                    {teacherAuth.isUnlocked ? '🎙️ Record Reference' : '🔒 Teacher Unlock'}
+                  {/if}
                 </button>
-              {/if}
-            </div>
 
-            {#if teacherAudioUrl}
-              <audio src={teacherAudioUrl} controls class="audio-player"></audio>
-              {#if teacherTrack?.durationSeconds}
-                <div class="take-meta">Reference: {formatTime(teacherTrack.durationSeconds)}</div>
-              {/if}
-            {:else}
-              <p class="empty-state">No master reference track recorded.</p>
-            {/if}
-
-            <button
-              class="record-btn teacher {teacherRecorder.isRecording ? 'recording' : ''}"
-              onclick={handleTeacherRecord}
-            >
-              {#if teacherRecorder.isRecording}
-                ⏹ Stop Recording ({formatTime(teacherRecorder.recordingSeconds)})
-              {:else}
-                {teacherAuth.isUnlocked ? '🎙️ Record Reference' : '🔒 Teacher Unlock'}
-              {/if}
-            </button>
-
-            {#if teacherRecorder.isRecording}
-              <div class="vu-wrapper neo-border">
-                <div class="vu-fill teacher" style="width: {teacherRecorder.volumeLevel * 100}%"></div>
+                {#if teacherRecorder.isRecording}
+                  <div class="vu-wrapper neo-border">
+                    <div class="vu-fill teacher" style="width: {teacherRecorder.volumeLevel * 100}%"></div>
+                  </div>
+                {/if}
               </div>
-            {/if}
-          </div>
-        </section>
+            </section>
+          {/if}
+        </div>
       {/if}
 
       <!-- Interactive Learning Checkpoints -->
-      <section class="checkpoints-card neo-card">
-        <div class="checkpoints-top">
-          <div class="title-group">
-            <span class="checkpoints-icon">🎯</span>
-            <h3>Practice Checkpoints</h3>
+      <div class="cockpit-card-wrap">
+        <button
+          class="section-collapse-header"
+          onclick={() => toggleSection('checkpoints')}
+          aria-expanded={!collapsedSections.checkpoints}
+        >
+          <div class="collapse-title-row">
+            <span class="collapse-chevron">{collapsedSections.checkpoints ? '▶' : '▼'}</span>
+            <span class="collapse-title">🎯 Practice Checkpoints</span>
           </div>
-          {#if !isEditingCheckpoints}
-            <button class="edit-checkpoints-btn" onclick={handleEditCheckpoints}>
-              {teacherAuth.isUnlocked ? '✏️ Edit Points' : '🔒 Teacher Edit'}
-            </button>
+          {#if currentLesson}
+            {@const lesson = currentLesson}
+            <span class="collapse-summary-badge {lesson.checkpoints.length > 0 && Object.keys(completedCheckpoints).filter(k => k.startsWith(lesson.id) && completedCheckpoints[k]).length === lesson.checkpoints.length ? 'badge-success' : ''}">
+              {Object.keys(completedCheckpoints).filter(k => k.startsWith(lesson.id) && completedCheckpoints[k]).length} / {lesson.checkpoints.length} Done
+            </span>
           {/if}
-        </div>
+        </button>
 
-        {#if isEditingCheckpoints}
-          <p class="edit-instructions">Enter each learning point on a separate line:</p>
-          <textarea bind:value={editCheckpointsText} class="neo-textarea" rows="4"></textarea>
-          <div class="edit-btn-row">
-            <button class="action-btn primary-btn" onclick={saveCheckpoints}>Save Points</button>
-            <button class="action-btn outline-btn" onclick={() => isEditingCheckpoints = false}>Cancel</button>
-          </div>
-        {:else}
-          <ul class="checkpoints-checklist">
-            {#each currentLesson.checkpoints as pt, i}
-              {@const key = `${currentLesson.id}_cp_${i}`}
-              <li>
-                <button
-                  class="checkpoint-item {completedCheckpoints[key] ? 'done' : ''}"
-                  onclick={() => toggleCheckpoint(i)}
-                >
-                  <span class="check-box">{completedCheckpoints[key] ? '✅' : '⬜'}</span>
-                  <span class="check-text">{pt}</span>
+        {#if !collapsedSections.checkpoints}
+          <section class="checkpoints-card neo-card">
+            <div class="checkpoints-top">
+              <div class="title-group">
+                <span class="checkpoints-icon">🎯</span>
+                <h3>Learning Goals</h3>
+              </div>
+              {#if !isEditingCheckpoints}
+                <button class="edit-checkpoints-btn" onclick={handleEditCheckpoints}>
+                  {teacherAuth.isUnlocked ? '✏️ Edit Points' : '🔒 Teacher Edit'}
                 </button>
-              </li>
-            {/each}
-          </ul>
+              {/if}
+            </div>
+
+            {#if isEditingCheckpoints}
+              <p class="edit-instructions">Enter each learning point on a separate line:</p>
+              <textarea bind:value={editCheckpointsText} class="neo-textarea" rows="4"></textarea>
+              <div class="edit-btn-row">
+                <button class="action-btn primary-btn" onclick={saveCheckpoints}>Save Points</button>
+                <button class="action-btn outline-btn" onclick={() => isEditingCheckpoints = false}>Cancel</button>
+              </div>
+            {:else}
+              <ul class="checkpoints-checklist">
+                {#each currentLesson.checkpoints as pt, i}
+                  {@const key = `${currentLesson.id}_cp_${i}`}
+                  <li>
+                    <button
+                      class="checkpoint-item {completedCheckpoints[key] ? 'done' : ''}"
+                      onclick={() => toggleCheckpoint(i)}
+                    >
+                      <span class="check-box">{completedCheckpoints[key] ? '✅' : '⬜'}</span>
+                      <span class="check-text">{pt}</span>
+                    </button>
+                  </li>
+                {/each}
+              </ul>
+            {/if}
+          </section>
         {/if}
-      </section>
+      </div>
     </main>
   {/if}
 
@@ -1172,6 +1341,171 @@
       ⚙️ App Settings & Preferences
     </button>
   </footer>
+
+  <!-- 3-Second Count-In Pre-Roll Overlay -->
+  {#if countInTimer !== null}
+    <div
+      class="count-in-overlay"
+      onclick={cancelCountIn}
+      role="button"
+      tabindex="0"
+      onkeydown={(e) => e.key === 'Escape' && cancelCountIn()}
+    >
+      <div class="count-in-card neo-card" onclick={(e) => e.stopPropagation()} role="presentation">
+        <span class="count-in-icon">🎹</span>
+        <div class="count-in-number">{countInTimer}</div>
+        <p class="count-in-label">
+          {countInTarget === 'play' ? 'Hands on the keys... Starting!' : 'Get ready at the piano... Recording!'}
+        </p>
+        <button class="count-in-cancel-btn" onclick={cancelCountIn}>
+          ✕ Tap to Cancel
+        </button>
+      </div>
+    </div>
+  {/if}
+
+  <!-- Practice Lab & Advanced Tools Pop-Up Modal -->
+  {#if showPracticeLabModal && currentLesson}
+    <div
+      class="modal-backdrop"
+      onclick={() => showPracticeLabModal = false}
+      onkeydown={(e) => e.key === 'Escape' && (showPracticeLabModal = false)}
+      role="presentation"
+    >
+      <!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
+      <div
+        class="modal-card neo-card practice-lab-modal"
+        onclick={(e) => e.stopPropagation()}
+        onkeydown={(e) => e.stopPropagation()}
+        role="dialog"
+        tabindex="-1"
+        aria-modal="true"
+        aria-label="Practice Lab & Studio Tools"
+      >
+        <div class="modal-header">
+          <div class="modal-title-row">
+            <span class="modal-header-icon">🎛️</span>
+            <h2>Practice Lab & Studio Tools</h2>
+          </div>
+          <button class="modal-close-btn" onclick={() => showPracticeLabModal = false}>✕</button>
+        </div>
+
+        <div class="lab-body">
+          <!-- Playback Speed Section -->
+          <div class="lab-section">
+            <span class="lab-section-label">⚡ Practice Tempo & Speed</span>
+            <div class="lab-speed-grid">
+              {#each [0.5, 0.7, 0.85, 1.0, 1.25] as rate}
+                <button
+                  class="lab-speed-btn {playbackRate === rate ? 'active' : ''}"
+                  onclick={() => changePlaybackRate(rate)}
+                >
+                  <span class="rate-number">{rate}x</span>
+                  <span class="rate-desc">
+                    {rate === 0.5 ? 'Slow Mo' : rate === 0.7 ? 'Practice' : rate === 0.85 ? 'Medium' : rate === 1.0 ? 'Normal' : 'Brisk'}
+                  </span>
+                </button>
+              {/each}
+            </div>
+          </div>
+
+          <!-- A/B Looper Precision Studio Section -->
+          <div class="lab-section">
+            <span class="lab-section-label">🔁 A/B Loop Precision Studio</span>
+            <div class="lab-loop-grid">
+              <!-- Point A -->
+              <div class="loop-nudge-card">
+                <div class="loop-nudge-header">
+                  <span class="point-badge marker-a">🚩 Loop Start (A)</span>
+                  <span class="point-time">{formatTime(customLoopA ?? currentLesson.startTime)}</span>
+                </div>
+                <div class="nudge-btn-row">
+                  <button class="nudge-btn" onclick={() => nudgeLoopA(-0.5)}>-0.5s</button>
+                  <button class="nudge-btn" onclick={() => nudgeLoopA(-0.1)}>-0.1s</button>
+                  <button class="nudge-btn set-btn" onclick={setLoopA}>Set</button>
+                  <button class="nudge-btn" onclick={() => nudgeLoopA(0.1)}>+0.1s</button>
+                  <button class="nudge-btn" onclick={() => nudgeLoopA(0.5)}>+0.5s</button>
+                </div>
+              </div>
+
+              <!-- Point B -->
+              <div class="loop-nudge-card">
+                <div class="loop-nudge-header">
+                  <span class="point-badge marker-b">🏁 Loop End (B)</span>
+                  <span class="point-time">{formatTime(customLoopB ?? (currentLesson.endTime > 0 ? currentLesson.endTime : videoDuration))}</span>
+                </div>
+                <div class="nudge-btn-row">
+                  <button class="nudge-btn" onclick={() => nudgeLoopB(-0.5)}>-0.5s</button>
+                  <button class="nudge-btn" onclick={() => nudgeLoopB(-0.1)}>-0.1s</button>
+                  <button class="nudge-btn set-btn" onclick={setLoopB}>Set</button>
+                  <button class="nudge-btn" onclick={() => nudgeLoopB(0.1)}>+0.1s</button>
+                  <button class="nudge-btn" onclick={() => nudgeLoopB(0.5)}>+0.5s</button>
+                </div>
+              </div>
+            </div>
+
+            {#if customLoopA !== null || customLoopB !== null}
+              <button class="lab-clear-loop-btn" onclick={resetLoopAB}>
+                ✖ Reset Loop to Full Lesson Boundaries
+              </button>
+            {/if}
+          </div>
+
+          <!-- Fine Seeking Section -->
+          <div class="lab-section">
+            <span class="lab-section-label">🎯 Frame-by-Frame Precision Stepping</span>
+            <div class="lab-seek-row">
+              <button class="lab-seek-btn" onclick={() => seekBy(-1)}>◀ 1s Back</button>
+              <button class="lab-seek-btn" onclick={() => seekBy(-5)}>⏪ 5s Rewind</button>
+              <button class="lab-seek-btn restart-accent" onclick={restartPiece}>⏮ Restart</button>
+              <button class="lab-seek-btn" onclick={() => seekBy(5)}>5s Forward ⏩</button>
+              <button class="lab-seek-btn" onclick={() => seekBy(1)}>1s Forward ▶</button>
+            </div>
+          </div>
+
+          <!-- View & Audio Modes -->
+          <div class="lab-section">
+            <span class="lab-section-label">📺 View & Playback Modes</span>
+            <div class="lab-mode-grid">
+              <button
+                class="lab-mode-btn {isMuted ? 'active-muted' : ''}"
+                onclick={toggleMute}
+              >
+                {isMuted ? '🔇 Audio Muted (Visual Only)' : '🔊 Audio Normal'}
+              </button>
+
+              <button
+                class="lab-mode-btn {isTheaterMode ? 'active-theater' : ''}"
+                onclick={toggleTheaterMode}
+              >
+                {isTheaterMode ? '🔳 Standard Cockpit' : '🔲 Wide Theater Stage'}
+              </button>
+
+              <button
+                class="lab-mode-btn {isFullscreen ? 'active-fullscreen' : ''}"
+                onclick={toggleFullscreen}
+              >
+                {isFullscreen ? '🗗 Exit Fullscreen' : '⛶ Fullscreen'}
+              </button>
+
+              <button
+                class="lab-mode-btn {autoAdvance ? 'active-auto' : ''}"
+                onclick={() => { autoAdvance = !autoAdvance; if (autoAdvance) isLooping = false; }}
+              >
+                {autoAdvance ? '⏩ Continuous ON' : '⏭️ Auto-Next OFF'}
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button class="modal-primary-btn" onclick={() => showPracticeLabModal = false}>
+            ✓ Done & Return to Practice
+          </button>
+        </div>
+      </div>
+    </div>
+  {/if}
 
   <!-- Add Custom Provider Modal -->
   {#if showAddProviderModal}
@@ -1957,7 +2291,7 @@
     flex-wrap: wrap;
   }
 
-  .transport-left, .transport-middle, .speed-selector {
+  .transport-left, .transport-middle {
     display: flex;
     align-items: center;
     gap: 6px;
@@ -2012,62 +2346,6 @@
     color: #ffffff;
   }
 
-  .auto-advance-btn {
-    background: #ffffff;
-    border: 2px solid #000;
-    border-radius: 8px;
-    font-weight: 800;
-    font-size: 0.8rem;
-    padding: 8px 10px;
-    cursor: pointer;
-    box-shadow: 1px 1px 0 #000;
-  }
-
-  .auto-advance-btn.active {
-    background: #9C27B0;
-    color: #ffffff;
-  }
-
-  .ab-btn {
-    background: #ffffff;
-    border: 2px solid #000;
-    border-radius: 8px;
-    font-weight: 800;
-    font-size: 0.8rem;
-    padding: 8px 8px;
-    cursor: pointer;
-    box-shadow: 1px 1px 0 #000;
-  }
-
-  .ab-btn.set {
-    background: #E1BEE7;
-  }
-
-  .ab-reset-btn {
-    background: #FFCDD2;
-    border: 2px solid #000;
-    border-radius: 8px;
-    font-weight: 800;
-    padding: 8px 8px;
-    cursor: pointer;
-  }
-
-  .speed-chip {
-    background: #ffffff;
-    border: 2px solid #000;
-    border-radius: 6px;
-    font-weight: 800;
-    font-size: 0.75rem;
-    padding: 6px 8px;
-    cursor: pointer;
-    box-shadow: 1px 1px 0 #000;
-  }
-
-  .speed-chip.active {
-    background: #212121;
-    color: #ffffff;
-  }
-
   .transport-right {
     display: flex;
     align-items: center;
@@ -2110,13 +2388,6 @@
     background: #E8F5E9;
     color: #2E7D32;
     border-color: #2E7D32;
-  }
-
-  .fine-step-btn {
-    background: #F3E5F5;
-    color: #6A1B9A;
-    font-size: 0.75rem;
-    padding: 8px 8px;
   }
 
   /* Audio Studio */
@@ -2632,5 +2903,475 @@
     color: #666;
     font-style: italic;
     text-align: center;
+  }
+
+  /* Collapsible Cockpit Sections */
+  .cockpit-card-wrap {
+    margin-bottom: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .section-collapse-header {
+    background: #ffffff;
+    border: 3px solid #000;
+    border-radius: 12px;
+    padding: 10px 16px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    box-shadow: 2px 2px 0 #000;
+    cursor: pointer;
+    user-select: none;
+    box-sizing: border-box;
+    transition: transform 0.1s ease, box-shadow 0.1s ease;
+  }
+
+  .section-collapse-header:active {
+    transform: translate(1px, 1px);
+    box-shadow: 1px 1px 0 #000;
+  }
+
+  .collapse-title-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 900;
+    font-size: 0.95rem;
+    color: #121212;
+  }
+
+  .collapse-chevron {
+    font-size: 0.8rem;
+    width: 16px;
+    display: inline-block;
+  }
+
+  .collapse-summary-badge {
+    font-size: 0.75rem;
+    font-weight: 800;
+    background: #FFF9C4;
+    border: 1.5px solid #000;
+    border-radius: 6px;
+    padding: 3px 8px;
+    color: #333;
+    max-width: 50%;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .collapse-summary-badge.badge-success {
+    background: #E8F5E9;
+    color: #2E7D32;
+    border-color: #2E7D32;
+  }
+
+  /* Quick Count-in & Practice Lab Transport Buttons */
+  .count-in-quick-btn {
+    background: #FFF9C4;
+    border: 2px solid #000;
+    border-radius: 8px;
+    font-weight: 800;
+    font-size: 0.8rem;
+    padding: 8px 10px;
+    cursor: pointer;
+    box-shadow: 1px 1px 0 #000;
+    color: #E65100;
+    transition: transform 0.1s ease;
+  }
+
+  .count-in-quick-btn:active {
+    transform: translate(1px, 1px);
+  }
+
+  .practice-lab-trigger-btn {
+    background: #FFE082;
+    border: 2px solid #000;
+    border-radius: 8px;
+    font-weight: 900;
+    font-size: 0.85rem;
+    padding: 8px 14px;
+    cursor: pointer;
+    box-shadow: 2px 2px 0 #000;
+    color: #3E2723;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    transition: transform 0.1s ease, box-shadow 0.1s ease;
+  }
+
+  .practice-lab-trigger-btn:active {
+    transform: translate(1px, 1px);
+    box-shadow: 1px 1px 0 #000;
+  }
+
+  .record-btn-row {
+    display: flex;
+    gap: 8px;
+    align-items: stretch;
+    margin-top: 10px;
+  }
+
+  .record-btn-row .record-btn {
+    flex: 1;
+    margin-top: 0;
+  }
+
+  .count-in-record-btn {
+    background: #FFF9C4;
+    border: 2px solid #000;
+    border-radius: 8px;
+    font-weight: 800;
+    font-size: 0.8rem;
+    padding: 10px 12px;
+    cursor: pointer;
+    box-shadow: 1px 1px 0 #000;
+    color: #E65100;
+    white-space: nowrap;
+  }
+
+  /* 3-Second Visual Pre-Roll Count-in Overlay */
+  .count-in-overlay {
+    position: fixed;
+    top: 0; left: 0; width: 100vw; height: 100vh;
+    background: rgba(0, 0, 0, 0.75);
+    backdrop-filter: blur(4px);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 2000;
+  }
+
+  .count-in-card {
+    background: #FFFDE7;
+    border: 4px solid #000;
+    border-radius: 24px;
+    padding: 36px 40px;
+    text-align: center;
+    box-shadow: 8px 8px 0 #000;
+    max-width: 380px;
+    width: 88%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .count-in-icon {
+    font-size: 2.8rem;
+  }
+
+  .count-in-number {
+    font-size: 5.5rem;
+    font-weight: 900;
+    color: #FF6F00;
+    line-height: 1;
+    margin: 12px 0;
+    text-shadow: 2px 2px 0 #000;
+  }
+
+  .count-in-label {
+    font-size: 1.15rem;
+    font-weight: 900;
+    color: #212121;
+    margin-bottom: 20px;
+  }
+
+  .count-in-cancel-btn {
+    background: #ffffff;
+    border: 2px solid #000;
+    border-radius: 8px;
+    font-weight: 800;
+    padding: 8px 16px;
+    cursor: pointer;
+    box-shadow: 2px 2px 0 #000;
+    font-size: 0.85rem;
+  }
+
+  /* Practice Lab Modal */
+  .practice-lab-modal {
+    max-width: 640px !important;
+    width: 94% !important;
+    border-radius: 16px !important;
+    border: 4px solid #000 !important;
+    box-shadow: 6px 6px 0 #000 !important;
+    background: #FAF9F6 !important;
+    max-height: 88vh !important;
+    display: flex !important;
+    flex-direction: column !important;
+    padding: 0 !important;
+    overflow: hidden !important;
+  }
+
+  .modal-backdrop {
+    position: fixed;
+    top: 0; left: 0; width: 100vw; height: 100vh;
+    background: rgba(0, 0, 0, 0.65);
+    backdrop-filter: blur(2px);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1500;
+  }
+
+  .modal-header {
+    padding: 14px 20px;
+    border-bottom: 3px solid #000;
+    background: #FFE082;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .modal-title-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .modal-title-row h2 {
+    margin: 0;
+    font-size: 1.25rem;
+    font-weight: 900;
+  }
+
+  .modal-header-icon {
+    font-size: 1.4rem;
+  }
+
+  .modal-close-btn {
+    background: #ffffff;
+    border: 2px solid #000;
+    border-radius: 8px;
+    width: 34px;
+    height: 34px;
+    font-weight: 900;
+    cursor: pointer;
+    box-shadow: 2px 2px 0 #000;
+  }
+
+  .lab-body {
+    padding: 16px 20px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    flex: 1;
+  }
+
+  .lab-section {
+    background: #ffffff;
+    border: 2.5px solid #000;
+    border-radius: 12px;
+    padding: 14px;
+    box-shadow: 2px 2px 0 #000;
+  }
+
+  .lab-section-label {
+    display: block;
+    font-weight: 900;
+    font-size: 0.9rem;
+    margin-bottom: 10px;
+    color: #212121;
+  }
+
+  .lab-speed-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
+    gap: 8px;
+  }
+
+  .lab-speed-btn {
+    background: #ffffff;
+    border: 2px solid #000;
+    border-radius: 8px;
+    padding: 8px 6px;
+    cursor: pointer;
+    text-align: center;
+    box-shadow: 1px 1px 0 #000;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .lab-speed-btn.active {
+    background: #FFD54F;
+    border-width: 3px;
+  }
+
+  .rate-number {
+    font-size: 1.05rem;
+    font-weight: 900;
+  }
+
+  .rate-desc {
+    font-size: 0.65rem;
+    font-weight: 800;
+    color: #666;
+  }
+
+  .lab-loop-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+
+  @media (max-width: 550px) {
+    .lab-loop-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .loop-nudge-card {
+    background: #F5F5F5;
+    border: 2px solid #000;
+    border-radius: 8px;
+    padding: 10px;
+  }
+
+  .loop-nudge-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+  }
+
+  .point-badge {
+    font-size: 0.75rem;
+    font-weight: 800;
+    padding: 2px 6px;
+    border-radius: 4px;
+    border: 1px solid #000;
+    color: #fff;
+  }
+
+  .point-time {
+    font-size: 0.85rem;
+    font-weight: 900;
+  }
+
+  .nudge-btn-row {
+    display: flex;
+    gap: 4px;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .nudge-btn {
+    background: #ffffff;
+    border: 1.5px solid #000;
+    border-radius: 6px;
+    font-size: 0.75rem;
+    font-weight: 800;
+    padding: 6px 6px;
+    cursor: pointer;
+    flex: 1;
+    min-width: 38px;
+    text-align: center;
+  }
+
+  .nudge-btn.set-btn {
+    background: #E1BEE7;
+  }
+
+  .lab-clear-loop-btn {
+    margin-top: 10px;
+    width: 100%;
+    background: #FFEBEE;
+    color: #C62828;
+    border: 2px solid #C62828;
+    border-radius: 8px;
+    font-weight: 800;
+    font-size: 0.8rem;
+    padding: 8px;
+    cursor: pointer;
+  }
+
+  .lab-seek-row {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .lab-seek-btn {
+    background: #ffffff;
+    border: 2px solid #000;
+    border-radius: 8px;
+    font-weight: 800;
+    font-size: 0.8rem;
+    padding: 8px 12px;
+    cursor: pointer;
+    box-shadow: 1px 1px 0 #000;
+  }
+
+  .lab-seek-btn.restart-accent {
+    background: #E8F5E9;
+    color: #2E7D32;
+    border-color: #2E7D32;
+  }
+
+  .lab-mode-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+  }
+
+  @media (max-width: 550px) {
+    .lab-mode-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .lab-mode-btn {
+    background: #ffffff;
+    border: 2px solid #000;
+    border-radius: 8px;
+    font-weight: 800;
+    font-size: 0.8rem;
+    padding: 10px;
+    cursor: pointer;
+    text-align: center;
+    box-shadow: 1px 1px 0 #000;
+  }
+
+  .lab-mode-btn.active-muted {
+    background: #FFCDD2;
+    color: #C62828;
+    border-color: #C62828;
+  }
+
+  .lab-mode-btn.active-theater {
+    background: #FFF9C4;
+  }
+
+  .lab-mode-btn.active-fullscreen {
+    background: #E1F5FE;
+  }
+
+  .lab-mode-btn.active-auto {
+    background: #E1BEE7;
+  }
+
+  .modal-footer {
+    padding: 12px 20px;
+    border-top: 2px solid #000;
+    background: #ffffff;
+    display: flex;
+    justify-content: flex-end;
+  }
+
+  .modal-primary-btn {
+    background: #4CAF50;
+    color: #ffffff;
+    border: 2px solid #000;
+    border-radius: 8px;
+    font-weight: 900;
+    font-size: 0.95rem;
+    padding: 10px 20px;
+    cursor: pointer;
+    box-shadow: 2px 2px 0 #000;
   }
 </style>
