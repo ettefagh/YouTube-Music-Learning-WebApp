@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { onMount } from 'svelte';
+  import { onMount, onDestroy } from 'svelte';
   import {
     db,
     initDatabase,
@@ -86,6 +86,12 @@
   let customLoopA = $state<number | null>(null);
   let customLoopB = $state<number | null>(null);
 
+  // --- Enhanced Player Controls State ---
+  let isFullscreen = $state<boolean>(false);
+  let isTheaterMode = $state<boolean>(false);
+  let isMuted = $state<boolean>(false);
+  let playerCardElement = $state<HTMLElement | null>(null);
+
   // --- Metronome ---
   let showMetronome = $state<boolean>(false);
 
@@ -152,7 +158,25 @@
       selectedBookId = books[0].id;
       await loadDataForSelectedBook();
     }
+
+    if (typeof document !== 'undefined') {
+      document.addEventListener('fullscreenchange', handleFullscreenChange);
+      document.addEventListener('webkitfullscreenchange', handleFullscreenChange);
+    }
   });
+
+  onDestroy(() => {
+    if (typeof document !== 'undefined') {
+      document.removeEventListener('fullscreenchange', handleFullscreenChange);
+      document.removeEventListener('webkitfullscreenchange', handleFullscreenChange);
+    }
+  });
+
+  function handleFullscreenChange() {
+    if (typeof document !== 'undefined') {
+      isFullscreen = !!document.fullscreenElement;
+    }
+  }
 
   async function loadDataForSelectedBook() {
     allLessons = await db.lessons.where('bookId').equals(selectedBookId).sortBy('sequenceIndex');
@@ -291,6 +315,46 @@
     playbackRate = rate;
     if (playerController) {
       playerController.setRate(rate);
+    }
+  }
+
+  function toggleFullscreen() {
+    if (!playerCardElement) return;
+    if (!document.fullscreenElement) {
+      if (playerCardElement.requestFullscreen) {
+        playerCardElement.requestFullscreen().catch(err => console.warn('Fullscreen error:', err));
+      } else if ((playerCardElement as any).webkitRequestFullscreen) {
+        (playerCardElement as any).webkitRequestFullscreen();
+      }
+    } else {
+      if (document.exitFullscreen) {
+        document.exitFullscreen().catch(err => console.warn('Exit fullscreen error:', err));
+      } else if ((document as any).webkitExitFullscreen) {
+        (document as any).webkitExitFullscreen();
+      }
+    }
+  }
+
+  function toggleTheaterMode() {
+    isTheaterMode = !isTheaterMode;
+  }
+
+  function toggleMute() {
+    if (!playerController) return;
+    if (isMuted) {
+      playerController.unMute();
+      isMuted = false;
+    } else {
+      playerController.mute();
+      isMuted = true;
+    }
+  }
+
+  function restartPiece() {
+    const startTime = currentLesson?.startTime ?? 0;
+    videoSeekTarget = startTime;
+    if (playerController) {
+      playerController.seekTo(startTime);
     }
   }
 
@@ -772,7 +836,10 @@
       {/if}
 
       <!-- Video Player Card -->
-      <div class="player-card neo-card">
+      <div
+        class="player-card neo-card {isTheaterMode ? 'theater-mode' : ''} {isFullscreen ? 'is-fullscreen' : ''}"
+        bind:this={playerCardElement}
+      >
         <!-- YouTube Frame with Looper Action -->
         {#key `${currentLesson.youtubeVideoId}_${selectedProvider}`}
           <div
@@ -881,8 +948,11 @@
             >
               {isVideoPlaying ? '⏸ Pause' : '▶ Play'}
             </button>
+            <button class="skip-btn restart-btn" onclick={restartPiece} title="Restart piece from beginning">⏮ Restart</button>
+            <button class="skip-btn fine-step-btn" onclick={() => seekBy(-1)} title="Step back 1 second">◀ 1s</button>
             <button class="skip-btn" onclick={() => seekBy(-5)} title="Rewind 5 seconds">⏪ 5s</button>
             <button class="skip-btn" onclick={() => seekBy(5)} title="Forward 5 seconds">5s ⏩</button>
+            <button class="skip-btn fine-step-btn" onclick={() => seekBy(1)} title="Step forward 1 second">1s ▶</button>
           </div>
 
           <div class="transport-middle">
@@ -924,6 +994,35 @@
                 {rate}x
               </button>
             {/each}
+          </div>
+
+          <div class="transport-right">
+            <!-- Mute / Unmute Toggle -->
+            <button
+              class="utility-btn mute-btn {isMuted ? 'muted' : ''}"
+              onclick={toggleMute}
+              title={isMuted ? 'Unmute video audio' : 'Mute video audio (practice visually with hands)'}
+            >
+              {isMuted ? '🔇 Unmute' : '🔊 Mute'}
+            </button>
+
+            <!-- Theater Mode Toggle -->
+            <button
+              class="utility-btn theater-btn {isTheaterMode ? 'active' : ''}"
+              onclick={toggleTheaterMode}
+              title={isTheaterMode ? 'Standard cockpit view' : 'Wide theater stage'}
+            >
+              {isTheaterMode ? '🔳 Standard' : '🔲 Theater'}
+            </button>
+
+            <!-- Fullscreen Toggle -->
+            <button
+              class="utility-btn fullscreen-btn {isFullscreen ? 'active' : ''}"
+              onclick={toggleFullscreen}
+              title={isFullscreen ? 'Exit full screen' : 'Expand full screen'}
+            >
+              {isFullscreen ? '🗗 Exit' : '⛶ Fullscreen'}
+            </button>
           </div>
         </div>
       </div>
@@ -1702,6 +1801,38 @@
     background: #000000;
     overflow: hidden;
     margin-bottom: 20px;
+    transition: max-width 0.25s ease, width 0.25s ease;
+  }
+
+  .player-card.theater-mode {
+    max-width: 1100px;
+    width: min(96vw, 1100px);
+    margin-left: 50%;
+    transform: translateX(-50%);
+  }
+
+  .player-card:fullscreen,
+  .player-card:-webkit-full-screen {
+    width: 100vw !important;
+    height: 100vh !important;
+    max-width: none !important;
+    border-radius: 0 !important;
+    border: none !important;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: space-between !important;
+    background: #000 !important;
+    margin: 0 !important;
+    transform: none !important;
+    box-shadow: none !important;
+  }
+
+  .player-card:fullscreen .yt-frame,
+  .player-card:-webkit-full-screen .yt-frame {
+    flex: 1;
+    height: auto !important;
+    aspect-ratio: auto;
+    max-height: calc(100vh - 130px);
   }
 
   .yt-frame {
@@ -1935,6 +2066,57 @@
   .speed-chip.active {
     background: #212121;
     color: #ffffff;
+  }
+
+  .transport-right {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-wrap: wrap;
+  }
+
+  .utility-btn {
+    background: #ffffff;
+    border: 2px solid #000;
+    border-radius: 8px;
+    font-weight: 800;
+    font-size: 0.8rem;
+    padding: 8px 10px;
+    cursor: pointer;
+    box-shadow: 1px 1px 0 #000;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    transition: transform 0.1s ease, box-shadow 0.1s ease, background 0.15s ease;
+  }
+
+  .utility-btn:active {
+    transform: translate(1px, 1px);
+    box-shadow: 0 0 0 #000;
+  }
+
+  .utility-btn.active {
+    background: #FFD54F;
+    color: #000000;
+  }
+
+  .utility-btn.muted {
+    background: #FFCDD2;
+    color: #C62828;
+    border-color: #C62828;
+  }
+
+  .restart-btn {
+    background: #E8F5E9;
+    color: #2E7D32;
+    border-color: #2E7D32;
+  }
+
+  .fine-step-btn {
+    background: #F3E5F5;
+    color: #6A1B9A;
+    font-size: 0.75rem;
+    padding: 8px 8px;
   }
 
   /* Audio Studio */

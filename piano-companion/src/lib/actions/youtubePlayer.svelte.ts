@@ -6,6 +6,9 @@ export interface YouTubePlayerController {
   seekBy: (deltaSeconds: number) => void;
   setRate: (rate: number) => void;
   isPlaying: () => boolean;
+  mute: () => void;
+  unMute: () => void;
+  isMuted: () => boolean;
 }
 
 export interface LooperOptions {
@@ -72,6 +75,15 @@ export function youtubeLooper(node: HTMLElement, options: LooperOptions) {
     isPlaying: () => {
       if (!player?.getPlayerState || !window.YT) return false;
       return player.getPlayerState() === window.YT.PlayerState.PLAYING;
+    },
+    mute: () => {
+      if (player?.mute) player.mute();
+    },
+    unMute: () => {
+      if (player?.unMute) player.unMute();
+    },
+    isMuted: () => {
+      return player?.isMuted ? player.isMuted() : false;
     }
   };
 
