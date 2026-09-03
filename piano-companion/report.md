@@ -1,21 +1,23 @@
 Implemented the engineered scope for this issue.
 
-**Commit:** `8b2407a0c87bb7d26b8da106de9cc4c59440fa98`
+**Commit:** `26c62dcc16b157e80a7023c831f58c4208e8b3aa`
 
 **Files touched:**
-- `piano-companion/src/lib/actions/youtubePlayer.svelte.ts`
+- `piano-companion/src/lib/actions/longpress.ts`
+- `piano-companion/src/routes/+page.svelte`
 
 **Behavior verified:**
-- **Autoplay Eliminated on App Open & Provider Changes**: Replaced aggressive video auto-loading (`loadVideoById`) with non-playing video preparation (`cueVideoById`) during lesson selection and curriculum provider switches. Videos only begin playing when the user explicitly clicks `▶ Play`.
-- **Initialization Lifecycle Protection**: Removed premature `startLoopWatcher()` execution from `onReady`, ensuring loop boundary monitors only run while `controller.isPlaying()` is true.
-- **Initial Chapter Cues**: Configured `onReady` to cue start seconds (`cueVideoById`) or ensure `player.pauseVideo()` is called after setting the playback rate.
-- **Paused Chapter Jump Safety**: Ensured chapter jumps within the same video ID maintain paused state if the user was paused prior to selecting a chapter.
+- **Touchscreen & Kid Ergonomics**: Upgraded all primary transport buttons to chunky 48px+ touch targets with tactile neo-brutalist styling, high-contrast borders, and touch suppression on long-press.
+- **3-Second Pre-Roll Count-in**: Introduced visual count-in modal with 3-2-1 countdown for both practice playback (`⏳ 3s Play`) and take recording (`⏳ 3s Pre-Roll`), giving young students calm transition time to position their hands on the piano keys.
+- **Practice Lab Pop-Up Modal**: Moved advanced teacher/parent tools (fine-grained tempo chips 0.5x–1.25x, frame-by-frame 1s/5s seeking, precision A/B micro-looping nudges with ±0.1s/0.5s steppers, theater/fullscreen/mute controls) into a dedicated pop-up modal launched via `🎛️ Practice Lab`.
+- **Collapsible Cockpit Sections**: Built high-contrast accordion headers for Timeline, Audio Recording Studio, Interactive Metronome, and Practice Checkpoints with live status badges (`✅ Take Recorded`, `0/4 Done`) and `localStorage` state persistence.
+- **Long-Press Gestures Engine**: Implemented `longpress` action enabling 500ms hold on Play (to start 3s count-in) and Restart (for Deep Reset with Pip cheering).
 
 **Verification passed:**
 - `npm run check` — 0 errors, 0 warnings.
 - `npm run build` — Clean production build.
-- Playwright E2E verification (`test-no-autoplay.js`) — Validated that video remains in paused state (`▶ Play`) upon initial app open, upon switching to singles provider (`Anikó Drabon`), upon switching to playlist provider (`VikaPiano`), and upon selecting next lesson.
-- Cloudflare Pages live deployment — Deployed to production endpoint `https://5e1a9855.piano-practice-companion.pages.dev` and verified.
+- Playwright E2E verification (`test-touch-kid-ux.js`) — Emulated touch device (iPad 1024x768), tested section collapse/expand, count-in pre-roll, Practice Lab speed adjustment to 0.7x, and long-press Deep Reset.
+- Cloudflare Pages live deployment — Successfully deployed to production endpoint `https://11b3e7f9.piano-practice-companion.pages.dev` and verified with HTTP 200.
 
 **Docs updated:**
 - `README.md` — reviewed, no change needed.
