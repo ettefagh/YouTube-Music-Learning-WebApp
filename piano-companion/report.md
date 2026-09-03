@@ -1,24 +1,21 @@
 Implemented the engineered scope for this issue.
 
-**Commit:** `4ca231f6ab4e7fa50202678e6c6783c21c98840e`
+**Commit:** `ed464477b0a79d855aac582371f7b80329326040`
 
 **Files touched:**
-- `piano-companion/src/lib/db/db.ts`
-- `piano-companion/src/lib/actions/youtubePlayer.svelte.ts`
-- `piano-companion/src/lib/components/ChapterTimeline.svelte`
 - `piano-companion/src/routes/+page.svelte`
 
 **Behavior verified:**
-- **Lesson List Types Architecture**: Implemented robust type definition `LessonListType` (`'singles' | 'playlist' | 'chapters'`) and `detectListType` heuristic detection across curriculum books and custom sources.
-- **Instant Chapter Seeking (Zero Iframe Reload)**: Enhanced `youtubePlayer.svelte.ts` looper action to detect chapter switches on the same video ID and immediately invoke `player.seekTo(startTime, true)` without reloading the YouTube player, completely eliminating buffering lag between chapters.
-- **Interactive Chapter Timeline Ribbon**: Created `ChapterTimeline.svelte` showing proportional visual chapter segments along the timeline, highlighting active chapter, showing time spans, and enabling single-click seeking across all chapters.
-- **Continuous Recital / Auto-Advance Mode**: Added `onSegmentComplete` boundary detection and `autoAdvance` toggle in transport bar to allow students to choose between looping a single piece or automatically proceeding to the next piece in a playlist or chapter sequence.
-- **Channel & Provider UI Polish**: Added distinct visual icons to provider pills (`🔖` Bookmarked Chapters, `🎬` Singles, `📑` Playlist) and updated the "Add Source" dialog with dedicated templates and guidance for each list type.
+- **Curriculum Channels Manager in Settings**: Added a dedicated management panel in Companion Settings listing all active sources for the selected book with list type icons (`🔖`, `📑`, `🎬`), track counts, and status indicators.
+- **Built-in Channel Safety**: Identified core seed channels and marked them with `🔒 Built-in`, safeguarding essential curricula from accidental deletion.
+- **Custom Provider Deletion**: Enabled removal of custom sources with confirmation dialog, purging associated lesson records from Dexie IndexedDB and updating UI state cleanly.
+- **Standard YouTube Extraction**: Upgraded provider input parser with standard helpers (`extractYouTubeVideoId` and `extractYouTubePlaylistId`) to extract IDs from standard YouTube URLs (`youtu.be`, `youtube.com/watch?v=`, `youtube.com/playlist?list=`) and flexible chapter timestamp layouts (`MM:SS Title`, `HH:MM:SS Title`, `0:00 - Title`).
+- **In-Settings Source Creation**: Added `➕ Add Source` button directly within the Settings modal for streamlined custom repertoire management.
 
 **Verification passed:**
 - `npm run check` — 0 errors, 0 warnings.
-- `npm run build` — Clean Cloudflare Pages production bundle generated in 1m 1s.
-- Playwright E2E browser verification (`test-list-types.js`) — Successfully verified DOM badges (`🔖 Bookmarked Video`, `🎬 Individual Videos`, `📑 YouTube Playlist`), 54 chapter ribbon segments, and captured full-page screenshot.
+- `npm run build` — Clean production build generated in 24s.
+- Playwright E2E verification (`test-settings-channels.js`) — Successfully unlocked Teacher Gate via math challenge, inspected 3 built-in channels, added custom provider with standard YouTube URL, verified track count, and performed confirmed deletion.
 
 **Docs updated:**
 - `README.md` — reviewed, no change needed.
