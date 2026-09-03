@@ -34,6 +34,28 @@
   // Lesson list type detection
   let currentListType = $derived<LessonListType>(detectListType(lessons, selectedProvider));
 
+  const BUILTIN_PROVIDERS = [
+    'Anikó Drabon (Singles)',
+    'VikaPiano (Playlist)',
+    'Piano Companion (Chapters)',
+    'Anikó Drabon (Playlist)',
+    'Gavin Brady (Chapters)'
+  ];
+
+  let providerSummaries = $derived(
+    providers.map(pName => {
+      const pLessons = allLessons.filter(l => l.providerName === pName);
+      const type = detectListType(pLessons, pName);
+      const isBuiltin = BUILTIN_PROVIDERS.includes(pName);
+      return {
+        name: pName,
+        type,
+        count: pLessons.length,
+        isBuiltin
+      };
+    })
+  );
+
   // Search & Navigation
   let lessonSearch = $state<string>('');
   let isDropdownOpen = $state<boolean>(false);
@@ -418,6 +440,47 @@
   }
 
   // --- Custom Provider Handler ---
+  async function deleteCustomProvider(providerName: string) {
+    if (BUILTIN_PROVIDERS.includes(providerName)) return;
+    const confirmDelete = window.confirm(`Are you sure you want to remove channel "${providerName}" and all its tracks?`);
+    if (!confirmDelete) return;
+
+    const lessonIdsToDelete = allLessons
+      .filter(l => l.providerName === providerName)
+      .map(l => l.id);
+
+    await db.lessons.bulkDelete(lessonIdsToDelete);
+
+    if (defaultProvider === providerName) {
+      defaultProvider = '';
+      localStorage.removeItem('defaultProvider');
+    }
+
+    await loadDataForSelectedBook();
+
+    if (selectedProvider === providerName) {
+      if (providers.length > 0) {
+        selectProvider(providers[0]);
+      } else {
+        currentLesson = null;
+      }
+    }
+  }
+
+  function extractYouTubeVideoId(input: string): string {
+    const trimmed = input.trim();
+    const urlMatch = trimmed.match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|embed\/|v\/|shorts\/))([\w-]{11})/);
+    if (urlMatch) return urlMatch[1];
+    const idMatch = trimmed.match(/([a-zA-Z0-9_-]{11})/);
+    return idMatch ? idMatch[1] : trimmed;
+  }
+
+  function extractYouTubePlaylistId(input: string): string {
+    const trimmed = input.trim();
+    const match = trimmed.match(/[?&]list=([a-zA-Z0-9_-]+)/);
+    return match ? match[1] : trimmed;
+  }
+
   async function handleAddProvider() {
     isAddingProvider = true;
     addProviderError = '';
@@ -441,18 +504,31 @@
       };
 
       if (newProviderType === 'singles') {
-        const ids = newProviderInput.split('\n').map(id => id.trim()).filter(id => id);
-        ids.forEach((videoId, index) => {
-          newLessons.push({
-            ...baseLessonParams,
-            id: crypto.randomUUID(),
-            title: `Custom Track ${index + 1}`,
-            sequenceIndex: index + 1,
-            youtubeVideoId: videoId
-          });
+        const lines = newProviderInput.split('\n').map(l => l.trim()).filter(l => l);
+        lines.forEach((line, index) => {
+          let title = `Piece ${index + 1}`;
+          let videoUrlOrId = line;
+
+          const separatorMatch = line.match(/^(.*?)\s*[-:]\s*(https?:\/\/.*|[a-zA-Z0-9_-]{11})$/);
+          if (separatorMatch) {
+            title = separatorMatch[1].trim() || title;
+            videoUrlOrId = separatorMatch[2].trim();
+          }
+
+          const videoId = extractYouTubeVideoId(videoUrlOrId);
+          if (videoId) {
+            newLessons.push({
+              ...baseLessonParams,
+              id: crypto.randomUUID(),
+              title,
+              sequenceIndex: index + 1,
+              youtubeVideoId: videoId
+            });
+          }
         });
       } else if (newProviderType === 'playlist') {
-        const res = await fetch(`https://inv.nadeko.net/api/v1/playlists/${newProviderInput.trim()}`);
+        const playlistId = extractYouTubePlaylistId(newProviderInput.trim());
+        const res = await fetch(`https://inv.nadeko.net/api/v1/playlists/${playlistId}`);
         if (!res.ok) throw new Error('Failed to fetch playlist.');
         const data = await res.json();
         if (!data.videos) throw new Error('Playlist has no videos.');
@@ -467,7 +543,7 @@
         });
       } else if (newProviderType === 'chapters') {
         const lines = newProviderInput.split('\n').map(l => l.trim()).filter(l => l);
-        const videoId = lines[0];
+        const videoId = extractYouTubeVideoId(lines[0]);
         const chapterLines = lines.slice(1);
 
         const timeToSeconds = (timeStr: string) => {
@@ -477,11 +553,11 @@
         };
 
         const parsedChapters: Array<{ time: string; title: string }> = [];
-        const regex = /(\d+:\d{2}(?::\d{2})?)\s+(.*)/;
+        const regex = /(?:^|\s)(\d{1,2}:\d{2}(?::\d{2})?)\s*[-:]?\s*(.*)/;
         for (const line of chapterLines) {
           const match = regex.exec(line);
           if (match) {
-            parsedChapters.push({ time: match[1], title: match[2].trim() });
+            parsedChapters.push({ time: match[1], title: match[2].trim() || `Chapter ${parsedChapters.length + 1}` });
           }
         }
 
@@ -509,7 +585,7 @@
         await loadDataForSelectedBook();
         selectProvider(newLessons[0].providerName);
       } else {
-        addProviderError = 'No valid tracks could be generated.';
+        addProviderError = 'No valid tracks could be generated from the input.';
       }
     } catch (err: any) {
       addProviderError = err.message || 'An error occurred parsing input.';
@@ -1112,6 +1188,49 @@
               <option value={p}>{p}</option>
             {/each}
           </select>
+        </div>
+
+        <div class="form-group">
+          <div class="channel-header-row">
+            <span class="form-label">Curriculum Sources & Channels:</span>
+            <button
+              class="add-channel-btn-mini"
+              onclick={() => { showSettingsModal = false; showAddProviderModal = true; }}
+            >
+              ➕ Add Source
+            </button>
+          </div>
+
+          <div class="channels-manager-list neo-border">
+            {#each providerSummaries as p}
+              <div class="channel-row-item {selectedProvider === p.name ? 'active-channel' : ''}">
+                <div class="channel-item-left">
+                  <span class="type-icon">{p.type === 'chapters' ? '🔖' : p.type === 'playlist' ? '📑' : '🎬'}</span>
+                  <div class="channel-meta-text">
+                    <span class="channel-title">{p.name}</span>
+                    <span class="channel-subtext">{p.count} tracks · {p.type}</span>
+                  </div>
+                </div>
+
+                <div class="channel-item-right">
+                  {#if p.isBuiltin}
+                    <span class="builtin-badge">🔒 Built-in</span>
+                  {:else}
+                    <button
+                      class="delete-channel-btn"
+                      onclick={() => deleteCustomProvider(p.name)}
+                      title="Remove custom channel"
+                    >
+                      🗑️ Remove
+                    </button>
+                  {/if}
+                </div>
+              </div>
+            {/each}
+            {#if providerSummaries.length === 0}
+              <div class="no-channels-msg">No channels found for this book.</div>
+            {/if}
+          </div>
         </div>
 
         <div class="form-group">
@@ -2096,8 +2215,10 @@
   .modal-card {
     background: #ffffff;
     padding: 24px;
-    max-width: 480px;
-    width: 90%;
+    max-width: 500px;
+    width: 92%;
+    max-height: 90vh;
+    overflow-y: auto;
     box-sizing: border-box;
   }
 
@@ -2213,5 +2334,121 @@
     0% { transform: scale(1); }
     50% { transform: scale(0.97); }
     100% { transform: scale(1); }
+  }
+
+  /* Channels Manager in Settings Modal */
+  .channel-header-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 6px;
+  }
+
+  .add-channel-btn-mini {
+    background: #E8F5E9;
+    border: 2px solid #000;
+    border-radius: 6px;
+    font-weight: 800;
+    font-size: 0.75rem;
+    padding: 3px 8px;
+    cursor: pointer;
+    box-shadow: 1px 1px 0 #000;
+  }
+
+  .add-channel-btn-mini:active {
+    transform: translate(1px, 1px);
+    box-shadow: 0 0 0 #000;
+  }
+
+  .channels-manager-list {
+    background: #FAFAFA;
+    max-height: 180px;
+    overflow-y: auto;
+    border-radius: 8px;
+  }
+
+  .channel-row-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 12px;
+    border-bottom: 1px solid #E0E0E0;
+  }
+
+  .channel-row-item:last-child {
+    border-bottom: none;
+  }
+
+  .channel-row-item.active-channel {
+    background: #FFFDE7;
+  }
+
+  .channel-item-left {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-width: 0;
+  }
+
+  .channel-meta-text {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+  }
+
+  .channel-title {
+    font-size: 0.85rem;
+    font-weight: 800;
+    color: #121212;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .channel-subtext {
+    font-size: 0.7rem;
+    font-weight: 700;
+    color: #666;
+    text-transform: capitalize;
+  }
+
+  .channel-item-right {
+    flex-shrink: 0;
+    margin-left: 8px;
+  }
+
+  .builtin-badge {
+    font-size: 0.7rem;
+    font-weight: 800;
+    color: #555;
+    background: #E0E0E0;
+    padding: 2px 6px;
+    border-radius: 4px;
+    border: 1px solid #999;
+  }
+
+  .delete-channel-btn {
+    background: #FFEBEE;
+    color: #D32F2F;
+    border: 1.5px solid #D32F2F;
+    border-radius: 6px;
+    font-weight: 800;
+    font-size: 0.75rem;
+    padding: 3px 8px;
+    cursor: pointer;
+    box-shadow: 1px 1px 0 #000;
+  }
+
+  .delete-channel-btn:active {
+    transform: translate(1px, 1px);
+    box-shadow: 0 0 0 #000;
+  }
+
+  .no-channels-msg {
+    padding: 12px;
+    font-size: 0.8rem;
+    color: #666;
+    font-style: italic;
+    text-align: center;
   }
 </style>
