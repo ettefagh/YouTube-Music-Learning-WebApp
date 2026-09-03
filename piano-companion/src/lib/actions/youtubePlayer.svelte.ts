@@ -134,11 +134,20 @@ export function youtubeLooper(node: HTMLElement, options: LooperOptions) {
       events: {
         onReady: () => {
           player.setPlaybackRate(options.playbackRate());
-          if (options.startTime() > 0 && player.seekTo) {
-            player.seekTo(options.startTime(), true);
+          if (options.startTime() > 0) {
+            if (player.cueVideoById && vId) {
+              player.cueVideoById({
+                videoId: vId,
+                startSeconds: options.startTime()
+              });
+            } else if (player.seekTo) {
+              player.seekTo(options.startTime(), false);
+              player.pauseVideo?.();
+            }
+          } else {
+            player.pauseVideo?.();
           }
           options.onReady?.(controller);
-          startLoopWatcher();
         },
         onStateChange: (event: any) => {
           let stateName: 'unstarted' | 'ended' | 'playing' | 'paused' | 'buffering' | 'cued' = 'unstarted';
@@ -169,6 +178,12 @@ export function youtubeLooper(node: HTMLElement, options: LooperOptions) {
     const earlySeekThreshold = 0.08;
 
     const checkTime = () => {
+      // Only execute loop monitoring while the player is actively playing
+      if (!controller.isPlaying()) {
+        stopLoopWatcher();
+        return;
+      }
+
       if (player && player.getCurrentTime) {
         const currentTime = player.getCurrentTime();
         const duration = player.getDuration() || 0;
@@ -244,21 +259,31 @@ export function youtubeLooper(node: HTMLElement, options: LooperOptions) {
       if (player && newVId) {
         const currentVideoUrl = player.getVideoUrl ? player.getVideoUrl() : '';
         if (newVId !== lastVideoId && (!currentVideoUrl || !currentVideoUrl.includes(newVId))) {
-          // Different video: load new video
+          // Different video: cue new video unless user was already playing
+          const wasPlaying = controller.isPlaying();
           lastVideoId = newVId;
           lastStartTime = newStart;
           segmentEndedFired = false;
-          if (player.loadVideoById) {
+          if (wasPlaying && player.loadVideoById) {
             player.loadVideoById({
+              videoId: newVId,
+              startSeconds: newStart
+            });
+          } else if (player.cueVideoById) {
+            player.cueVideoById({
               videoId: newVId,
               startSeconds: newStart
             });
           }
         } else if (newStart !== lastStartTime && player.seekTo) {
           // Same video ID: user switched chapters! Zero-reload instant jump!
+          const wasPlaying = controller.isPlaying();
           lastStartTime = newStart;
           segmentEndedFired = false;
           player.seekTo(newStart, true);
+          if (!wasPlaying && player.pauseVideo) {
+            player.pauseVideo();
+          }
         }
       }
     },
