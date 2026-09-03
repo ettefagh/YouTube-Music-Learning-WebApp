@@ -18,6 +18,29 @@
   import OnboardingModal from '#lib/components/OnboardingModal.svelte';
   import TeacherGate from '#lib/components/TeacherGate.svelte';
   import { longpress } from '#lib/actions/longpress.js';
+  import {
+    type StudentProfile,
+    type KidAvatarKey,
+    KID_AVATARS,
+    DEFAULT_STUDENT_PROFILES,
+    getAvatarEmoji,
+    getAvatarColor
+  } from '#lib/types/studentProfile.js';
+  import { getEducatorInfo } from '#lib/types/educator.js';
+
+  // --- Multi-Screen YouTube Kids-Style Navigation ---
+  type ActiveScreen = 'hub' | 'player' | 'studio' | 'goals';
+  let activeScreen = $state<ActiveScreen>('hub');
+
+  // --- Kid Profiles State ---
+  let studentProfiles = $state<StudentProfile[]>(DEFAULT_STUDENT_PROFILES);
+  let activeProfileId = $state<string>('profile-leo');
+  let activeProfile = $derived<StudentProfile>(
+    studentProfiles.find(p => p.id === activeProfileId) ?? studentProfiles[0]
+  );
+  let showAddProfileModal = $state<boolean>(false);
+  let newProfileName = $state<string>('');
+  let newProfileAvatar = $state<KidAvatarKey>('lion');
 
   // --- Curriculum & Book State ---
   let books = $state<LocalBook[]>([]);
@@ -174,6 +197,25 @@
       } catch (e) {
         console.warn('Failed to parse collapsedSections:', e);
       }
+    }
+
+    const savedScreen = localStorage.getItem('activeScreen');
+    if (savedScreen && ['hub', 'player', 'studio', 'goals'].includes(savedScreen)) {
+      activeScreen = savedScreen as ActiveScreen;
+    }
+
+    const savedProfiles = localStorage.getItem('student_profiles');
+    if (savedProfiles) {
+      try {
+        studentProfiles = JSON.parse(savedProfiles);
+      } catch (e) {
+        console.warn('Failed to parse student_profiles:', e);
+      }
+    }
+
+    const savedProfileId = localStorage.getItem('active_profile_id');
+    if (savedProfileId && studentProfiles.some(p => p.id === savedProfileId)) {
+      activeProfileId = savedProfileId;
     }
 
     await initDatabase();
@@ -387,6 +429,49 @@
     resetLoopAB();
     mascotState = 'cheering';
     mascotMessage = 'Fresh start! Song restarted & loop markers cleared.';
+  }
+
+  function selectScreen(screen: ActiveScreen) {
+    if ((screen === 'player' || screen === 'studio' || screen === 'goals') && !currentLesson) {
+      if (lessons.length > 0) {
+        selectLesson(lessons[0]);
+      } else {
+        return;
+      }
+    }
+    activeScreen = screen;
+    localStorage.setItem('activeScreen', screen);
+    if (typeof window !== 'undefined') {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  }
+
+  function selectProfile(profileId: string) {
+    activeProfileId = profileId;
+    localStorage.setItem('active_profile_id', profileId);
+    mascotState = 'cheering';
+    mascotMessage = `Hi ${activeProfile.name}! Ready to practice piano? 🎹`;
+  }
+
+  function addStudentProfile() {
+    if (!newProfileName.trim()) return;
+    const newProfile: StudentProfile = {
+      id: `profile-${Date.now()}`,
+      name: newProfileName.trim(),
+      avatarKey: newProfileAvatar,
+      color: getAvatarColor(newProfileAvatar),
+      createdAt: Date.now()
+    };
+    studentProfiles = [...studentProfiles, newProfile];
+    localStorage.setItem('student_profiles', JSON.stringify(studentProfiles));
+    selectProfile(newProfile.id);
+    newProfileName = '';
+    showAddProfileModal = false;
+  }
+
+  function playLessonFromHub(lesson: LocalLesson) {
+    selectLesson(lesson);
+    selectScreen('player');
   }
 
   function toggleSection(sectionKey: string) {
@@ -750,7 +835,7 @@
     const m = Math.floor(seconds / 60);
     const s = Math.floor(seconds % 60);
     return `${m}:${s.toString().padStart(2, '0')}`;
-  }
+}
 </script>
 
 <div class="cockpit-container">
@@ -758,582 +843,703 @@
     <OnboardingModal onComplete={() => { localStorage.setItem('onboardingComplete', 'true'); showOnboarding = false; }} />
   {/if}
 
-  <!-- Top Navigation & Curriculum Bar -->
-  <nav class="curriculum-bar">
-    <div class="book-tabs">
-      {#each books as book}
-        <button
-          class="book-tab {selectedBookId === book.id ? 'active' : ''}"
-          onclick={() => selectBook(book.id)}
-        >
-          <span class="book-icon">📖</span>
-          <span class="book-name">{book.title}</span>
-        </button>
-      {/each}
-    </div>
-
-    <button
-      class="top-icon-btn metronome-toggle {showMetronome ? 'active' : ''}"
-      onclick={() => showMetronome = !showMetronome}
-      title="Toggle Metronome"
-    >
-      ⏱️ Metronome
+  <!-- Kids Top App Header -->
+  <header class="kids-top-header">
+    <button class="kids-brand-btn" onclick={() => selectScreen('hub')}>
+      <span class="brand-piano-icon">🎹</span>
+      <div class="brand-text-col">
+        <span class="brand-title">Piano Companion</span>
+        <span class="kids-pill-badge">KIDS</span>
+      </div>
     </button>
-  </nav>
 
-  <!-- Provider Pill Bar with List Type Indicators -->
-  <div class="provider-bar">
-    <span class="provider-badge">Channel:</span>
-    <div class="provider-pill-scroll">
-      {#each providers as provider}
-        {@const pLessons = allLessons.filter(l => l.providerName === provider)}
-        {@const pType = detectListType(pLessons, provider)}
-        <button
-          class="provider-pill {selectedProvider === provider ? 'active' : ''}"
-          onclick={() => selectProvider(provider)}
-        >
-          <span class="type-icon">{pType === 'chapters' ? '🔖' : pType === 'playlist' ? '📑' : '🎬'}</span>
-          {provider}
-        </button>
-      {/each}
-      <button
-        class="provider-add-pill"
-        onclick={() => showAddProviderModal = true}
-        title="Add custom provider"
-      >
-        + Add Source
+    <!-- Active Profile Badge / Switcher -->
+    <button
+      class="active-profile-chip"
+      onclick={() => selectScreen('hub')}
+      title="Switch Kid Profile"
+    >
+      <div class="avatar-bubble" style="background-color: {activeProfile.color}">
+        <span class="avatar-emoji">{getAvatarEmoji(activeProfile.avatarKey)}</span>
+      </div>
+      <div class="profile-info-col">
+        <span class="profile-name">{activeProfile.name}</span>
+        <span class="profile-switch-tag">Switch 🔄</span>
+      </div>
+    </button>
+
+    <div class="top-bar-right">
+      <button class="top-gear-btn" onclick={openSettings} title="Settings & Teacher Controls">
+        ⚙️
       </button>
     </div>
-  </div>
-
-  <!-- Neobrutalist Header & Lesson Dropdown -->
-  <header class="neo-header">
-    <div class="header-main-card neo-card">
-      <div class="header-left">
-        <span class="header-icon">🎹</span>
-        <div class="header-info">
-          <div class="meta-row">
-            <span class="book-label">{currentBook?.title ?? 'Piano Practice'}</span>
-            <!-- List Type Status Badge -->
-            {#if currentListType === 'chapters'}
-              <span class="mode-badge chapters">🔖 Bookmarked Video</span>
-            {:else if currentListType === 'playlist'}
-              <span class="mode-badge playlist">📑 YouTube Playlist</span>
-            {:else}
-              <span class="mode-badge singles">🎬 Individual Videos</span>
-            {/if}
-          </div>
-
-          <div class="title-row">
-            <button
-              class="completion-btn {currentLesson?.isCompleted ? 'completed' : ''}"
-              onclick={toggleLessonCompletion}
-              title={currentLesson?.isCompleted ? 'Completed! Click to unmark' : 'Mark as completed'}
-              aria-label="Toggle song completion"
-            >
-              {currentLesson?.isCompleted ? '✓' : '○'}
-            </button>
-            <button
-              class="dropdown-trigger-btn"
-              onclick={() => isDropdownOpen = !isDropdownOpen}
-              aria-expanded={isDropdownOpen}
-            >
-              <h1 class="lesson-title">
-                {currentLesson ? `${currentLesson.sequenceIndex}. ${currentLesson.title}` : 'Select a lesson...'}
-              </h1>
-              <span class="dropdown-arrow {isDropdownOpen ? 'open' : ''}">▼</span>
-            </button>
-          </div>
-        </div>
-      </div>
-
-      <!-- Quick Nav Buttons & Playlist Position -->
-      <div class="lesson-nav-actions">
-        <button
-          class="nav-btn prev-btn"
-          disabled={!hasPrevLesson}
-          onclick={prevLesson}
-          title="Previous Lesson"
-        >
-          ⏮ Prev
-        </button>
-        <button
-          class="nav-btn next-btn"
-          disabled={!hasNextLesson}
-          onclick={nextLesson}
-          title="Next Lesson"
-        >
-          Next ⏭
-        </button>
-      </div>
-    </div>
-
-    <!-- Expandable Searchable Lesson Dropdown -->
-    {#if isDropdownOpen}
-      <div class="lesson-dropdown-panel neo-card">
-        <div class="search-bar-row">
-          <input
-            type="text"
-            bind:value={lessonSearch}
-            placeholder="🔍 Search song or number..."
-            class="dropdown-search-input"
-          />
-          <span class="lesson-count">{filteredLessons.length} songs</span>
-        </div>
-
-        <ul class="dropdown-list">
-          {#each filteredLessons as l}
-            <li>
-              <button
-                class="dropdown-item {currentLesson?.id === l.id ? 'active' : ''}"
-                onclick={() => selectLesson(l)}
-              >
-                <span class="item-status">{l.isCompleted ? '✅' : '⚪'}</span>
-                <span class="item-seq">#{l.sequenceIndex}</span>
-                <span class="item-title">{l.title}</span>
-                {#if currentListType === 'chapters' && l.endTime > 0}
-                  <span class="item-timestamp">({formatTime(l.startTime)} – {formatTime(l.endTime)})</span>
-                {/if}
-              </button>
-            </li>
-          {/each}
-          {#if filteredLessons.length === 0}
-            <li class="no-matches">No songs matching "{lessonSearch}"</li>
-          {/if}
-        </ul>
-      </div>
-    {/if}
   </header>
 
-  <!-- Built-in Metronome Widget -->
-  {#if showMetronome}
-    <div class="cockpit-card-wrap">
-      <button
-        class="section-collapse-header"
-        onclick={() => toggleSection('metronome')}
-        aria-expanded={!collapsedSections.metronome}
-      >
-        <div class="collapse-title-row">
-          <span class="collapse-chevron">{collapsedSections.metronome ? '▶' : '▼'}</span>
-          <span class="collapse-title">⏱️ Interactive Metronome</span>
+  <!-- ================= SCREEN 1: Welcome & Library Hub ================= -->
+  {#if activeScreen === 'hub'}
+    <div class="screen-hub">
+      <!-- Mascot Welcome Banner -->
+      <MascotPip state={mascotState} message={mascotMessage} />
+
+      <!-- Section 1: Who's Practicing? Profile Selector -->
+      <section class="hub-card-section neo-card">
+        <div class="section-title-bar">
+          <span class="section-emoji">👑</span>
+          <h2>Who's Practicing Today?</h2>
         </div>
-        <span class="collapse-summary-badge">Rhythm Practice</span>
-      </button>
-      {#if !collapsedSections.metronome}
-        <Metronome />
+        <div class="profiles-carousel">
+          {#each studentProfiles as profile}
+            <button
+              class="profile-bubble-card {activeProfileId === profile.id ? 'active' : ''}"
+              onclick={() => selectProfile(profile.id)}
+            >
+              <div class="bubble-circle" style="background-color: {profile.color}">
+                <span class="bubble-emoji">{getAvatarEmoji(profile.avatarKey)}</span>
+                {#if activeProfileId === profile.id}
+                  <span class="crown-badge">👑</span>
+                {/if}
+              </div>
+              <span class="bubble-name">{profile.name}</span>
+              {#if activeProfileId === profile.id}
+                <span class="bubble-active-pill">Playing</span>
+              {/if}
+            </button>
+          {/each}
+
+          <button class="add-kid-btn" onclick={() => showAddProfileModal = true}>
+            <div class="add-circle">➕</div>
+            <span class="bubble-name">Add Kid</span>
+          </button>
+        </div>
+      </section>
+
+      <!-- Section 2: Choose Your Piano Book -->
+      <section class="hub-card-section neo-card">
+        <div class="section-title-bar">
+          <span class="section-emoji">📚</span>
+          <h2>1. Choose Your Book</h2>
+        </div>
+        <div class="bookshelf-row">
+          {#each books as book}
+            <button
+              class="book-shelf-card {selectedBookId === book.id ? 'selected' : ''}"
+              onclick={() => selectBook(book.id)}
+            >
+              <div class="book-cover-art">
+                <span class="book-art-icon">📖</span>
+                <span class="book-art-publisher">{book.publisher}</span>
+              </div>
+              <div class="book-meta-col">
+                <h3 class="book-name">{book.title}</h3>
+                <span class="book-song-count">
+                  {allLessons.filter(l => l.bookId === book.id).length} pieces available
+                </span>
+                {#if selectedBookId === book.id}
+                  <span class="book-active-badge">✓ Selected</span>
+                {/if}
+              </div>
+            </button>
+          {/each}
+        </div>
+      </section>
+
+      <!-- Section 3: Pick Your YouTube Teacher -->
+      <section class="hub-card-section neo-card">
+        <div class="section-title-bar between">
+          <div class="title-with-icon">
+            <span class="section-emoji">📺</span>
+            <h2>2. Pick Your YouTube Teacher</h2>
+          </div>
+          <button class="add-source-btn" onclick={() => showAddProviderModal = true}>
+            + Add Channel
+          </button>
+        </div>
+        <div class="educator-grid">
+          {#each providers as provider}
+            {@const pLessons = allLessons.filter(l => l.providerName === provider)}
+            {@const pType = detectListType(pLessons, provider)}
+            {@const ed = getEducatorInfo(provider)}
+            <button
+              class="educator-card {selectedProvider === provider ? 'selected' : ''}"
+              onclick={() => selectProvider(provider)}
+            >
+              <div class="educator-avatar-wrap" style="background-color: {ed.avatarBgColor}">
+                <span class="educator-emoji">{ed.avatarEmoji}</span>
+              </div>
+              <div class="educator-content">
+                <div class="educator-header-row">
+                  <span class="educator-display-name">{ed.educatorName}</span>
+                  <span class="type-pill-badge {pType}">
+                    {pType === 'chapters' ? '🔖 Chapters' : pType === 'playlist' ? '📑 Playlist' : '🎬 Singles'}
+                  </span>
+                </div>
+                <p class="educator-bio-text">{ed.description}</p>
+                <div class="educator-footer-row">
+                  <span class="ed-handle">{ed.channelHandle}</span>
+                  <span class="ed-count">{pLessons.length} lessons</span>
+                </div>
+              </div>
+            </button>
+          {/each}
+        </div>
+      </section>
+
+      <!-- Section 4: Pick a Song to Practice -->
+      <section class="hub-card-section neo-card">
+        <div class="section-title-bar between">
+          <div class="title-with-icon">
+            <span class="section-emoji">🎹</span>
+            <h2>3. Pick a Song to Practice</h2>
+          </div>
+          <span class="songs-total-pill">{lessons.length} Pieces</span>
+        </div>
+
+        <div class="songs-hub-grid">
+          {#each lessons as l}
+            <button
+              class="song-hub-card {currentLesson?.id === l.id ? 'current' : ''}"
+              onclick={() => playLessonFromHub(l)}
+            >
+              <div class="song-num-col">#{l.sequenceIndex}</div>
+              <div class="song-details-col">
+                <h4 class="song-title-text">{l.title}</h4>
+                {#if currentListType === 'chapters' && l.endTime > 0}
+                  <span class="song-time-text">Chapter: {formatTime(l.startTime)} → {formatTime(l.endTime)}</span>
+                {/if}
+              </div>
+              <div class="song-status-col">
+                <span class="song-star">{l.isCompleted ? '⭐' : '○'}</span>
+                <span class="song-play-btn">Play ▶</span>
+              </div>
+            </button>
+          {/each}
+        </div>
+      </section>
+    </div>
+
+  <!-- ================= SCREEN 2: Dedicated Player Stage ================= -->
+  {:else if activeScreen === 'player'}
+    <div class="screen-player">
+      {#if currentLesson}
+        <!-- Top Lesson Header Strip -->
+        <div class="player-header-strip neo-card">
+          <button class="back-to-hub-btn" onclick={() => selectScreen('hub')}>
+            ← 📚 Change Song
+          </button>
+          <div class="player-song-title-wrap">
+            <span class="player-song-index">#{currentLesson.sequenceIndex}</span>
+            <h2 class="player-song-title">{currentLesson.title}</h2>
+            <span class="player-meta-badge">{currentBook?.title ?? ''} • {selectedProvider}</span>
+          </div>
+          <div class="player-header-right">
+            <button
+              class="nav-icon-btn prev-btn"
+              disabled={!hasPrevLesson}
+              onclick={prevLesson}
+              title="Previous piece"
+            >
+              ⏮
+            </button>
+            <button
+              class="nav-icon-btn next-btn"
+              disabled={!hasNextLesson}
+              onclick={nextLesson}
+              title="Next piece"
+            >
+              ⏭
+            </button>
+            <button
+              class="metronome-quick-btn {showMetronome ? 'active' : ''}"
+              onclick={() => showMetronome = !showMetronome}
+              title="Toggle metronome"
+            >
+              ⏱️ Metronome
+            </button>
+          </div>
+        </div>
+
+        {#if showMetronome}
+          <div class="player-metronome-wrap">
+            <Metronome />
+          </div>
+        {/if}
+
+        <!-- Main Video Card with Scrubber and Chunky Transport Bar -->
+        <section
+          class="player-stage-card neo-card {isFullscreen ? 'is-fullscreen' : ''} {isTheaterMode ? 'is-theater' : ''}"
+          bind:this={playerCardElement}
+        >
+          <!-- Special chapter timeline if chapters mode -->
+          {#if currentListType === 'chapters'}
+            <div class="cockpit-card-wrap">
+              <ChapterTimeline
+                {lessons}
+                currentLessonId={currentLesson.id}
+                {videoCurrentTime}
+                {videoDuration}
+                onSelectChapter={(lesson) => {
+                  selectLesson(lesson);
+                  videoSeekTarget = lesson.startTime;
+                }}
+              />
+            </div>
+          {/if}
+
+          <!-- YouTube Player Container -->
+          <div class="player-box">
+            {#key currentLesson.youtubeVideoId}
+              <div
+                use:youtubeLooper={{
+                  videoId: () => currentLesson?.youtubeVideoId ?? '',
+                  startTime: () => customLoopA ?? currentLesson?.startTime ?? 0,
+                  endTime: () => customLoopB ?? (currentLesson?.endTime && currentLesson.endTime > 0 ? currentLesson.endTime : videoDuration),
+                  customLoopStart: () => customLoopA,
+                  customLoopEnd: () => customLoopB,
+                  playbackRate: () => playbackRate,
+                  isLooping: () => isLooping,
+                  onReady: (controller) => {
+                    playerController = controller;
+                  },
+                  onPlayerStateChange: handlePlayerStateChange,
+                  onSegmentComplete: handleSegmentComplete,
+                  onTimeUpdate: handleTimeUpdate,
+                  seekTarget: () => videoSeekTarget,
+                  _trigger: [playbackRate, isLooping, currentLesson?.youtubeVideoId, videoSeekTarget, customLoopA, customLoopB, autoAdvance]
+                }}
+                class="yt-frame"
+              ></div>
+            {/key}
+
+            <!-- Interactive Progress Scrubber with A/B Loop Markers & Chapter Boundaries -->
+            <div
+              class="scrubber-track"
+              role="slider"
+              tabindex="0"
+              aria-label="Video practice progress"
+              aria-valuemin={0}
+              aria-valuemax={videoDuration || 100}
+              aria-valuenow={videoCurrentTime}
+              onclick={handleProgressClick}
+              onkeydown={(e) => e.key === 'Enter' && handleProgressClick(e as any)}
+            >
+              <div class="scrubber-bar-bg">
+                {#if videoDuration > 0}
+                  {@const startSec = customLoopA ?? currentLesson.startTime ?? 0}
+                  {@const endSec = (customLoopB ?? (currentLesson.endTime > 0 ? currentLesson.endTime : videoDuration))}
+                  {@const leftPct = (startSec / videoDuration) * 100}
+                  {@const widthPct = Math.max(0, ((endSec - startSec) / videoDuration) * 100)}
+                  <div
+                    class="loop-range-highlight"
+                    style="left: {leftPct}%; width: {widthPct}%;"
+                  ></div>
+                {/if}
+
+                <div
+                  class="scrubber-fill"
+                  style="width: {videoDuration ? (videoCurrentTime / videoDuration) * 100 : 0}%"
+                ></div>
+
+                {#if customLoopA !== null && videoDuration > 0}
+                  <div
+                    class="loop-marker marker-a"
+                    style="left: {(customLoopA / videoDuration) * 100}%"
+                    title="Loop Point A: {formatTime(customLoopA)}"
+                  >
+                    A
+                  </div>
+                {/if}
+                {#if customLoopB !== null && videoDuration > 0}
+                  <div
+                    class="loop-marker marker-b"
+                    style="left: {(customLoopB / videoDuration) * 100}%"
+                    title="Loop Point B: {formatTime(customLoopB)}"
+                  >
+                    B
+                  </div>
+                {/if}
+
+                <div
+                  class="scrubber-knob"
+                  style="left: {videoDuration ? (videoCurrentTime / videoDuration) * 100 : 0}%"
+                ></div>
+              </div>
+
+              <div class="scrubber-times">
+                <span class="time-current">{formatTime(videoCurrentTime)}</span>
+                {#if currentListType === 'chapters' && currentLesson.endTime > 0}
+                  <span class="chapter-readout">
+                    Chapter: {formatTime(currentLesson.startTime)} → {formatTime(currentLesson.endTime)} ({currentLesson.endTime - currentLesson.startTime}s)
+                  </span>
+                {:else if customLoopA !== null || customLoopB !== null}
+                  <span class="loop-badge">
+                    A/B: {formatTime(customLoopA ?? currentLesson.startTime)} → {formatTime(customLoopB ?? (currentLesson.endTime > 0 ? currentLesson.endTime : videoDuration))}
+                  </span>
+                {:else if currentListType === 'playlist'}
+                  <span class="playlist-badge">
+                    Track {currentIndex + 1} of {lessons.length}
+                  </span>
+                {/if}
+                <span class="time-duration">{formatTime(videoDuration)}</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Chunky Kid Transport Bar -->
+          <div class="transport-bar">
+            <div class="transport-left">
+              <button
+                class="play-toggle-btn {isVideoPlaying ? 'playing' : ''}"
+                use:longpress={{
+                  duration: 500,
+                  onLongPress: () => { if (!isVideoPlaying) startCountIn('play'); },
+                  onClick: togglePlayVideo
+                }}
+                title="Tap to Play/Pause • Hold for 3s count-in pre-roll"
+              >
+                {isVideoPlaying ? '⏸ Pause' : '▶ Play'}
+              </button>
+
+              {#if !isVideoPlaying}
+                <button
+                  class="count-in-quick-btn"
+                  onclick={() => startCountIn('play')}
+                  title="Start with 3-second countdown to get hands on the keys"
+                >
+                  ⏳ 3s Play
+                </button>
+              {/if}
+
+              <button
+                class="restart-btn utility-btn"
+                use:longpress={{
+                  duration: 600,
+                  onLongPress: deepReset,
+                  onClick: restartPiece
+                }}
+                title="Tap to restart song • Hold for Deep Reset"
+              >
+                ⏮ Restart
+              </button>
+
+              <button class="skip-btn" onclick={() => seekBy(-5)} title="Rewind 5s">⏪ 5s</button>
+              <button class="skip-btn" onclick={() => seekBy(5)} title="Forward 5s">5s ⏩</button>
+            </div>
+
+            <div class="transport-middle">
+              <button
+                class="loop-toggle-btn {isLooping ? 'active' : ''}"
+                onclick={() => isLooping = !isLooping}
+                title="Toggle infinite loop between boundaries"
+              >
+                {isLooping ? '🔄 Loop ON' : '➡️ Loop OFF'}
+              </button>
+
+              <button
+                class="practice-lab-trigger-btn"
+                onclick={() => showPracticeLabModal = true}
+                title="Open Practice Lab (Tempo, Micro-Loops, Fullscreen)"
+              >
+                🎛️ Practice Lab ({playbackRate}x)
+              </button>
+            </div>
+
+            <div class="transport-right">
+              <button
+                class="utility-btn {isMuted ? 'muted' : ''}"
+                onclick={toggleMute}
+                title={isMuted ? 'Unmute' : 'Mute'}
+              >
+                {isMuted ? '🔇 Muted' : '🔊 Sound'}
+              </button>
+              <button
+                class="utility-btn"
+                onclick={toggleFullscreen}
+                title="Fullscreen"
+              >
+                ⛶ Fullscreen
+              </button>
+            </div>
+          </div>
+        </section>
+
+        <!-- Mascot Pip Encouragement -->
+        <MascotPip state={mascotState} message={mascotMessage} />
+
+        <!-- Quick Jump to Studio or Goals -->
+        <div class="player-quick-action-strip">
+          <button class="quick-nav-card studio-cta" onclick={() => selectScreen('studio')}>
+            <span class="cta-emoji">🎙️</span>
+            <div class="cta-text-col">
+              <strong>Record My Practice Take</strong>
+              <small>{studentTrack ? 'Take recorded! Listen in Studio' : 'Record yourself playing this piece'}</small>
+            </div>
+            <span class="cta-arrow">→</span>
+          </button>
+          <button class="quick-nav-card goals-cta" onclick={() => selectScreen('goals')}>
+            <span class="cta-emoji">🎯</span>
+            <div class="cta-text-col">
+              <strong>Practice Checkpoints</strong>
+              <small>View learning goals & earn stars</small>
+            </div>
+            <span class="cta-arrow">→</span>
+          </button>
+        </div>
+      {:else}
+        <div class="no-lesson-state neo-card">
+          <span class="empty-icon">🎹</span>
+          <h3>No Song Selected</h3>
+          <p>Choose a book and piece from your library to start practicing!</p>
+          <button class="action-btn primary-btn" onclick={() => selectScreen('hub')}>
+            📚 Go to Library
+          </button>
+        </div>
+      {/if}
+    </div>
+
+  <!-- ================= SCREEN 3: Dedicated Audio Recording Studio ================= -->
+  {:else if activeScreen === 'studio'}
+    <div class="screen-studio">
+      <div class="studio-top-bar neo-card">
+        <div class="studio-title-col">
+          <span class="studio-top-tag">AUDIO RECORDING STATION</span>
+          <h2>🎙️ {currentLesson ? currentLesson.title : 'Select a piece'}</h2>
+        </div>
+        <button class="back-to-player-btn" onclick={() => selectScreen('player')}>
+          🎹 Back to Playing
+        </button>
+      </div>
+
+      <section class="audio-studio-grid">
+        <!-- Student Take Card -->
+        <div class="studio-card student-card neo-card">
+          <div class="studio-header">
+            <div class="title-wrap">
+              <span class="studio-icon">{getAvatarEmoji(activeProfile.avatarKey)}</span>
+              <h3>{activeProfile.name}'s Practice Take</h3>
+            </div>
+            {#if studentTrack}
+              <button class="trash-btn" onclick={() => deleteTrack('student')} title="Delete take">
+                🗑️
+              </button>
+            {/if}
+          </div>
+
+          {#if studentAudioUrl}
+            <audio src={studentAudioUrl} controls class="audio-player"></audio>
+            {#if studentTrack?.durationSeconds}
+              <div class="take-meta">Take length: {formatTime(studentTrack.durationSeconds)}</div>
+            {/if}
+          {:else}
+            <p class="empty-state">No take recorded yet for this piece. Tap below to start!</p>
+          {/if}
+
+          <div class="record-btn-row">
+            <button
+              class="record-btn student {studentRecorder.isRecording ? 'recording' : ''}"
+              use:longpress={{
+                duration: 500,
+                onLongPress: () => { if (!studentRecorder.isRecording) startCountIn('record'); },
+                onClick: toggleStudentRecord
+              }}
+              title="Tap to record • Hold for 3s pre-roll"
+            >
+              {#if studentRecorder.isRecording}
+                ⏹ Stop Recording ({formatTime(studentRecorder.recordingSeconds)})
+              {:else}
+                🎙️ {studentAudioUrl ? 'Re-record Take' : 'Record Take'}
+              {/if}
+            </button>
+
+            {#if !studentRecorder.isRecording}
+              <button
+                class="count-in-record-btn"
+                onclick={() => startCountIn('record')}
+                title="Start recording with 3s countdown"
+              >
+                ⏳ 3s Pre-Roll
+              </button>
+            {/if}
+          </div>
+
+          {#if studentRecorder.isRecording}
+            <div class="vu-wrapper neo-border">
+              <div class="vu-fill student" style="width: {studentRecorder.volumeLevel * 100}%"></div>
+            </div>
+          {/if}
+        </div>
+
+        <!-- Teacher Reference Card -->
+        <div class="studio-card teacher-card neo-card">
+          <div class="studio-header">
+            <div class="title-wrap">
+              <span class="studio-icon">👩‍🏫</span>
+              <h3>Teacher Reference Track</h3>
+            </div>
+            {#if teacherTrack && teacherAuth.isUnlocked}
+              <button class="trash-btn" onclick={() => deleteTrack('teacher')} title="Delete reference">
+                🗑️
+              </button>
+            {/if}
+          </div>
+
+          {#if teacherAudioUrl}
+            <audio src={teacherAudioUrl} controls class="audio-player"></audio>
+            {#if teacherTrack?.durationSeconds}
+              <div class="take-meta">Reference: {formatTime(teacherTrack.durationSeconds)}</div>
+            {/if}
+          {:else}
+            <p class="empty-state">No master reference track recorded for this piece.</p>
+          {/if}
+
+          <button
+            class="record-btn teacher {teacherRecorder.isRecording ? 'recording' : ''}"
+            onclick={handleTeacherRecord}
+          >
+            {#if teacherRecorder.isRecording}
+              ⏹ Stop Recording ({formatTime(teacherRecorder.recordingSeconds)})
+            {:else}
+              {teacherAuth.isUnlocked ? '🎙️ Record Reference' : '🔒 Teacher Unlock'}
+            {/if}
+          </button>
+
+          {#if teacherRecorder.isRecording}
+            <div class="vu-wrapper neo-border">
+              <div class="vu-fill teacher" style="width: {teacherRecorder.volumeLevel * 100}%"></div>
+            </div>
+          {/if}
+        </div>
+      </section>
+
+      <MascotPip state={mascotState} message={mascotMessage} />
+    </div>
+
+  <!-- ================= SCREEN 4: Dedicated Learning Goals ================= -->
+  {:else if activeScreen === 'goals'}
+    <div class="screen-goals">
+      {#if currentLesson}
+        {@const lesson = currentLesson}
+        {@const completedCount = Object.keys(completedCheckpoints).filter(k => k.startsWith(lesson.id) && completedCheckpoints[k]).length}
+        {@const totalCount = lesson.checkpoints.length}
+        <div class="goals-hero-card neo-card">
+          <div class="hero-left">
+            <span class="hero-icon">🎯</span>
+            <div class="hero-text-col">
+              <span class="hero-tag">LEARNING GOALS FOR</span>
+              <h2>{lesson.title}</h2>
+              <div class="stars-counter-row">
+                <span class="stars-badge">{completedCount} of {totalCount} Stars Earned ⭐</span>
+                {#if totalCount > 0 && completedCount === totalCount}
+                  <span class="mastered-badge">🎉 Mastered!</span>
+                {/if}
+              </div>
+            </div>
+          </div>
+          <div class="hero-right">
+            <button class="back-to-player-btn" onclick={() => selectScreen('player')}>
+              🎹 Practice Song
+            </button>
+            {#if !isEditingCheckpoints}
+              <button class="edit-checkpoints-btn" onclick={handleEditCheckpoints}>
+                {teacherAuth.isUnlocked ? '✏️ Edit Goals' : '🔒 Teacher Edit'}
+              </button>
+            {/if}
+          </div>
+        </div>
+
+        {#if isEditingCheckpoints}
+          <div class="goals-edit-card neo-card">
+            <p class="edit-instructions">Enter each learning point on a separate line:</p>
+            <textarea bind:value={editCheckpointsText} class="neo-textarea" rows="4"></textarea>
+            <div class="edit-btn-row">
+              <button class="action-btn primary-btn" onclick={saveCheckpoints}>Save Points</button>
+              <button class="action-btn outline-btn" onclick={() => isEditingCheckpoints = false}>Cancel</button>
+            </div>
+          </div>
+        {:else}
+          <div class="goals-checklist-grid">
+            {#each lesson.checkpoints as pt, i}
+              {@const key = `${lesson.id}_cp_${i}`}
+              {@const isDone = !!completedCheckpoints[key]}
+              <button
+                class="goal-card neo-card {isDone ? 'done' : ''}"
+                onclick={() => toggleCheckpoint(i)}
+              >
+                <div class="goal-star-bubble {isDone ? 'earned' : ''}">
+                  {isDone ? '⭐' : '☆'}
+                </div>
+                <div class="goal-content">
+                  <span class="goal-number">Goal #{i + 1}</span>
+                  <p class="goal-text">{pt}</p>
+                </div>
+                <div class="goal-check-pill {isDone ? 'done' : ''}">
+                  {isDone ? 'Done! ✓' : 'Tap to Complete'}
+                </div>
+              </button>
+            {/each}
+          </div>
+        {/if}
+
+        <MascotPip state={mascotState} message={mascotMessage} />
+      {:else}
+        <div class="no-lesson-state neo-card">
+          <span class="empty-icon">🎯</span>
+          <h3>No Song Selected</h3>
+          <p>Choose a piece from the library to track your practice goals.</p>
+          <button class="action-btn primary-btn" onclick={() => selectScreen('hub')}>
+            📚 Go to Library
+          </button>
+        </div>
       {/if}
     </div>
   {/if}
 
-  {#if currentLesson}
-    <main class="practice-cockpit">
-      <!-- Specialized Chapter Timeline for Bookmarked Video Mode -->
-      {#if currentListType === 'chapters'}
-        <div class="cockpit-card-wrap">
-          <button
-            class="section-collapse-header"
-            onclick={() => toggleSection('timeline')}
-            aria-expanded={!collapsedSections.timeline}
-          >
-            <div class="collapse-title-row">
-              <span class="collapse-chevron">{collapsedSections.timeline ? '▶' : '▼'}</span>
-              <span class="collapse-title">📖 Chapter Timeline</span>
-            </div>
-            <span class="collapse-summary-badge">
-              {currentLesson.title} ({formatTime(currentLesson.startTime)} → {formatTime(currentLesson.endTime)})
-            </span>
-          </button>
-          {#if !collapsedSections.timeline}
-            <ChapterTimeline
-              {lessons}
-              currentLessonId={currentLesson.id}
-              {videoCurrentTime}
-              {videoDuration}
-              onSelectChapter={selectLesson}
-            />
-          {/if}
-        </div>
+  <!-- Universal Kid-Friendly Bottom Navigation Dock -->
+  <nav class="kids-bottom-dock neo-border">
+    <button
+      class="dock-btn {activeScreen === 'hub' ? 'active' : ''}"
+      onclick={() => selectScreen('hub')}
+    >
+      <span class="dock-icon">📚</span>
+      <span class="dock-label">Library</span>
+    </button>
+
+    <button
+      class="dock-btn {activeScreen === 'player' ? 'active' : ''}"
+      onclick={() => selectScreen('player')}
+    >
+      <span class="dock-icon">🎹</span>
+      <span class="dock-label">Practice</span>
+      {#if currentLesson}
+        <span class="dock-pill-indicator"></span>
       {/if}
+    </button>
 
-      <!-- Video Player Card -->
-      <div
-        class="player-card neo-card {isTheaterMode ? 'theater-mode' : ''} {isFullscreen ? 'is-fullscreen' : ''}"
-        bind:this={playerCardElement}
-      >
-        <!-- YouTube Frame with Looper Action -->
-        {#key `${currentLesson.youtubeVideoId}_${selectedProvider}`}
-          <div
-            use:youtubeLooper={{
-              videoId: () => currentLesson?.youtubeVideoId,
-              startTime: () => currentLesson?.startTime ?? 0,
-              endTime: () => currentLesson?.endTime ?? 0,
-              customLoopStart: () => customLoopA,
-              customLoopEnd: () => customLoopB,
-              playbackRate: () => playbackRate,
-              isLooping: () => isLooping,
-              onReady: (controller) => {
-                playerController = controller;
-              },
-              onPlayerStateChange: handlePlayerStateChange,
-              onSegmentComplete: handleSegmentComplete,
-              onTimeUpdate: handleTimeUpdate,
-              seekTarget: () => videoSeekTarget,
-              _trigger: [playbackRate, isLooping, currentLesson?.youtubeVideoId, videoSeekTarget, customLoopA, customLoopB, autoAdvance]
-            }}
-            class="yt-frame"
-          ></div>
-        {/key}
-
-        <!-- Interactive Progress Scrubber with A/B Loop Markers & Chapter Boundaries -->
-        <div
-          class="scrubber-track"
-          role="slider"
-          tabindex="0"
-          aria-valuemin="0"
-          aria-valuemax={videoDuration}
-          aria-valuenow={videoCurrentTime}
-          onclick={handleProgressClick}
-          onkeydown={(e) => e.key === 'Enter' && handleProgressClick(e as any)}
-        >
-          <div class="scrubber-bar-bg">
-            <!-- Active Loop / Chapter Region Highlight -->
-            {#if videoDuration > 0}
-              {@const startSec = customLoopA ?? currentLesson.startTime ?? 0}
-              {@const endSec = (customLoopB ?? (currentLesson.endTime > 0 ? currentLesson.endTime : videoDuration))}
-              {@const leftPct = (startSec / videoDuration) * 100}
-              {@const widthPct = Math.max(0, ((endSec - startSec) / videoDuration) * 100)}
-              <div
-                class="loop-range-highlight"
-                style="left: {leftPct}%; width: {widthPct}%;"
-              ></div>
-            {/if}
-
-            <div
-              class="scrubber-fill"
-              style="width: {videoDuration ? (videoCurrentTime / videoDuration) * 100 : 0}%"
-            ></div>
-
-            <!-- Loop Marker Pins -->
-            {#if customLoopA !== null && videoDuration > 0}
-              <div
-                class="loop-marker marker-a"
-                style="left: {(customLoopA / videoDuration) * 100}%"
-                title="Loop Point A: {formatTime(customLoopA)}"
-              >
-                A
-              </div>
-            {/if}
-            {#if customLoopB !== null && videoDuration > 0}
-              <div
-                class="loop-marker marker-b"
-                style="left: {(customLoopB / videoDuration) * 100}%"
-                title="Loop Point B: {formatTime(customLoopB)}"
-              >
-                B
-              </div>
-            {/if}
-
-            <div
-              class="scrubber-knob"
-              style="left: {videoDuration ? (videoCurrentTime / videoDuration) * 100 : 0}%"
-            ></div>
-          </div>
-
-          <div class="scrubber-times">
-            <span class="time-current">{formatTime(videoCurrentTime)}</span>
-            {#if currentListType === 'chapters' && currentLesson.endTime > 0}
-              <span class="chapter-readout">
-                Chapter: {formatTime(currentLesson.startTime)} → {formatTime(currentLesson.endTime)} ({currentLesson.endTime - currentLesson.startTime}s)
-              </span>
-            {:else if customLoopA !== null || customLoopB !== null}
-              <span class="loop-badge">
-                A/B: {formatTime(customLoopA ?? currentLesson.startTime)} → {formatTime(customLoopB ?? (currentLesson.endTime > 0 ? currentLesson.endTime : videoDuration))}
-              </span>
-            {:else if currentListType === 'playlist'}
-              <span class="playlist-badge">
-                Track {currentIndex + 1} of {lessons.length}
-              </span>
-            {/if}
-            <span class="time-duration">{formatTime(videoDuration)}</span>
-          </div>
-        </div>
-
-        <!-- Master Kid-First Transport Controls Bar -->
-        <div class="transport-bar">
-          <div class="transport-left">
-            <button
-              class="play-toggle-btn {isVideoPlaying ? 'playing' : ''}"
-              use:longpress={{
-                duration: 500,
-                onLongPress: () => { if (!isVideoPlaying) startCountIn('play'); },
-                onClick: togglePlayVideo
-              }}
-              aria-label={isVideoPlaying ? 'Pause video' : 'Play video (Hold for 3s count-in)'}
-              title="Tap to Play/Pause • Hold for 3s Count-in"
-            >
-              {isVideoPlaying ? '⏸ Pause' : '▶ Play'}
-            </button>
-
-            {#if !isVideoPlaying}
-              <button
-                class="count-in-quick-btn"
-                onclick={() => startCountIn('play')}
-                title="Start playback with a 3-second visual count-in to get hands on the piano keys"
-              >
-                ⏳ 3s Play
-              </button>
-            {/if}
-
-            <button
-              class="skip-btn restart-btn"
-              use:longpress={{
-                duration: 500,
-                onLongPress: deepReset,
-                onClick: restartPiece
-              }}
-              title="Tap to restart lesson • Hold for Deep Reset (restart + clear loop points)"
-            >
-              ⏮ Restart
-            </button>
-            <button class="skip-btn" onclick={() => seekBy(-5)} title="Rewind 5 seconds">⏪ 5s</button>
-            <button class="skip-btn" onclick={() => seekBy(5)} title="Forward 5 seconds">5s ⏩</button>
-          </div>
-
-          <div class="transport-middle">
-            <button
-              class="loop-toggle-btn {isLooping ? 'active' : ''}"
-              onclick={() => { isLooping = !isLooping; if (isLooping) autoAdvance = false; }}
-              title="Loop current piece continuously"
-            >
-              🔄 Loop {isLooping ? 'ON' : 'OFF'}
-            </button>
-
-            <!-- Practice Lab Modal Trigger Button -->
-            <button
-              class="practice-lab-trigger-btn"
-              onclick={() => showPracticeLabModal = true}
-              title="Open Practice Lab for speed, A/B looping, and stage modes"
-            >
-              🎛️ Practice Lab ({playbackRate}x)
-            </button>
-          </div>
-
-          <div class="transport-right">
-            <!-- Mute / Unmute Toggle -->
-            <button
-              class="utility-btn mute-btn {isMuted ? 'muted' : ''}"
-              onclick={toggleMute}
-              title={isMuted ? 'Unmute video audio' : 'Mute video audio (practice visually with hands)'}
-            >
-              {isMuted ? '🔇 Unmute' : '🔊 Mute'}
-            </button>
-
-            <!-- Fullscreen Toggle -->
-            <button
-              class="utility-btn fullscreen-btn {isFullscreen ? 'active' : ''}"
-              onclick={toggleFullscreen}
-              title={isFullscreen ? 'Exit full screen' : 'Expand full screen'}
-            >
-              {isFullscreen ? '🗗 Exit' : '⛶ Fullscreen'}
-            </button>
-          </div>
-        </div>
-      </div>
-
-      <!-- Mascot Pip Companion -->
-      <MascotPip state={mascotState} message={mascotMessage} />
-
-      <!-- Dual Audio Recording Studio -->
-      {#if !hideAudioTakes}
-        <div class="cockpit-card-wrap">
-          <button
-            class="section-collapse-header"
-            onclick={() => toggleSection('studio')}
-            aria-expanded={!collapsedSections.studio}
-          >
-            <div class="collapse-title-row">
-              <span class="collapse-chevron">{collapsedSections.studio ? '▶' : '▼'}</span>
-              <span class="collapse-title">🎙️ Audio Recording Studio</span>
-            </div>
-            <span class="collapse-summary-badge {studentTrack ? 'badge-success' : ''}">
-              {studentTrack ? '✅ Take Recorded' : 'No take yet'}
-            </span>
-          </button>
-
-          {#if !collapsedSections.studio}
-            <section class="audio-studio-grid">
-              <!-- Student Practice Take Card -->
-              <div class="studio-card student-card neo-card">
-                <div class="studio-header">
-                  <div class="title-wrap">
-                    <span class="studio-icon">🧒</span>
-                    <h3>My Practice Take</h3>
-                  </div>
-                  {#if studentTrack}
-                    <button
-                      class="trash-btn"
-                      onclick={() => deleteTrack('student')}
-                      title="Delete take"
-                    >
-                      🗑️
-                    </button>
-                  {/if}
-                </div>
-
-                {#if studentAudioUrl}
-                  <audio src={studentAudioUrl} controls class="audio-player"></audio>
-                  {#if studentTrack?.durationSeconds}
-                    <div class="take-meta">Take length: {formatTime(studentTrack.durationSeconds)}</div>
-                  {/if}
-                {:else}
-                  <p class="empty-state">No take recorded yet. Press below to start!</p>
-                {/if}
-
-                <div class="record-btn-row">
-                  <button
-                    class="record-btn student {studentRecorder.isRecording ? 'recording' : ''}"
-                    use:longpress={{
-                      duration: 500,
-                      onLongPress: () => { if (!studentRecorder.isRecording) startCountIn('record'); },
-                      onClick: toggleStudentRecord
-                    }}
-                    title="Tap to record • Hold for 3s count-in pre-roll"
-                  >
-                    {#if studentRecorder.isRecording}
-                      ⏹ Stop Recording ({formatTime(studentRecorder.recordingSeconds)})
-                    {:else}
-                      🎙️ {studentAudioUrl ? 'Re-record Take' : 'Record My Take'}
-                    {/if}
-                  </button>
-
-                  {#if !studentRecorder.isRecording}
-                    <button
-                      class="count-in-record-btn"
-                      onclick={() => startCountIn('record')}
-                      title="Start recording with 3-second pre-roll to get hands on the piano keys"
-                    >
-                      ⏳ 3s Pre-Roll
-                    </button>
-                  {/if}
-                </div>
-
-                {#if studentRecorder.isRecording}
-                  <div class="vu-wrapper neo-border">
-                    <div class="vu-fill student" style="width: {studentRecorder.volumeLevel * 100}%"></div>
-                  </div>
-                {/if}
-              </div>
-
-              <!-- Teacher Reference Card -->
-              <div class="studio-card teacher-card neo-card">
-                <div class="studio-header">
-                  <div class="title-wrap">
-                    <span class="studio-icon">👩‍🏫</span>
-                    <h3>Teacher Reference</h3>
-                  </div>
-                  {#if teacherTrack && teacherAuth.isUnlocked}
-                    <button
-                      class="trash-btn"
-                      onclick={() => deleteTrack('teacher')}
-                      title="Delete reference"
-                    >
-                      🗑️
-                    </button>
-                  {/if}
-                </div>
-
-                {#if teacherAudioUrl}
-                  <audio src={teacherAudioUrl} controls class="audio-player"></audio>
-                  {#if teacherTrack?.durationSeconds}
-                    <div class="take-meta">Reference: {formatTime(teacherTrack.durationSeconds)}</div>
-                  {/if}
-                {:else}
-                  <p class="empty-state">No master reference track recorded.</p>
-                {/if}
-
-                <button
-                  class="record-btn teacher {teacherRecorder.isRecording ? 'recording' : ''}"
-                  onclick={handleTeacherRecord}
-                >
-                  {#if teacherRecorder.isRecording}
-                    ⏹ Stop Recording ({formatTime(teacherRecorder.recordingSeconds)})
-                  {:else}
-                    {teacherAuth.isUnlocked ? '🎙️ Record Reference' : '🔒 Teacher Unlock'}
-                  {/if}
-                </button>
-
-                {#if teacherRecorder.isRecording}
-                  <div class="vu-wrapper neo-border">
-                    <div class="vu-fill teacher" style="width: {teacherRecorder.volumeLevel * 100}%"></div>
-                  </div>
-                {/if}
-              </div>
-            </section>
-          {/if}
-        </div>
+    <button
+      class="dock-btn {activeScreen === 'studio' ? 'active' : ''}"
+      onclick={() => selectScreen('studio')}
+    >
+      <span class="dock-icon">🎙️</span>
+      <span class="dock-label">Studio</span>
+      {#if studentTrack}
+        <span class="dock-badge-success">✓</span>
       {/if}
+    </button>
 
-      <!-- Interactive Learning Checkpoints -->
-      <div class="cockpit-card-wrap">
-        <button
-          class="section-collapse-header"
-          onclick={() => toggleSection('checkpoints')}
-          aria-expanded={!collapsedSections.checkpoints}
-        >
-          <div class="collapse-title-row">
-            <span class="collapse-chevron">{collapsedSections.checkpoints ? '▶' : '▼'}</span>
-            <span class="collapse-title">🎯 Practice Checkpoints</span>
-          </div>
-          {#if currentLesson}
-            {@const lesson = currentLesson}
-            <span class="collapse-summary-badge {lesson.checkpoints.length > 0 && Object.keys(completedCheckpoints).filter(k => k.startsWith(lesson.id) && completedCheckpoints[k]).length === lesson.checkpoints.length ? 'badge-success' : ''}">
-              {Object.keys(completedCheckpoints).filter(k => k.startsWith(lesson.id) && completedCheckpoints[k]).length} / {lesson.checkpoints.length} Done
-            </span>
-          {/if}
-        </button>
-
-        {#if !collapsedSections.checkpoints}
-          <section class="checkpoints-card neo-card">
-            <div class="checkpoints-top">
-              <div class="title-group">
-                <span class="checkpoints-icon">🎯</span>
-                <h3>Learning Goals</h3>
-              </div>
-              {#if !isEditingCheckpoints}
-                <button class="edit-checkpoints-btn" onclick={handleEditCheckpoints}>
-                  {teacherAuth.isUnlocked ? '✏️ Edit Points' : '🔒 Teacher Edit'}
-                </button>
-              {/if}
-            </div>
-
-            {#if isEditingCheckpoints}
-              <p class="edit-instructions">Enter each learning point on a separate line:</p>
-              <textarea bind:value={editCheckpointsText} class="neo-textarea" rows="4"></textarea>
-              <div class="edit-btn-row">
-                <button class="action-btn primary-btn" onclick={saveCheckpoints}>Save Points</button>
-                <button class="action-btn outline-btn" onclick={() => isEditingCheckpoints = false}>Cancel</button>
-              </div>
-            {:else}
-              <ul class="checkpoints-checklist">
-                {#each currentLesson.checkpoints as pt, i}
-                  {@const key = `${currentLesson.id}_cp_${i}`}
-                  <li>
-                    <button
-                      class="checkpoint-item {completedCheckpoints[key] ? 'done' : ''}"
-                      onclick={() => toggleCheckpoint(i)}
-                    >
-                      <span class="check-box">{completedCheckpoints[key] ? '✅' : '⬜'}</span>
-                      <span class="check-text">{pt}</span>
-                    </button>
-                  </li>
-                {/each}
-              </ul>
-            {/if}
-          </section>
+    <button
+      class="dock-btn {activeScreen === 'goals' ? 'active' : ''}"
+      onclick={() => selectScreen('goals')}
+    >
+      <span class="dock-icon">🎯</span>
+      <span class="dock-label">Goals</span>
+      {#if currentLesson}
+        {@const activeLesson = currentLesson}
+        {@const completedCount = Object.keys(completedCheckpoints).filter(k => k.startsWith(activeLesson.id) && completedCheckpoints[k]).length}
+        {#if completedCount > 0}
+          <span class="dock-badge-stars">{completedCount}⭐</span>
         {/if}
-      </div>
-    </main>
-  {/if}
+      {/if}
+    </button>
+  </nav>
 
   <!-- Footer Controls -->
   <footer class="neo-footer">
@@ -1501,6 +1707,66 @@
         <div class="modal-footer">
           <button class="modal-primary-btn" onclick={() => showPracticeLabModal = false}>
             ✓ Done & Return to Practice
+          </button>
+        </div>
+      </div>
+    </div>
+  {/if}
+
+  <!-- Add Kid Profile Modal -->
+  {#if showAddProfileModal}
+    <div
+      class="modal-backdrop"
+      onclick={() => showAddProfileModal = false}
+      onkeydown={(e) => e.key === 'Escape' && (showAddProfileModal = false)}
+      role="presentation"
+    >
+      <!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
+      <div
+        class="modal-card neo-card"
+        onclick={(e) => e.stopPropagation()}
+        onkeydown={(e) => e.stopPropagation()}
+        role="dialog"
+        tabindex="-1"
+        aria-modal="true"
+        aria-label="Add New Kid Profile"
+      >
+        <h2>➕ Add New Kid Profile</h2>
+
+        <div class="form-group">
+          <span class="form-label">Kid's Name:</span>
+          <input
+            type="text"
+            bind:value={newProfileName}
+            class="neo-input"
+            placeholder="e.g. Emma"
+            maxlength="20"
+          />
+        </div>
+
+        <div class="form-group">
+          <span class="form-label">Choose Avatar:</span>
+          <div class="avatar-picker-grid">
+            {#each KID_AVATARS as av}
+              <button
+                class="avatar-pick-btn {newProfileAvatar === av.key ? 'selected' : ''}"
+                style="background-color: {av.color}"
+                onclick={() => newProfileAvatar = av.key}
+                type="button"
+              >
+                <span class="pick-emoji">{av.emoji}</span>
+                <span class="pick-label">{av.label}</span>
+              </button>
+            {/each}
+          </div>
+        </div>
+
+        <div class="modal-btn-row">
+          <button class="action-btn outline-btn" onclick={() => showAddProfileModal = false}>
+            Cancel
+          </button>
+          <button class="action-btn primary-btn" onclick={addStudentProfile} disabled={!newProfileName.trim()}>
+            Create Profile ✓
           </button>
         </div>
       </div>
@@ -2145,8 +2411,8 @@
     transform: translateX(-50%);
   }
 
-  .player-card:fullscreen,
-  .player-card:-webkit-full-screen {
+  .player-stage-card:fullscreen,
+  .player-stage-card:-webkit-full-screen {
     width: 100vw !important;
     height: 100vh !important;
     max-width: none !important;
@@ -2161,8 +2427,8 @@
     box-shadow: none !important;
   }
 
-  .player-card:fullscreen .yt-frame,
-  .player-card:-webkit-full-screen .yt-frame {
+  .player-stage-card:fullscreen .yt-frame,
+  .player-stage-card:-webkit-full-screen .yt-frame {
     flex: 1;
     height: auto !important;
     aspect-ratio: auto;
@@ -2544,12 +2810,6 @@
 
   .checkpoints-icon {
     font-size: 1.3rem;
-  }
-
-  .checkpoints-card h3 {
-    margin: 0;
-    font-weight: 900;
-    font-size: 1.2rem;
   }
 
   .edit-checkpoints-btn {
@@ -3373,5 +3633,1054 @@
     padding: 10px 20px;
     cursor: pointer;
     box-shadow: 2px 2px 0 #000;
+  }
+
+  /* ================= YouTube Kids Header ================= */
+  .kids-top-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 16px;
+    background: #FFF9C4;
+    border: 3px solid #000;
+    border-radius: 16px;
+    box-shadow: 3px 3px 0 #000;
+    margin-bottom: 20px;
+    margin-top: 10px;
+    position: sticky;
+    top: 10px;
+    z-index: 100;
+  }
+
+  .kids-brand-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+    text-align: left;
+  }
+
+  .brand-piano-icon {
+    font-size: 1.8rem;
+  }
+
+  .brand-text-col {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .brand-title {
+    font-size: 1.15rem;
+    font-weight: 900;
+    color: #121212;
+  }
+
+  .kids-pill-badge {
+    background: #FF5722;
+    color: #ffffff;
+    font-size: 0.7rem;
+    font-weight: 900;
+    padding: 2px 6px;
+    border-radius: 6px;
+    border: 1.5px solid #000;
+    letter-spacing: 0.5px;
+  }
+
+  .active-profile-chip {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: #ffffff;
+    border: 2px solid #000;
+    border-radius: 24px;
+    padding: 4px 12px 4px 6px;
+    cursor: pointer;
+    box-shadow: 2px 2px 0 #000;
+    transition: transform 0.1s ease;
+  }
+
+  .active-profile-chip:active {
+    transform: translate(1px, 1px);
+    box-shadow: 1px 1px 0 #000;
+  }
+
+  .avatar-bubble {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+    border: 2px solid #000;
+  }
+
+  .profile-info-col {
+    display: flex;
+    flex-direction: column;
+    text-align: left;
+  }
+
+  .profile-name {
+    font-weight: 900;
+    font-size: 0.85rem;
+    color: #121212;
+    line-height: 1.1;
+  }
+
+  .profile-switch-tag {
+    font-size: 0.65rem;
+    font-weight: 800;
+    color: #666;
+  }
+
+  .top-gear-btn {
+    background: #ffffff;
+    border: 2px solid #000;
+    border-radius: 10px;
+    width: 38px;
+    height: 38px;
+    font-size: 1.1rem;
+    cursor: pointer;
+    box-shadow: 2px 2px 0 #000;
+  }
+
+  .top-gear-btn:active {
+    transform: translate(1px, 1px);
+    box-shadow: 1px 1px 0 #000;
+  }
+
+  /* ================= SCREEN 1: Hub Styles ================= */
+  .screen-hub {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    padding-bottom: 20px;
+  }
+
+  .hub-card-section {
+    padding: 18px 20px;
+  }
+
+  .section-title-bar {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 14px;
+  }
+
+  .section-title-bar.between {
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .title-with-icon {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .section-title-bar h2 {
+    margin: 0;
+    font-size: 1.25rem;
+    font-weight: 900;
+    color: #121212;
+  }
+
+  .section-emoji {
+    font-size: 1.4rem;
+  }
+
+  .add-source-btn {
+    background: #FFF9C4;
+    border: 2px solid #000;
+    border-radius: 8px;
+    font-weight: 800;
+    font-size: 0.8rem;
+    padding: 6px 12px;
+    cursor: pointer;
+    box-shadow: 1.5px 1.5px 0 #000;
+  }
+
+  .songs-total-pill {
+    background: #E8F5E9;
+    border: 1.5px solid #2E7D32;
+    color: #2E7D32;
+    border-radius: 8px;
+    font-size: 0.75rem;
+    font-weight: 800;
+    padding: 4px 10px;
+  }
+
+  /* Profile Carousel */
+  .profiles-carousel {
+    display: flex;
+    gap: 18px;
+    overflow-x: auto;
+    padding: 8px 4px 12px 4px;
+    align-items: flex-start;
+  }
+
+  .profile-bubble-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 4px;
+    flex-shrink: 0;
+  }
+
+  .bubble-circle {
+    width: 68px;
+    height: 68px;
+    border-radius: 50%;
+    border: 3.5px solid #000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2.2rem;
+    position: relative;
+    box-shadow: 3px 3px 0 #000;
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+  }
+
+  .profile-bubble-card.active .bubble-circle {
+    transform: scale(1.08);
+    box-shadow: 0 0 0 4px #FFD54F, 4px 4px 0 #000;
+  }
+
+  .crown-badge {
+    position: absolute;
+    top: -8px;
+    right: -6px;
+    font-size: 1.2rem;
+    filter: drop-shadow(1px 1px 0 #000);
+  }
+
+  .bubble-name {
+    font-weight: 900;
+    font-size: 0.95rem;
+    color: #121212;
+  }
+
+  .bubble-active-pill {
+    font-size: 0.65rem;
+    font-weight: 900;
+    background: #4CAF50;
+    color: #ffffff;
+    padding: 2px 8px;
+    border-radius: 8px;
+    border: 1px solid #000;
+  }
+
+  .add-kid-btn {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 4px;
+    flex-shrink: 0;
+  }
+
+  .add-circle {
+    width: 68px;
+    height: 68px;
+    border-radius: 50%;
+    border: 3px dashed #666;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.8rem;
+    background: #F5F5F5;
+  }
+
+  /* Bookshelf */
+  .bookshelf-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 16px;
+  }
+
+  .book-shelf-card {
+    display: flex;
+    gap: 16px;
+    background: #FFF8E1;
+    border: 3px solid #000;
+    border-radius: 14px;
+    padding: 14px;
+    cursor: pointer;
+    box-shadow: 4px 4px 0 #000;
+    text-align: left;
+    transition: transform 0.1s ease, background 0.15s ease;
+  }
+
+  .book-shelf-card:active {
+    transform: translate(2px, 2px);
+    box-shadow: 2px 2px 0 #000;
+  }
+
+  .book-shelf-card.selected {
+    background: #FFF59D;
+    border-color: #E65100;
+    box-shadow: 4px 4px 0 #E65100;
+  }
+
+  .book-cover-art {
+    width: 68px;
+    height: 88px;
+    background: #FF7043;
+    border: 2.5px solid #000;
+    border-radius: 8px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 6px;
+    color: #fff;
+    text-align: center;
+    box-shadow: 2px 2px 0 #000;
+    flex-shrink: 0;
+  }
+
+  .book-art-icon {
+    font-size: 1.8rem;
+  }
+
+  .book-art-publisher {
+    font-size: 0.55rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    margin-top: 4px;
+    line-height: 1.1;
+  }
+
+  .book-meta-col {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    min-width: 0;
+  }
+
+  .book-name {
+    margin: 0 0 4px 0;
+    font-size: 1.1rem;
+    font-weight: 900;
+    color: #121212;
+  }
+
+  .book-song-count {
+    font-size: 0.8rem;
+    font-weight: 800;
+    color: #555;
+  }
+
+  .book-active-badge {
+    display: inline-block;
+    margin-top: 8px;
+    font-size: 0.75rem;
+    font-weight: 900;
+    background: #4CAF50;
+    color: #fff;
+    padding: 2px 8px;
+    border-radius: 6px;
+    border: 1px solid #000;
+    width: fit-content;
+  }
+
+  /* Educator Grid */
+  .educator-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(290px, 1fr));
+    gap: 14px;
+  }
+
+  .educator-card {
+    display: flex;
+    gap: 14px;
+    background: #ffffff;
+    border: 2.5px solid #000;
+    border-radius: 14px;
+    padding: 14px;
+    cursor: pointer;
+    box-shadow: 3px 3px 0 #000;
+    text-align: left;
+    transition: transform 0.1s ease;
+  }
+
+  .educator-card:active {
+    transform: translate(1px, 1px);
+    box-shadow: 2px 2px 0 #000;
+  }
+
+  .educator-card.selected {
+    background: #E8F5E9;
+    border-color: #2E7D32;
+    box-shadow: 4px 4px 0 #2E7D32;
+  }
+
+  .educator-avatar-wrap {
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    border: 2.5px solid #000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.8rem;
+    box-shadow: 2px 2px 0 #000;
+    flex-shrink: 0;
+  }
+
+  .educator-content {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    flex: 1;
+  }
+
+  .educator-header-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: 4px;
+  }
+
+  .educator-display-name {
+    font-weight: 900;
+    font-size: 0.95rem;
+    color: #121212;
+  }
+
+  .educator-bio-text {
+    font-size: 0.75rem;
+    color: #555;
+    margin: 0 0 6px 0;
+    line-height: 1.3;
+    font-weight: 600;
+  }
+
+  .educator-footer-row {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.7rem;
+    font-weight: 800;
+    color: #777;
+  }
+
+  .type-pill-badge {
+    font-size: 0.65rem;
+    font-weight: 900;
+    padding: 2px 6px;
+    border-radius: 6px;
+    border: 1px solid #000;
+  }
+
+  .type-pill-badge.chapters {
+    background: #FFF9C4;
+    color: #F57F17;
+  }
+
+  .type-pill-badge.playlist {
+    background: #E1BEE7;
+    color: #7B1FA2;
+  }
+
+  .type-pill-badge.singles {
+    background: #E0F2F1;
+    color: #00796B;
+  }
+
+  /* Songs Hub Grid */
+  .songs-hub-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 10px;
+  }
+
+  .song-hub-card {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: #ffffff;
+    border: 2px solid #000;
+    border-radius: 12px;
+    padding: 12px 14px;
+    cursor: pointer;
+    box-shadow: 2px 2px 0 #000;
+    text-align: left;
+    transition: transform 0.1s ease;
+  }
+
+  .song-hub-card:active {
+    transform: translate(1px, 1px);
+    box-shadow: 1px 1px 0 #000;
+  }
+
+  .song-hub-card.current {
+    background: #FFFDE7;
+    border-color: #E65100;
+  }
+
+  .song-num-col {
+    font-size: 1rem;
+    font-weight: 900;
+    color: #666;
+    width: 32px;
+    flex-shrink: 0;
+  }
+
+  .song-details-col {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .song-title-text {
+    margin: 0;
+    font-size: 0.95rem;
+    font-weight: 900;
+    color: #121212;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .song-time-text {
+    font-size: 0.7rem;
+    font-weight: 700;
+    color: #888;
+  }
+
+  .song-status-col {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-shrink: 0;
+  }
+
+  .song-star {
+    font-size: 1.1rem;
+  }
+
+  .song-play-btn {
+    background: #4CAF50;
+    color: #ffffff;
+    border: 1.5px solid #000;
+    border-radius: 6px;
+    font-weight: 900;
+    font-size: 0.75rem;
+    padding: 4px 8px;
+    box-shadow: 1px 1px 0 #000;
+  }
+
+  /* ================= SCREEN 2: Player Stage Styles ================= */
+  .screen-player {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .player-header-strip {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 16px;
+    background: #ffffff;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  .back-to-hub-btn {
+    background: #FFF9C4;
+    border: 2px solid #000;
+    border-radius: 8px;
+    font-weight: 900;
+    font-size: 0.85rem;
+    padding: 6px 12px;
+    cursor: pointer;
+    box-shadow: 2px 2px 0 #000;
+  }
+
+  .player-song-title-wrap {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    flex: 1;
+    min-width: 180px;
+  }
+
+  .player-song-index {
+    font-size: 0.75rem;
+    font-weight: 800;
+    color: #E65100;
+  }
+
+  .player-song-title {
+    margin: 0;
+    font-size: 1.2rem;
+    font-weight: 900;
+    color: #121212;
+  }
+
+  .player-meta-badge {
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: #666;
+  }
+
+  .player-header-right {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+  }
+
+  .nav-icon-btn {
+    background: #ffffff;
+    border: 2px solid #000;
+    border-radius: 8px;
+    width: 36px;
+    height: 36px;
+    font-size: 0.9rem;
+    font-weight: 900;
+    cursor: pointer;
+    box-shadow: 1px 1px 0 #000;
+  }
+
+  .metronome-quick-btn {
+    background: #ffffff;
+    border: 2px solid #000;
+    border-radius: 8px;
+    padding: 6px 10px;
+    font-size: 0.85rem;
+    font-weight: 800;
+    cursor: pointer;
+    box-shadow: 1px 1px 0 #000;
+  }
+
+  .metronome-quick-btn.active {
+    background: #FFD54F;
+  }
+
+  .player-stage-card {
+    padding: 0;
+    overflow: hidden;
+  }
+
+  .player-quick-action-strip {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-top: 8px;
+  }
+
+  @media (max-width: 580px) {
+    .player-quick-action-strip {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .quick-nav-card {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    border: 2.5px solid #000;
+    border-radius: 14px;
+    padding: 14px;
+    cursor: pointer;
+    box-shadow: 3px 3px 0 #000;
+    text-align: left;
+    background: #ffffff;
+    transition: transform 0.1s ease;
+  }
+
+  .quick-nav-card:active {
+    transform: translate(1px, 1px);
+    box-shadow: 1px 1px 0 #000;
+  }
+
+  .quick-nav-card.studio-cta {
+    background: #E8F5E9;
+    border-color: #2E7D32;
+  }
+
+  .quick-nav-card.goals-cta {
+    background: #FFFDE7;
+    border-color: #F57F17;
+  }
+
+  .cta-emoji {
+    font-size: 1.8rem;
+  }
+
+  .cta-text-col {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+  }
+
+  .cta-text-col strong {
+    font-size: 0.95rem;
+    font-weight: 900;
+  }
+
+  .cta-text-col small {
+    font-size: 0.75rem;
+    color: #555;
+  }
+
+  .cta-arrow {
+    font-size: 1.3rem;
+    font-weight: 900;
+  }
+
+  /* ================= SCREEN 3: Studio Styles ================= */
+  .screen-studio {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+  }
+
+  .studio-top-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 14px 18px;
+    background: #ffffff;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  .studio-top-tag {
+    font-size: 0.7rem;
+    font-weight: 900;
+    color: #E65100;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  .studio-top-bar h2 {
+    margin: 2px 0 0 0;
+    font-size: 1.25rem;
+    font-weight: 900;
+  }
+
+  .back-to-player-btn {
+    background: #4CAF50;
+    color: #ffffff;
+    border: 2px solid #000;
+    border-radius: 8px;
+    font-weight: 900;
+    font-size: 0.85rem;
+    padding: 8px 14px;
+    cursor: pointer;
+    box-shadow: 2px 2px 0 #000;
+  }
+
+  /* ================= SCREEN 4: Goals Styles ================= */
+  .screen-goals {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+  }
+
+  .goals-hero-card {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 18px 20px;
+    background: #FFFDE7;
+    border: 3px solid #000;
+    border-radius: 16px;
+    box-shadow: 4px 4px 0 #000;
+    flex-wrap: wrap;
+    gap: 14px;
+  }
+
+  .hero-left {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+
+  .hero-icon {
+    font-size: 2.2rem;
+  }
+
+  .hero-tag {
+    font-size: 0.7rem;
+    font-weight: 900;
+    color: #F57F17;
+  }
+
+  .goals-hero-card h2 {
+    margin: 2px 0 6px 0;
+    font-size: 1.3rem;
+    font-weight: 900;
+  }
+
+  .stars-badge {
+    font-size: 0.85rem;
+    font-weight: 900;
+    background: #FFE082;
+    padding: 3px 8px;
+    border-radius: 6px;
+    border: 1.5px solid #000;
+  }
+
+  .mastered-badge {
+    font-size: 0.85rem;
+    font-weight: 900;
+    background: #C8E6C9;
+    color: #2E7D32;
+    padding: 3px 8px;
+    border-radius: 6px;
+    border: 1.5px solid #000;
+  }
+
+  .hero-right {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+  }
+
+  .goals-checklist-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .goal-card {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 14px 18px;
+    background: #ffffff;
+    border: 2.5px solid #000;
+    border-radius: 14px;
+    box-shadow: 3px 3px 0 #000;
+    cursor: pointer;
+    text-align: left;
+    transition: transform 0.1s ease;
+  }
+
+  .goal-card:active {
+    transform: translate(1px, 1px);
+    box-shadow: 1px 1px 0 #000;
+  }
+
+  .goal-card.done {
+    background: #FFFDE7;
+    border-color: #FFB300;
+  }
+
+  .goal-star-bubble {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    border: 2px solid #000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    background: #F5F5F5;
+    box-shadow: 1px 1px 0 #000;
+    flex-shrink: 0;
+  }
+
+  .goal-star-bubble.earned {
+    background: #FFD54F;
+  }
+
+  .goal-content {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .goal-number {
+    font-size: 0.75rem;
+    font-weight: 800;
+    color: #777;
+  }
+
+  .goal-text {
+    margin: 2px 0 0 0;
+    font-size: 0.95rem;
+    font-weight: 800;
+    color: #121212;
+  }
+
+  .goal-check-pill {
+    font-size: 0.75rem;
+    font-weight: 900;
+    padding: 6px 12px;
+    border-radius: 8px;
+    border: 1.5px solid #000;
+    background: #F5F5F5;
+    color: #555;
+  }
+
+  .goal-check-pill.done {
+    background: #4CAF50;
+    color: #ffffff;
+  }
+
+  .goals-edit-card {
+    padding: 16px;
+    background: #ffffff;
+  }
+
+  .no-lesson-state {
+    padding: 36px 20px;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .empty-icon {
+    font-size: 3rem;
+  }
+
+  /* ================= Universal Kids Bottom Navigation Dock ================= */
+  .kids-bottom-dock {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100vw;
+    background: #FFF9C4;
+    border-top: 3px solid #000;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    padding: 6px 10px calc(6px + env(safe-area-inset-bottom, 0px));
+    z-index: 1000;
+    box-shadow: 0 -3px 0 rgba(0,0,0,0.08);
+    box-sizing: border-box;
+  }
+
+  .dock-btn {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 6px 16px;
+    position: relative;
+    border-radius: 12px;
+    transition: transform 0.1s ease;
+  }
+
+  .dock-btn:active {
+    transform: scale(0.94);
+  }
+
+  .dock-btn.active {
+    background: #FFE082;
+    border: 2px solid #000;
+    box-shadow: 2px 2px 0 #000;
+  }
+
+  .dock-icon {
+    font-size: 1.4rem;
+  }
+
+  .dock-label {
+    font-size: 0.75rem;
+    font-weight: 900;
+    color: #121212;
+  }
+
+  .dock-pill-indicator {
+    position: absolute;
+    top: 4px;
+    right: 12px;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #4CAF50;
+    border: 1px solid #000;
+  }
+
+  .dock-badge-success {
+    position: absolute;
+    top: 2px;
+    right: 8px;
+    background: #4CAF50;
+    color: #fff;
+    font-size: 0.65rem;
+    font-weight: 900;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid #000;
+  }
+
+  .dock-badge-stars {
+    position: absolute;
+    top: 2px;
+    right: 4px;
+    background: #FFD54F;
+    color: #000;
+    font-size: 0.65rem;
+    font-weight: 900;
+    padding: 1px 4px;
+    border-radius: 8px;
+    border: 1px solid #000;
+  }
+
+  /* ================= Avatar Picker Grid ================= */
+  .avatar-picker-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
+    margin-top: 8px;
+  }
+
+  .avatar-pick-btn {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    padding: 10px 6px;
+    border: 2px solid #000;
+    border-radius: 12px;
+    cursor: pointer;
+    box-shadow: 2px 2px 0 #000;
+    transition: transform 0.1s ease;
+  }
+
+  .avatar-pick-btn.selected {
+    border-width: 3px;
+    box-shadow: 0 0 0 3px #000;
+    transform: scale(1.05);
+  }
+
+  .pick-emoji {
+    font-size: 1.8rem;
+  }
+
+  .pick-label {
+    font-size: 0.65rem;
+    font-weight: 800;
+    color: #000;
+    text-align: center;
   }
 </style>

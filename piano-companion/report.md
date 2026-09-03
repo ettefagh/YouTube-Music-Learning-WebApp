@@ -1,23 +1,28 @@
 Implemented the engineered scope for this issue.
 
-**Commit:** `26c62dcc16b157e80a7023c831f58c4208e8b3aa`
+**Commit:** `00f3798544e3fa386927a75ca1f54cfdf7d39efd`
 
 **Files touched:**
-- `piano-companion/src/lib/actions/longpress.ts`
+- `piano-companion/src/lib/types/studentProfile.ts`
+- `piano-companion/src/lib/types/educator.ts`
+- `piano-companion/src/lib/index.ts`
 - `piano-companion/src/routes/+page.svelte`
+- `piano-companion/test-kids-multiview.js`
 
 **Behavior verified:**
-- **Touchscreen & Kid Ergonomics**: Upgraded all primary transport buttons to chunky 48px+ touch targets with tactile neo-brutalist styling, high-contrast borders, and touch suppression on long-press.
-- **3-Second Pre-Roll Count-in**: Introduced visual count-in modal with 3-2-1 countdown for both practice playback (`⏳ 3s Play`) and take recording (`⏳ 3s Pre-Roll`), giving young students calm transition time to position their hands on the piano keys.
-- **Practice Lab Pop-Up Modal**: Moved advanced teacher/parent tools (fine-grained tempo chips 0.5x–1.25x, frame-by-frame 1s/5s seeking, precision A/B micro-looping nudges with ±0.1s/0.5s steppers, theater/fullscreen/mute controls) into a dedicated pop-up modal launched via `🎛️ Practice Lab`.
-- **Collapsible Cockpit Sections**: Built high-contrast accordion headers for Timeline, Audio Recording Studio, Interactive Metronome, and Practice Checkpoints with live status badges (`✅ Take Recorded`, `0/4 Done`) and `localStorage` state persistence.
-- **Long-Press Gestures Engine**: Implemented `longpress` action enabling 500ms hold on Play (to start 3s count-in) and Restart (for Deep Reset with Pip cheering).
+- **YouTube Kids-Style Profile Switcher**: Implemented visual kid profile selector ("Who's Practicing Today?") with vibrant avatar personas (🦁 Leo, 🐰 Mia, 🐼 Sammy, 🦊 Felix, 🦄 Luna, 🦉 Oliver, 🐻 Benny, 🐱 Chloe) and profile creation modal. Active child profile is persisted in `localStorage` and displayed in the top header pill.
+- **Visual Bookshelf (`hub`)**: Replaced dropdowns with 3D colorful book cover cards displaying titles, publishers, piece counts, and selection indicators.
+- **YouTube Educator Cards (`hub`)**: Designed cards showcasing YouTuber channel profile photos/avatars, bios, method badges (Singles, Playlist, Chapters), and video lesson previews.
+- **Dedicated Player Stage (`player`)**: Segregated practice playback into a distraction-free stage with large video player, chapter scrubbers, quick song switcher, metronome toggle, and 48px+ kid transport buttons (`▶ Play`, `⏳ 3s Play`, `⏮ Restart`, `🔄 Loop`, `🎛️ Practice Lab`).
+- **Dedicated Audio Recording Studio (`studio`)**: Built dedicated station for recording student practice takes (`⏳ 3s Pre-Roll`, VU meter, take playback) and unlocked teacher reference tracks.
+- **Dedicated Learning Goals & Checkpoints (`goals`)**: Developed gamified star-checkpoints tracker with completion celebration badges (`1 of 1 Stars Earned ⭐`, `🎉 Mastered!`), cheerful Pip mascot animations, and PIN-protected teacher goal editing.
+- **Universal Bottom Dock Navigation**: Integrated tactile Neo-brutalist 4-button dock (`📚 Library`, `🎹 Practice`, `🎙️ Studio`, `🎯 Goals`) with live state badges (`✓ Take Recorded`, `1⭐`) for fluid 1-tap screen switching on iPads and touch laptops.
 
 **Verification passed:**
 - `npm run check` — 0 errors, 0 warnings.
-- `npm run build` — Clean production build.
-- Playwright E2E verification (`test-touch-kid-ux.js`) — Emulated touch device (iPad 1024x768), tested section collapse/expand, count-in pre-roll, Practice Lab speed adjustment to 0.7x, and long-press Deep Reset.
-- Cloudflare Pages live deployment — Successfully deployed to production endpoint `https://11b3e7f9.piano-practice-companion.pages.dev` and verified with HTTP 200.
+- `npm run build` — Clean production build via `@sveltejs/adapter-cloudflare`.
+- Playwright E2E verification (`test-kids-multiview.js`) — Emulated tablet touch screen (1024x768), verified Hub loading, profile switching to Mia, adding new profile Noah, opening Glocken in dedicated Player stage, navigating to Studio and Goals via bottom dock, earning checkpoint stars with dock badge notification, and returning to Hub.
+- Cloudflare Pages live deployment — Successfully deployed to production endpoint `https://a7cd4181.piano-practice-companion.pages.dev` and verified with Playwright against the live deployment.
 
 **Docs updated:**
 - `README.md` — reviewed, no change needed.
