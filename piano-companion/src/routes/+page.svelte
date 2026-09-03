@@ -8,15 +8,15 @@
     type LocalAudioTrack,
     type LocalBook,
     type LessonListType
-  } from '$lib/db/db';
-  import { youtubeLooper, type YouTubePlayerController } from '$lib/actions/youtubePlayer.svelte';
-  import { AudioRecorderEngine } from '$lib/audio/audioRecorder.svelte';
-  import { teacherAuth } from '$lib/stores/teacherAuth.svelte';
-  import MascotPip from '$lib/components/MascotPip.svelte';
-  import Metronome from '$lib/components/Metronome.svelte';
-  import ChapterTimeline from '$lib/components/ChapterTimeline.svelte';
-  import OnboardingModal from '$lib/components/OnboardingModal.svelte';
-  import TeacherGate from '$lib/components/TeacherGate.svelte';
+  } from '#lib/db/db.js';
+  import { youtubeLooper, type YouTubePlayerController } from '#lib/actions/youtubePlayer.svelte.js';
+  import { AudioRecorderEngine } from '#lib/audio/audioRecorder.svelte.js';
+  import { teacherAuth } from '#lib/stores/teacherAuth.svelte.js';
+  import MascotPip from '#lib/components/MascotPip.svelte';
+  import Metronome from '#lib/components/Metronome.svelte';
+  import ChapterTimeline from '#lib/components/ChapterTimeline.svelte';
+  import OnboardingModal from '#lib/components/OnboardingModal.svelte';
+  import TeacherGate from '#lib/components/TeacherGate.svelte';
 
   // --- Curriculum & Book State ---
   let books = $state<LocalBook[]>([]);

@@ -1,5 +1,5 @@
 <script lang="ts">
-  import type { LocalLesson } from '$lib/db/db';
+  import type { LocalLesson } from '#lib/db/db.js';
 
   interface Props {
     lessons: LocalLesson[];
