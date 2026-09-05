@@ -24,21 +24,23 @@
     KID_AVATARS,
     DEFAULT_STUDENT_PROFILES,
     getAvatarEmoji,
-    getAvatarColor
+    getAvatarColor,
+    type ActiveScreen
   } from '#lib/types/studentProfile.js';
   import { getEducatorInfo } from '#lib/types/educator.js';
 
-  // --- Sequential YouTube Kids-Style Navigation Flow ---
-  type ActiveScreen =
-    | 'splash'
-    | 'select-profile'
-    | 'select-book'
-    | 'select-teacher'
-    | 'select-lesson'
-    | 'player'
-    | 'studio'
-    | 'goals';
+  // Modular Kids UX Components
+  import KidsTopHeader from '#lib/components/kids/KidsTopHeader.svelte';
+  import KidsBottomNav from '#lib/components/kids/KidsBottomNav.svelte';
+  import LibraryScreen from '#lib/components/screens/LibraryScreen.svelte';
+  import StudioScreen from '#lib/components/screens/StudioScreen.svelte';
+  import ProfileScreen from '#lib/components/screens/ProfileScreen.svelte';
+  import SettingsScreen from '#lib/components/screens/SettingsScreen.svelte';
+  import AppSplashScreen from '#lib/components/screens/AppSplashScreen.svelte';
+
   let activeScreen = $state<ActiveScreen>('splash');
+  let isAppReady = $state<boolean>(false);
+  let showInitialSplash = $state<boolean>(true);
 
   // --- Kid Profiles State ---
   let studentProfiles = $state<StudentProfile[]>(DEFAULT_STUDENT_PROFILES);
@@ -229,13 +231,11 @@
 
     const validScreens: ActiveScreen[] = [
       'splash',
-      'select-profile',
-      'select-book',
-      'select-teacher',
-      'select-lesson',
+      'library',
       'player',
       'studio',
-      'goals'
+      'profile',
+      'settings'
     ];
     const savedScreen = localStorage.getItem('activeScreen');
     if (savedScreen && validScreens.includes(savedScreen as ActiveScreen)) {
@@ -268,6 +268,8 @@
       document.addEventListener('fullscreenchange', handleFullscreenChange);
       document.addEventListener('webkitfullscreenchange', handleFullscreenChange);
     }
+
+    isAppReady = true;
   });
 
   onDestroy(() => {
@@ -471,7 +473,7 @@
   }
 
   function selectScreen(screen: ActiveScreen) {
-    if ((screen === 'player' || screen === 'studio' || screen === 'goals') && !currentLesson) {
+    if ((screen === 'player' || screen === 'studio') && !currentLesson) {
       if (lessons.length > 0) {
         selectLesson(lessons[0]);
       } else {
@@ -508,27 +510,39 @@
     }
   }
 
-  async function selectProfileAndAdvance(profileId: string) {
+  function handleSelectProfile(profileId: string) {
     selectProfile(profileId);
-    selectScreen('select-book');
+    selectScreen('library');
   }
 
-  async function selectBookAndAdvance(bookId: string) {
+  function handleAddProfile(name: string, avatarKey: KidAvatarKey) {
+    const newProfile: StudentProfile = {
+      id: `profile-${Date.now()}`,
+      name,
+      avatarKey,
+      color: getAvatarColor(avatarKey),
+      createdAt: Date.now()
+    };
+    studentProfiles = [...studentProfiles, newProfile];
+    saveProfilesToStorage();
+    selectProfile(newProfile.id);
+    selectScreen('library');
+  }
+
+  async function handleSelectBook(bookId: string) {
     await selectBook(bookId);
     if (activeProfile) {
       activeProfile.lastBookId = bookId;
       saveProfilesToStorage();
     }
-    selectScreen('select-teacher');
   }
 
-  function selectTeacherAndAdvance(provider: string) {
+  function handleSelectProvider(provider: string) {
     selectProvider(provider);
     if (activeProfile) {
       activeProfile.lastProvider = provider;
       saveProfilesToStorage();
     }
-    selectScreen('select-lesson');
   }
 
   async function selectLessonAndPlay(lesson: LocalLesson) {
@@ -549,24 +563,77 @@
     } else if (lessons.length > 0) {
       selectLessonAndPlay(lessons[0]);
     } else {
-      selectScreen('select-profile');
+      selectScreen('library');
     }
+  }
+
+  function handleOpenParentGate() {
+    selectScreen('settings');
+  }
+
+  function handleUnlockTeacher() {
+    teacherAuth.unlock();
+    mascotState = 'cheering';
+    mascotMessage = 'Grown-Ups mode unlocked! ⚙️';
+  }
+
+  function handleLockTeacher() {
+    teacherAuth.lock();
+    mascotState = 'idle';
+    mascotMessage = 'Grown-Ups mode locked. 🔒';
   }
 
   function addStudentProfile() {
     if (!newProfileName.trim()) return;
-    const newProfile: StudentProfile = {
-      id: `profile-${Date.now()}`,
-      name: newProfileName.trim(),
-      avatarKey: newProfileAvatar,
-      color: getAvatarColor(newProfileAvatar),
-      createdAt: Date.now()
-    };
-    studentProfiles = [...studentProfiles, newProfile];
-    saveProfilesToStorage();
-    selectProfile(newProfile.id);
+    handleAddProfile(newProfileName.trim(), newProfileAvatar);
     newProfileName = '';
     showAddProfileModal = false;
+  }
+
+  function exportData() {
+    if (typeof window === 'undefined') return;
+    const data = {
+      version: 1,
+      profiles: studentProfiles,
+      activeProfileId,
+      completedCheckpoints,
+      exportedAt: Date.now()
+    };
+    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `piano-companion-backup-${new Date().toISOString().slice(0, 10)}.json`;
+    a.click();
+    URL.revokeObjectURL(url);
+  }
+
+  function importData(event: Event) {
+    const input = event.target as HTMLInputElement;
+    if (!input.files || input.files.length === 0) return;
+    const file = input.files[0];
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      try {
+        const data = JSON.parse(e.target?.result as string);
+        if (data.profiles) studentProfiles = data.profiles;
+        if (data.activeProfileId) activeProfileId = data.activeProfileId;
+        if (data.completedCheckpoints) completedCheckpoints = data.completedCheckpoints;
+        saveProfilesToStorage();
+        localStorage.setItem('completedCheckpoints', JSON.stringify(completedCheckpoints));
+        alert('Practice data restored successfully! 🎉');
+      } catch (err) {
+        alert('Failed to parse backup file.');
+      }
+    };
+    reader.readAsText(file);
+  }
+
+  function handleResetAllData() {
+    if (confirm('Are you sure you want to reset student progress and stars? This cannot be undone.')) {
+      localStorage.clear();
+      location.reload();
+    }
   }
 
   function playLessonFromHub(lesson: LocalLesson) {
@@ -720,14 +787,21 @@
   function toggleCheckpoint(index: number) {
     if (!currentLesson) return;
     const key = `${currentLesson.id}_cp_${index}`;
+    toggleCheckpointByKey(key);
+  }
+
+  function toggleCheckpointByKey(key: string) {
     completedCheckpoints[key] = !completedCheckpoints[key];
+    localStorage.setItem('completedCheckpoints', JSON.stringify(completedCheckpoints));
 
-    const total = currentLesson.checkpoints.length;
-    const checkedCount = currentLesson.checkpoints.filter((_, i) => completedCheckpoints[`${currentLesson!.id}_cp_${i}`]).length;
+    if (currentLesson) {
+      const total = currentLesson.checkpoints.length;
+      const checkedCount = currentLesson.checkpoints.filter((_, i) => completedCheckpoints[`${currentLesson!.id}_cp_${i}`]).length;
 
-    if (checkedCount === total && total > 0) {
-      mascotState = 'cheering';
-      mascotMessage = 'Brilliant! You mastered all points for this piece! 🎉';
+      if (checkedCount === total && total > 0) {
+        mascotState = 'cheering';
+        mascotMessage = 'Brilliant! You mastered all points for this piece! 🎉';
+      }
     }
   }
 
@@ -938,89 +1012,30 @@
 </script>
 
 <div class="cockpit-container">
+  {#if showInitialSplash}
+    <AppSplashScreen
+      isReady={isAppReady}
+      onComplete={() => {
+        showInitialSplash = false;
+      }}
+    />
+  {/if}
+
   {#if showOnboarding}
     <OnboardingModal onComplete={() => { localStorage.setItem('onboardingComplete', 'true'); showOnboarding = false; }} />
   {/if}
 
-  {#if activeScreen !== 'splash'}
-    <!-- Kids Top App Header -->
-    <header class="kids-top-header">
-      <button class="kids-brand-btn" onclick={() => selectScreen('splash')}>
-        <span class="brand-piano-icon">🎹</span>
-        <div class="brand-text-col">
-          <span class="brand-title">Piano Companion</span>
-          <span class="kids-pill-badge">KIDS</span>
-        </div>
-      </button>
-
-      <!-- Active Profile Badge / Switcher -->
-      <button
-        class="active-profile-chip"
-        onclick={() => selectScreen('select-profile')}
-        title="Switch Kid Profile"
-      >
-        <div class="avatar-bubble" style="background-color: {activeProfile.color}">
-          <span class="avatar-emoji">{getAvatarEmoji(activeProfile.avatarKey)}</span>
-        </div>
-        <div class="profile-info-col">
-          <span class="profile-name">{activeProfile.name}</span>
-          <span class="profile-switch-tag">Switch 🔄</span>
-        </div>
-      </button>
-
-      <div class="top-bar-right">
-        <button class="top-gear-btn" onclick={openSettings} title="Settings & Teacher Controls">
-          ⚙️
-        </button>
-      </div>
-    </header>
-
-    <!-- Interactive Top Breadcrumbs Bar -->
-    {#if activeScreen !== 'select-profile'}
-      <nav class="kids-breadcrumbs-bar neo-card">
-        <button class="crumb-chip" onclick={() => selectScreen('select-profile')} title="Switch Kid Profile">
-          <span class="crumb-avatar" style="background-color: {activeProfile.color}">
-            {getAvatarEmoji(activeProfile.avatarKey)}
-          </span>
-          <span class="crumb-text">{activeProfile.name}</span>
-        </button>
-
-        <span class="crumb-arrow">›</span>
-
-        <button
-          class="crumb-chip {activeScreen === 'select-book' ? 'current' : ''}"
-          onclick={() => selectScreen('select-book')}
-          title="Change Book"
-        >
-          <span class="crumb-icon">📖</span>
-          <span class="crumb-text">{currentBook?.title ?? 'Book'}</span>
-        </button>
-
-        {#if selectedProvider}
-          <span class="crumb-arrow">›</span>
-          <button
-            class="crumb-chip {activeScreen === 'select-teacher' ? 'current' : ''}"
-            onclick={() => selectScreen('select-teacher')}
-            title="Change Teacher"
-          >
-            <span class="crumb-icon">📺</span>
-            <span class="crumb-text">{selectedProvider.replace(/\s*\(.*?\)/, '')}</span>
-          </button>
-        {/if}
-
-        {#if currentLesson}
-          <span class="crumb-arrow">›</span>
-          <button
-            class="crumb-chip {activeScreen === 'select-lesson' ? 'current' : ''}"
-            onclick={() => selectScreen('select-lesson')}
-            title="Change Song"
-          >
-            <span class="crumb-icon">🎵</span>
-            <span class="crumb-text">#{currentLesson.sequenceIndex} {currentLesson.title}</span>
-          </button>
-        {/if}
-      </nav>
-    {/if}
+  {#if activeScreen !== 'splash' && activeScreen !== 'profile' && activeScreen !== 'settings'}
+    <!-- Kids Top App Header with Profile Chip & Parent Gate -->
+    <KidsTopHeader
+      {activeProfile}
+      {currentBook}
+      {selectedProvider}
+      {currentLesson}
+      {activeScreen}
+      onSelectScreen={selectScreen}
+      onOpenParentGate={handleOpenParentGate}
+    />
   {/if}
 
   <!-- ================= SCREEN 0: Splash Intro (Initiate State) ================= -->
@@ -1068,10 +1083,10 @@
         <div class="splash-action-row">
           <button
             class="start-funnel-btn neo-btn {!lastPracticedLesson ? 'primary-loud' : 'secondary-soft'}"
-            onclick={() => selectScreen('select-profile')}
+            onclick={() => selectScreen('library')}
           >
             {#if lastPracticedLesson}
-              📚 Switch Kid / Book / Song
+              📚 Open Song Library
             {:else}
               🎹 Let's Start Practicing!
             {/if}
@@ -1080,228 +1095,33 @@
       </div>
     </div>
 
-  <!-- ================= SCREEN 1: Step 1: Who's Practicing? (Profile Picker) ================= -->
-  {:else if activeScreen === 'select-profile'}
-    <div class="screen-step screen-select-profile">
-      <div class="step-nav-bar">
-        <button class="step-back-btn" onclick={() => selectScreen('splash')}>
-          ← Back to Intro
-        </button>
-        <span class="step-counter-pill">Step 1 of 4</span>
-      </div>
+  <!-- ================= SCREEN 1: Unified Library (Book + Teacher + Songs) ================= -->
+  {:else if activeScreen === 'library'}
+    <LibraryScreen
+      {books}
+      {selectedBookId}
+      {currentBook}
+      {providers}
+      {selectedProvider}
+      {lessons}
+      {allLessons}
+      {currentLesson}
+      {lastPracticedLesson}
+      {currentListType}
+      onSelectBook={handleSelectBook}
+      onSelectProvider={handleSelectProvider}
+      onSelectLesson={selectLessonAndPlay}
+      onOpenAddProvider={() => showAddProviderModal = true}
+    />
 
-      <div class="step-hero-header">
-        <span class="step-emoji-hero">👑</span>
-        <h1 class="step-main-title">Who's Practicing Today?</h1>
-        <p class="step-sub-instruction">Tap your animal avatar to start playing!</p>
-      </div>
-
-      <div class="profiles-full-grid">
-        {#each studentProfiles as profile}
-          <button
-            class="profile-jumbo-card neo-card {activeProfileId === profile.id ? 'selected-kid' : ''}"
-            onclick={() => selectProfileAndAdvance(profile.id)}
-          >
-            <div class="jumbo-bubble-circle" style="background-color: {profile.color}">
-              <span class="jumbo-avatar-emoji">{getAvatarEmoji(profile.avatarKey)}</span>
-              {#if activeProfileId === profile.id}
-                <span class="jumbo-crown-badge">👑</span>
-              {/if}
-            </div>
-            <h2 class="jumbo-kid-name">{profile.name}</h2>
-            {#if activeProfileId === profile.id}
-              <span class="jumbo-active-pill">Playing Now</span>
-            {:else}
-              <span class="jumbo-tap-pill">Tap to Play</span>
-            {/if}
-          </button>
-        {/each}
-
-        <!-- Add Kid Card -->
-        <button class="add-kid-jumbo-card neo-card" onclick={() => showAddProfileModal = true}>
-          <div class="add-jumbo-circle">➕</div>
-          <h2 class="jumbo-kid-name">Add Kid</h2>
-          <span class="jumbo-tap-pill">Create Profile</span>
-        </button>
-      </div>
-    </div>
-
-  <!-- ================= SCREEN 2: Step 2: Choose Your Book ================= -->
-  {:else if activeScreen === 'select-book'}
-    <div class="screen-step screen-select-book">
-      <div class="step-nav-bar">
-        <button class="step-back-btn" onclick={() => selectScreen('select-profile')}>
-          ← Change Kid ({activeProfile.name})
-        </button>
-        <span class="step-counter-pill">Step 2 of 4</span>
-      </div>
-
-      <div class="step-hero-header">
-        <span class="step-emoji-hero">📚</span>
-        <h1 class="step-main-title">Choose Your Piano Book</h1>
-        <p class="step-sub-instruction">Pick the book that matches the sheet music on your piano!</p>
-      </div>
-
-      <div class="books-full-grid">
-        {#each books as book}
-          <button
-            class="book-jumbo-card neo-card {selectedBookId === book.id ? 'selected-book' : ''}"
-            onclick={() => selectBookAndAdvance(book.id)}
-          >
-            <div class="book-jumbo-cover">
-              <span class="book-icon-hero">📖</span>
-              <span class="book-pub-badge">{book.publisher}</span>
-            </div>
-            <div class="book-jumbo-body">
-              <h2 class="book-jumbo-title">{book.title}</h2>
-              <span class="book-pieces-badge">
-                {allLessons.filter(l => l.bookId === book.id).length} Pieces Available
-              </span>
-              {#if selectedBookId === book.id}
-                <span class="book-selected-pill">✓ Selected Book</span>
-              {:else}
-                <span class="book-tap-pill">Select This Book ➡️</span>
-              {/if}
-            </div>
-          </button>
-        {/each}
-      </div>
-    </div>
-
-  <!-- ================= SCREEN 3: Step 3: Pick Your YouTube Teacher ================= -->
-  {:else if activeScreen === 'select-teacher'}
-    <div class="screen-step screen-select-teacher">
-      <div class="step-nav-bar between">
-        <button class="step-back-btn" onclick={() => selectScreen('select-book')}>
-          ← Change Book ({currentBook?.title ?? 'Book'})
-        </button>
-        <span class="step-counter-pill">Step 3 of 4</span>
-      </div>
-
-      <div class="step-hero-header">
-        <span class="step-emoji-hero">📺</span>
-        <h1 class="step-main-title">Pick Your YouTube Teacher</h1>
-        <p class="step-sub-instruction">Choose your favorite YouTube masterclass instructor!</p>
-      </div>
-
-      <div class="teachers-full-grid">
-        {#each providers as provider}
-          {@const pLessons = allLessons.filter(l => l.providerName === provider)}
-          {@const pType = detectListType(pLessons, provider)}
-          {@const ed = getEducatorInfo(provider)}
-          {@const isPipPick = provider.includes('Anikó Drabon')}
-          <button
-            class="teacher-jumbo-card neo-card {selectedProvider === provider ? 'selected-teacher' : ''} {isPipPick ? 'pip-pick-highlight' : ''}"
-            onclick={() => selectTeacherAndAdvance(provider)}
-          >
-            {#if isPipPick}
-              <div class="pip-pick-banner">⭐ Pip's Recommended Pick</div>
-            {/if}
-            <div class="teacher-avatar-col" style="background-color: {ed.avatarBgColor}">
-              <span class="teacher-avatar-icon">{ed.avatarEmoji}</span>
-            </div>
-            <div class="teacher-jumbo-content">
-              <div class="teacher-title-row">
-                <h3 class="teacher-jumbo-name">{ed.educatorName}</h3>
-                <span class="type-pill-badge {pType}">
-                  {pType === 'chapters' ? '🔖 Bookmarks' : pType === 'playlist' ? '📑 Playlist' : '🎬 Singles'}
-                </span>
-              </div>
-              <p class="teacher-jumbo-bio">{ed.description}</p>
-              <div class="teacher-footer-row">
-                <span class="teacher-handle">{ed.channelHandle}</span>
-                <span class="teacher-lessons-count">{pLessons.length} lessons</span>
-                <span class="teacher-select-pill">Practice with {ed.educatorName.split(' ')[0]} ➡️</span>
-              </div>
-            </div>
-          </button>
-        {/each}
-      </div>
-
-      <div class="add-custom-channel-row">
-        <button class="add-channel-full-btn neo-btn" onclick={() => showAddProviderModal = true}>
-          + Add Custom YouTube Channel or Playlist
-        </button>
-      </div>
-    </div>
-
-  <!-- ================= SCREEN 4: Step 4: Pick a Song to Play ================= -->
-  {:else if activeScreen === 'select-lesson'}
-    <div class="screen-step screen-select-lesson">
-      <div class="step-nav-bar between">
-        <button class="step-back-btn" onclick={() => selectScreen('select-teacher')}>
-          ← Change Teacher ({selectedProvider.replace(/\s*\(.*?\)/, '')})
-        </button>
-        <span class="step-counter-pill">Step 4 of 4</span>
-      </div>
-
-      <div class="step-hero-header">
-        <span class="step-emoji-hero">🎵</span>
-        <h1 class="step-main-title">Pick a Piece to Practice</h1>
-        <p class="step-sub-instruction">{currentBook?.title ?? ''} • {selectedProvider}</p>
-      </div>
-
-      <!-- Continue where you left off hero card if in this list -->
-      {#if lastPracticedLesson && lessons.some(l => l.id === lastPracticedLesson?.id)}
-        <div class="continue-lesson-card neo-card">
-          <div class="continue-badge-row">
-            <span class="continue-badge">⭐ LAST PRACTICED PIECE</span>
-          </div>
-          <div class="continue-content-row">
-            <div class="continue-num">#{lastPracticedLesson.sequenceIndex}</div>
-            <div class="continue-text-col">
-              <h3>{lastPracticedLesson.title}</h3>
-              <span>Ready to keep perfecting this piece?</span>
-            </div>
-            <button class="continue-play-now-btn neo-btn" onclick={() => selectLessonAndPlay(lastPracticedLesson!)}>
-              Continue Playing ▶
-            </button>
-          </div>
-        </div>
-      {/if}
-
-      <!-- Search and Count Row -->
-      <div class="lesson-search-bar-row neo-card">
-        <input
-          type="text"
-          class="lesson-search-input"
-          placeholder="🔍 Search song title or piece #..."
-          bind:value={lessonSearch}
-        />
-        <span class="lesson-count-badge">{filteredLessons.length} Songs</span>
-      </div>
-
-      <!-- Songs List Grid -->
-      <div class="lessons-full-grid">
-        {#each filteredLessons as l}
-          <button
-            class="song-step-card neo-card {currentLesson?.id === l.id ? 'current-song' : ''}"
-            onclick={() => selectLessonAndPlay(l)}
-          >
-            <div class="song-step-num">#{l.sequenceIndex}</div>
-            <div class="song-step-info">
-              <h4 class="song-step-title">{l.title}</h4>
-              {#if currentListType === 'chapters' && l.endTime > 0}
-                <span class="song-step-time">Chapter: {formatTime(l.startTime)} → {formatTime(l.endTime)}</span>
-              {/if}
-            </div>
-            <div class="song-step-action">
-              <span class="song-step-star">{l.isCompleted ? '⭐' : '○'}</span>
-              <span class="song-step-play-btn">Play ▶</span>
-            </div>
-          </button>
-        {/each}
-      </div>
-    </div>
-
-  <!-- ================= SCREEN 5: Dedicated Player Stage ================= -->
+  <!-- ================= SCREEN 2: Dedicated Player Stage ================= -->
   {:else if activeScreen === 'player'}
     <div class="screen-player">
       {#if currentLesson}
         <!-- Top Lesson Header Strip -->
         <div class="player-header-strip neo-card">
-          <button class="back-to-hub-btn" onclick={() => selectScreen('select-lesson')}>
-            ← 📚 Change Song
+          <button class="back-to-hub-btn" onclick={() => selectScreen('library')}>
+            ← 📚 Back to Library
           </button>
           <div class="player-song-title-wrap">
             <span class="player-song-index">#{currentLesson.sequenceIndex}</span>
@@ -1542,7 +1362,7 @@
         <!-- Mascot Pip Encouragement -->
         <MascotPip state={mascotState} message={mascotMessage} />
 
-        <!-- Quick Jump to Studio or Goals -->
+        <!-- Quick Jump to Studio -->
         <div class="player-quick-action-strip">
           <button class="quick-nav-card studio-cta" onclick={() => selectScreen('studio')}>
             <span class="cta-emoji">🎙️</span>
@@ -1552,8 +1372,8 @@
             </div>
             <span class="cta-arrow">→</span>
           </button>
-          <button class="quick-nav-card goals-cta" onclick={() => selectScreen('goals')}>
-            <span class="cta-emoji">🎯</span>
+          <button class="quick-nav-card goals-cta" onclick={() => selectScreen('studio')}>
+            <span class="cta-emoji">⭐</span>
             <div class="cta-text-col">
               <strong>Practice Checkpoints</strong>
               <small>View learning goals & earn stars</small>
@@ -1566,266 +1386,75 @@
           <span class="empty-icon">🎹</span>
           <h3>No Song Selected</h3>
           <p>Choose a book and piece from your library to start practicing!</p>
-          <button class="action-btn primary-btn" onclick={() => selectScreen('select-lesson')}>
+          <button class="action-btn primary-btn" onclick={() => selectScreen('library')}>
             📚 Go to Library
           </button>
         </div>
       {/if}
     </div>
 
-  <!-- ================= SCREEN 3: Dedicated Audio Recording Studio ================= -->
+  <!-- ================= SCREEN 3: Dedicated Studio (Trophy & Audio) ================= -->
   {:else if activeScreen === 'studio'}
-    <div class="screen-studio">
-      <div class="studio-top-bar neo-card">
-        <div class="studio-title-col">
-          <span class="studio-top-tag">AUDIO RECORDING STATION</span>
-          <h2>🎙️ {currentLesson ? currentLesson.title : 'Select a piece'}</h2>
-        </div>
-        <button class="back-to-player-btn" onclick={() => selectScreen('player')}>
-          🎹 Back to Playing
-        </button>
-      </div>
+    <StudioScreen
+      {currentLesson}
+      {completedCheckpoints}
+      {isEditingCheckpoints}
+      bind:editCheckpointsText
+      {studentRecorder}
+      {teacherRecorder}
+      {studentTrack}
+      {teacherTrack}
+      {studentAudioUrl}
+      {teacherAudioUrl}
+      {teacherAuth}
+      {mascotState}
+      {mascotMessage}
+      onToggleCheckpoint={toggleCheckpointByKey}
+      onEditCheckpoints={handleEditCheckpoints}
+      onSaveCheckpoints={saveCheckpoints}
+      onCancelEditCheckpoints={() => isEditingCheckpoints = false}
+      onStudentRecord={toggleStudentRecord}
+      onTeacherRecord={handleTeacherRecord}
+      onDeleteStudentTrack={() => deleteTrack('student')}
+      onDeleteTeacherTrack={() => deleteTrack('teacher')}
+      onSelectScreen={selectScreen}
+    />
 
-      <section class="audio-studio-grid">
-        <!-- Student Take Card -->
-        <div class="studio-card student-card neo-card">
-          <div class="studio-header">
-            <div class="title-wrap">
-              <span class="studio-icon">{getAvatarEmoji(activeProfile.avatarKey)}</span>
-              <h3>{activeProfile.name}'s Practice Take</h3>
-            </div>
-            {#if studentTrack}
-              <button class="trash-btn" onclick={() => deleteTrack('student')} title="Delete take">
-                🗑️
-              </button>
-            {/if}
-          </div>
+  <!-- ================= SCREEN 4: Dedicated Full-Page Profile Hub ================= -->
+  {:else if activeScreen === 'profile'}
+    <ProfileScreen
+      {studentProfiles}
+      {activeProfileId}
+      {activeProfile}
+      {allLessons}
+      {completedCheckpoints}
+      onSelectProfile={handleSelectProfile}
+      onAddProfile={handleAddProfile}
+      onBack={() => selectScreen('library')}
+    />
 
-          {#if studentAudioUrl}
-            <audio src={studentAudioUrl} controls class="audio-player"></audio>
-            {#if studentTrack?.durationSeconds}
-              <div class="take-meta">Take length: {formatTime(studentTrack.durationSeconds)}</div>
-            {/if}
-          {:else}
-            <p class="empty-state">No take recorded yet for this piece. Tap below to start!</p>
-          {/if}
-
-          <div class="record-btn-row">
-            <button
-              class="record-btn student {studentRecorder.isRecording ? 'recording' : ''}"
-              use:longpress={{
-                duration: 500,
-                onLongPress: () => { if (!studentRecorder.isRecording) startCountIn('record'); },
-                onClick: toggleStudentRecord
-              }}
-              title="Tap to record • Hold for 3s pre-roll"
-            >
-              {#if studentRecorder.isRecording}
-                ⏹ Stop Recording ({formatTime(studentRecorder.recordingSeconds)})
-              {:else}
-                🎙️ {studentAudioUrl ? 'Re-record Take' : 'Record Take'}
-              {/if}
-            </button>
-
-            {#if !studentRecorder.isRecording}
-              <button
-                class="count-in-record-btn"
-                onclick={() => startCountIn('record')}
-                title="Start recording with 3s countdown"
-              >
-                ⏳ 3s Pre-Roll
-              </button>
-            {/if}
-          </div>
-
-          {#if studentRecorder.isRecording}
-            <div class="vu-wrapper neo-border">
-              <div class="vu-fill student" style="width: {studentRecorder.volumeLevel * 100}%"></div>
-            </div>
-          {/if}
-        </div>
-
-        <!-- Teacher Reference Card -->
-        <div class="studio-card teacher-card neo-card">
-          <div class="studio-header">
-            <div class="title-wrap">
-              <span class="studio-icon">👩‍🏫</span>
-              <h3>Teacher Reference Track</h3>
-            </div>
-            {#if teacherTrack && teacherAuth.isUnlocked}
-              <button class="trash-btn" onclick={() => deleteTrack('teacher')} title="Delete reference">
-                🗑️
-              </button>
-            {/if}
-          </div>
-
-          {#if teacherAudioUrl}
-            <audio src={teacherAudioUrl} controls class="audio-player"></audio>
-            {#if teacherTrack?.durationSeconds}
-              <div class="take-meta">Reference: {formatTime(teacherTrack.durationSeconds)}</div>
-            {/if}
-          {:else}
-            <p class="empty-state">No master reference track recorded for this piece.</p>
-          {/if}
-
-          <button
-            class="record-btn teacher {teacherRecorder.isRecording ? 'recording' : ''}"
-            onclick={handleTeacherRecord}
-          >
-            {#if teacherRecorder.isRecording}
-              ⏹ Stop Recording ({formatTime(teacherRecorder.recordingSeconds)})
-            {:else}
-              {teacherAuth.isUnlocked ? '🎙️ Record Reference' : '🔒 Teacher Unlock'}
-            {/if}
-          </button>
-
-          {#if teacherRecorder.isRecording}
-            <div class="vu-wrapper neo-border">
-              <div class="vu-fill teacher" style="width: {teacherRecorder.volumeLevel * 100}%"></div>
-            </div>
-          {/if}
-        </div>
-      </section>
-
-      <MascotPip state={mascotState} message={mascotMessage} />
-    </div>
-
-  <!-- ================= SCREEN 4: Dedicated Learning Goals ================= -->
-  {:else if activeScreen === 'goals'}
-    <div class="screen-goals">
-      {#if currentLesson}
-        {@const lesson = currentLesson}
-        {@const completedCount = Object.keys(completedCheckpoints).filter(k => k.startsWith(lesson.id) && completedCheckpoints[k]).length}
-        {@const totalCount = lesson.checkpoints.length}
-        <div class="goals-hero-card neo-card">
-          <div class="hero-left">
-            <span class="hero-icon">🎯</span>
-            <div class="hero-text-col">
-              <span class="hero-tag">LEARNING GOALS FOR</span>
-              <h2>{lesson.title}</h2>
-              <div class="stars-counter-row">
-                <span class="stars-badge">{completedCount} of {totalCount} Stars Earned ⭐</span>
-                {#if totalCount > 0 && completedCount === totalCount}
-                  <span class="mastered-badge">🎉 Mastered!</span>
-                {/if}
-              </div>
-            </div>
-          </div>
-          <div class="hero-right">
-            <button class="back-to-player-btn" onclick={() => selectScreen('player')}>
-              🎹 Practice Song
-            </button>
-            {#if !isEditingCheckpoints}
-              <button class="edit-checkpoints-btn" onclick={handleEditCheckpoints}>
-                {teacherAuth.isUnlocked ? '✏️ Edit Goals' : '🔒 Teacher Edit'}
-              </button>
-            {/if}
-          </div>
-        </div>
-
-        {#if isEditingCheckpoints}
-          <div class="goals-edit-card neo-card">
-            <p class="edit-instructions">Enter each learning point on a separate line:</p>
-            <textarea bind:value={editCheckpointsText} class="neo-textarea" rows="4"></textarea>
-            <div class="edit-btn-row">
-              <button class="action-btn primary-btn" onclick={saveCheckpoints}>Save Points</button>
-              <button class="action-btn outline-btn" onclick={() => isEditingCheckpoints = false}>Cancel</button>
-            </div>
-          </div>
-        {:else}
-          <div class="goals-checklist-grid">
-            {#each lesson.checkpoints as pt, i}
-              {@const key = `${lesson.id}_cp_${i}`}
-              {@const isDone = !!completedCheckpoints[key]}
-              <button
-                class="goal-card neo-card {isDone ? 'done' : ''}"
-                onclick={() => toggleCheckpoint(i)}
-              >
-                <div class="goal-star-bubble {isDone ? 'earned' : ''}">
-                  {isDone ? '⭐' : '☆'}
-                </div>
-                <div class="goal-content">
-                  <span class="goal-number">Goal #{i + 1}</span>
-                  <p class="goal-text">{pt}</p>
-                </div>
-                <div class="goal-check-pill {isDone ? 'done' : ''}">
-                  {isDone ? 'Done! ✓' : 'Tap to Complete'}
-                </div>
-              </button>
-            {/each}
-          </div>
-        {/if}
-
-        <MascotPip state={mascotState} message={mascotMessage} />
-      {:else}
-        <div class="no-lesson-state neo-card">
-          <span class="empty-icon">🎯</span>
-          <h3>No Song Selected</h3>
-          <p>Choose a piece from the library to track your practice goals.</p>
-          <button class="action-btn primary-btn" onclick={() => selectScreen('select-lesson')}>
-            📚 Go to Library
-          </button>
-        </div>
-      {/if}
-    </div>
+  <!-- ================= SCREEN 5: Dedicated Full-Page Parent & Teacher Zone ================= -->
+  {:else if activeScreen === 'settings'}
+    <SettingsScreen
+      {teacherAuth}
+      onUnlockTeacher={handleUnlockTeacher}
+      onLockTeacher={handleLockTeacher}
+      onBack={() => selectScreen('library')}
+      onOpenAddProvider={() => showAddProviderModal = true}
+      onExportData={exportData}
+      onImportData={importData}
+      onResetAllData={handleResetAllData}
+    />
   {/if}
 
-  <!-- Universal Kid-Friendly Bottom Navigation Dock -->
-  {#if activeScreen !== 'splash'}
-    <nav class="kids-bottom-dock neo-border">
-      <button
-        class="dock-btn {['select-profile', 'select-book', 'select-teacher', 'select-lesson'].includes(activeScreen) ? 'active' : ''}"
-        onclick={() => selectScreen('select-lesson')}
-      >
-        <span class="dock-icon">📚</span>
-        <span class="dock-label">Library</span>
-      </button>
-
-      <button
-        class="dock-btn {activeScreen === 'player' ? 'active' : ''}"
-        onclick={() => selectScreen('player')}
-      >
-        <span class="dock-icon">🎹</span>
-        <span class="dock-label">Practice</span>
-        {#if currentLesson}
-          <span class="dock-pill-indicator"></span>
-        {/if}
-      </button>
-
-      <button
-        class="dock-btn {activeScreen === 'studio' ? 'active' : ''}"
-        onclick={() => selectScreen('studio')}
-      >
-        <span class="dock-icon">🎙️</span>
-        <span class="dock-label">Studio</span>
-        {#if studentTrack}
-          <span class="dock-badge-success">✓</span>
-        {/if}
-      </button>
-
-      <button
-        class="dock-btn {activeScreen === 'goals' ? 'active' : ''}"
-        onclick={() => selectScreen('goals')}
-      >
-        <span class="dock-icon">🎯</span>
-        <span class="dock-label">Goals</span>
-        {#if currentLesson}
-          {@const activeLesson = currentLesson}
-          {@const completedCount = Object.keys(completedCheckpoints).filter(k => k.startsWith(activeLesson.id) && completedCheckpoints[k]).length}
-          {#if completedCount > 0}
-            <span class="dock-badge-stars">{completedCount}⭐</span>
-          {/if}
-        {/if}
-      </button>
-    </nav>
-  {/if}
-
-  <!-- Footer Controls -->
-  <footer class="neo-footer">
-    <button class="footer-settings-btn" onclick={openSettings}>
-      ⚙️ App Settings & Preferences
-    </button>
-  </footer>
+  <!-- Universal Kid-Friendly 3-Pillar Bottom Navigation Bar -->
+  <KidsBottomNav
+    {activeScreen}
+    hasCurrentLesson={!!currentLesson}
+    completedStarsCount={currentLesson ? Object.keys(completedCheckpoints).filter(k => k.startsWith(currentLesson!.id) && completedCheckpoints[k]).length : 0}
+    hasStudentTrack={!!studentTrack}
+    onSelectScreen={selectScreen}
+  />
 
   <!-- 3-Second Count-In Pre-Roll Overlay -->
   {#if countInTimer !== null}

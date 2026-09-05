@@ -66,3 +66,12 @@ export function getAvatarColor(key: KidAvatarKey): string {
   const match = KID_AVATARS.find(a => a.key === key);
   return match ? match.color : '#FFCA28';
 }
+
+// 3-Pillar Kids UX Screen Routing
+export type ActiveScreen =
+  | 'splash'
+  | 'library'
+  | 'player'
+  | 'studio'
+  | 'profile'
+  | 'settings';

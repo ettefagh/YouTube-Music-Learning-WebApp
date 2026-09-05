@@ -1,0 +1,703 @@
+{
+  "communities": {
+    "0": [
+      "piano_companion_package_devdependencies",
+      "piano_companion_package_devdependencies_playwright",
+      "piano_companion_package_devdependencies_svelte",
+      "piano_companion_package_devdependencies_svelte_check",
+      "piano_companion_package_devdependencies_sveltejs_adapter_cloudflare",
+      "piano_companion_package_devdependencies_sveltejs_kit",
+      "piano_companion_package_devdependencies_sveltejs_vite_plugin_svelte",
+      "piano_companion_package_devdependencies_types_youtube",
+      "piano_companion_package_devdependencies_typescript",
+      "piano_companion_package_devdependencies_vite",
+      "piano_companion_package_devdependencies_vite_plugin_pwa",
+      "piano_companion_package_json_svelte",
+      "playwright",
+      "svelte_check",
+      "sveltejs_adapter_cloudflare",
+      "sveltejs_kit",
+      "sveltejs_vite_plugin_svelte",
+      "types_youtube",
+      "typescript",
+      "vite",
+      "vite_plugin_pwa"
+    ],
+    "1": [
+      "appsplashscreen_svelte",
+      "audiorecorder_svelte_js",
+      "chaptertimeline_svelte",
+      "kidsbottomnav_svelte",
+      "kidstopheader_svelte",
+      "libraryscreen_svelte",
+      "longpress_js",
+      "metronome_svelte",
+      "onboardingmodal_svelte",
+      "piano_companion_src_routes_page",
+      "piano_companion_src_routes_page_catch",
+      "piano_companion_src_routes_page_if",
+      "piano_companion_src_routes_page_loaddataforselectedbook",
+      "piano_companion_src_routes_page_selectlesson",
+      "piano_companion_src_routes_page_selectlessonandplay",
+      "profilescreen_svelte",
+      "settingsscreen_svelte",
+      "studioscreen_svelte",
+      "teacherauth_svelte_js",
+      "youtubeplayer_svelte_js"
+    ],
+    "2": [
+      "dexie",
+      "piano_companion_package",
+      "piano_companion_package_dependencies",
+      "piano_companion_package_dependencies_dexie",
+      "piano_companion_package_imports",
+      "piano_companion_package_imports_lib",
+      "piano_companion_package_name",
+      "piano_companion_package_private",
+      "piano_companion_package_scripts",
+      "piano_companion_package_scripts_build",
+      "piano_companion_package_scripts_check",
+      "piano_companion_package_scripts_check_watch",
+      "piano_companion_package_scripts_deploy",
+      "piano_companion_package_scripts_dev",
+      "piano_companion_package_scripts_prepare",
+      "piano_companion_package_scripts_preview",
+      "piano_companion_package_type",
+      "piano_companion_package_version"
+    ],
+    "3": [
+      "piano_companion_generate_full_seed",
+      "piano_companion_generate_full_seed_alllessons",
+      "piano_companion_generate_full_seed_books",
+      "piano_companion_generate_full_seed_fs",
+      "piano_companion_generate_full_seed_seentz1",
+      "piano_companion_generate_full_seed_seentz2",
+      "piano_companion_generate_full_seed_timetoseconds",
+      "piano_companion_generate_full_seed_tz1chaptermapped",
+      "piano_companion_generate_full_seed_tz1chapters",
+      "piano_companion_generate_full_seed_tz1originals",
+      "piano_companion_generate_full_seed_tz1uniquechapters",
+      "piano_companion_generate_full_seed_tz1vika",
+      "piano_companion_generate_full_seed_tz1vikamapped",
+      "piano_companion_generate_full_seed_tz2chaptermapped",
+      "piano_companion_generate_full_seed_tz2chapters",
+      "piano_companion_generate_full_seed_tz2playlist",
+      "piano_companion_generate_full_seed_tz2playlistmapped",
+      "piano_companion_generate_full_seed_tz2uniquechapters"
+    ],
+    "4": [
+      "piano_companion_src_lib_index",
+      "piano_companion_src_lib_types_educator",
+      "piano_companion_src_lib_types_educator_educatorchannelinfo",
+      "piano_companion_src_lib_types_educator_geteducatorinfo",
+      "piano_companion_src_lib_types_educator_known_educators",
+      "piano_companion_src_lib_types_studentprofile",
+      "piano_companion_src_lib_types_studentprofile_activescreen",
+      "piano_companion_src_lib_types_studentprofile_default_student_profiles",
+      "piano_companion_src_lib_types_studentprofile_getavatarcolor",
+      "piano_companion_src_lib_types_studentprofile_getavataremoji",
+      "piano_companion_src_lib_types_studentprofile_kid_avatars",
+      "piano_companion_src_lib_types_studentprofile_kidavatarkey",
+      "piano_companion_src_lib_types_studentprofile_kidavataroption",
+      "piano_companion_src_lib_types_studentprofile_studentprofile"
+    ],
+    "5": [
+      "piano_companion_src_lib_db_db",
+      "piano_companion_src_lib_db_db_db",
+      "piano_companion_src_lib_db_db_detectlisttype",
+      "piano_companion_src_lib_db_db_initdatabase",
+      "piano_companion_src_lib_db_db_lessonlisttype",
+      "piano_companion_src_lib_db_db_localaudiotrack",
+      "piano_companion_src_lib_db_db_localbook",
+      "piano_companion_src_lib_db_db_locallesson",
+      "piano_companion_src_lib_db_db_pianodatabase",
+      "piano_companion_src_lib_db_db_pianodatabase_constructor",
+      "piano_companion_src_lib_db_seeddata",
+      "piano_companion_src_lib_db_seeddata_seed_books",
+      "piano_companion_src_lib_db_seeddata_seed_lessons"
+    ],
+    "6": [
+      "lesson_js",
+      "piano_companion_src_lib_components_kids_kidstopheader",
+      "piano_companion_src_lib_components_screens_libraryscreen",
+      "piano_companion_src_lib_components_screens_profilescreen",
+      "piano_companion_src_lib_components_screens_profilescreen_handlecreatekid",
+      "piano_companion_src_lib_components_screens_profilescreen_newname",
+      "piano_companion_src_lib_components_screens_profilescreen_showaddmodal",
+      "piano_companion_src_lib_components_screens_studioscreen",
+      "piano_companion_src_lib_components_screens_studioscreen_ismastered",
+      "piano_companion_src_lib_components_screens_studioscreen_totalcount"
+    ],
+    "7": [
+      "piano_companion_src_lib_actions_youtubeplayer_svelte",
+      "piano_companion_src_lib_actions_youtubeplayer_svelte_looperoptions",
+      "piano_companion_src_lib_actions_youtubeplayer_svelte_window",
+      "piano_companion_src_lib_actions_youtubeplayer_svelte_youtubelooper",
+      "piano_companion_src_lib_actions_youtubeplayer_svelte_youtubelooper_initplayer",
+      "piano_companion_src_lib_actions_youtubeplayer_svelte_youtubelooper_loadyoutubeapi",
+      "piano_companion_src_lib_actions_youtubeplayer_svelte_youtubelooper_startloopwatcher",
+      "piano_companion_src_lib_actions_youtubeplayer_svelte_youtubelooper_stoploopwatcher",
+      "piano_companion_src_lib_actions_youtubeplayer_svelte_youtubeplayercontroller"
+    ],
+    "8": [
+      "piano_companion_test_trademark_policy_audit",
+      "piano_companion_test_trademark_policy_audit_candidates",
+      "piano_companion_test_trademark_policy_audit_evaluated",
+      "piano_companion_test_trademark_policy_audit_fs",
+      "piano_companion_test_trademark_policy_audit_path",
+      "piano_companion_test_trademark_policy_audit_policyviolations",
+      "piano_companion_test_trademark_policy_audit_rules",
+      "piano_companion_test_trademark_policy_audit_scorecard",
+      "piano_companion_test_trademark_policy_audit_top_3"
+    ],
+    "9": [
+      "piano_companion_tsconfig",
+      "piano_companion_tsconfig_compileroptions",
+      "piano_companion_tsconfig_compileroptions_rewriterelativeimportextensions",
+      "piano_companion_tsconfig_compileroptions_sourcemap",
+      "piano_companion_tsconfig_compileroptions_strict",
+      "piano_companion_tsconfig_extends",
+      "piano_companion_tsconfig_include",
+      "ref_app_tsconfig",
+      "ref_src"
+    ],
+    "10": [
+      "piano_companion_generate_chapter_seeds",
+      "piano_companion_generate_chapter_seeds_extracted",
+      "piano_companion_generate_chapter_seeds_fs",
+      "piano_companion_generate_chapter_seeds_lessons",
+      "piano_companion_generate_chapter_seeds_seeddata",
+      "piano_companion_generate_chapter_seeds_seentitles",
+      "piano_companion_generate_chapter_seeds_timetoseconds",
+      "piano_companion_generate_chapter_seeds_uniquechapters"
+    ],
+    "11": [
+      "piano_companion_parse_html5",
+      "piano_companion_parse_html5_data",
+      "piano_companion_parse_html5_findplaylistitems",
+      "piano_companion_parse_html5_items",
+      "piano_companion_parse_html5_seenids",
+      "piano_companion_parse_html5_uniquevideos",
+      "piano_companion_parse_html5_videos"
+    ],
+    "12": [
+      "piano_companion_src_lib_actions_longpress",
+      "piano_companion_src_lib_actions_longpress_longpress",
+      "piano_companion_src_lib_actions_longpress_longpress_cleartimer",
+      "piano_companion_src_lib_actions_longpress_longpress_onclick",
+      "piano_companion_src_lib_actions_longpress_longpress_onpointerdown",
+      "piano_companion_src_lib_actions_longpress_longpress_onpointermove",
+      "piano_companion_src_lib_actions_longpress_longpressoptions"
+    ],
+    "13": [
+      "piano_companion_src_lib_stores_teacherauth_svelte",
+      "piano_companion_src_lib_stores_teacherauth_svelte_teacherauth",
+      "piano_companion_src_lib_stores_teacherauth_svelte_teacherauthstore",
+      "piano_companion_src_lib_stores_teacherauth_svelte_teacherauthstore_isunlocked",
+      "piano_companion_src_lib_stores_teacherauth_svelte_teacherauthstore_lock",
+      "piano_companion_src_lib_stores_teacherauth_svelte_teacherauthstore_resettimer",
+      "piano_companion_src_lib_stores_teacherauth_svelte_teacherauthstore_unlock"
+    ],
+    "14": [
+      "piano_companion_parse_html6",
+      "piano_companion_parse_html6_data",
+      "piano_companion_parse_html6_findvideos",
+      "piano_companion_parse_html6_items",
+      "piano_companion_parse_html6_seenids",
+      "piano_companion_parse_html6_uniquevideos"
+    ],
+    "15": [
+      "piano_companion_scripts_verify_linguistic_claims",
+      "piano_companion_scripts_verify_linguistic_claims_rationale_1",
+      "piano_companion_scripts_verify_linguistic_claims_test_character_counts_and_pwa",
+      "piano_companion_scripts_verify_linguistic_claims_test_mascot_pip_linguistic_facts",
+      "piano_companion_scripts_verify_linguistic_claims_test_persian_phonotactics_epenthesis",
+      "piano_companion_scripts_verify_linguistic_claims_test_persian_zwnj_and_letter_connectivity"
+    ],
+    "16": [
+      "piano_companion_src_lib_audio_audiorecorder_svelte",
+      "piano_companion_src_lib_audio_audiorecorder_svelte_audiorecorderengine",
+      "piano_companion_src_lib_audio_audiorecorder_svelte_audiorecorderengine_detectbestmimetype",
+      "piano_companion_src_lib_audio_audiorecorder_svelte_audiorecorderengine_monitorvolume",
+      "piano_companion_src_lib_audio_audiorecorder_svelte_audiorecorderengine_start",
+      "piano_companion_src_lib_audio_audiorecorder_svelte_audiorecorderengine_stop"
+    ],
+    "17": [
+      "patch_page_css",
+      "patch_page_css_apphtml",
+      "patch_page_css_code",
+      "patch_page_css_fs"
+    ],
+    "18": [
+      "patch_ui_refactor",
+      "patch_ui_refactor_code",
+      "patch_ui_refactor_fs",
+      "patch_ui_refactor_mascotcode"
+    ],
+    "19": [
+      "piano_companion_generate_seed",
+      "piano_companion_generate_seed_extracted",
+      "piano_companion_generate_seed_fs",
+      "piano_companion_generate_seed_vikalessons"
+    ],
+    "20": [
+      "add_dark_mode",
+      "add_dark_mode_apphtml",
+      "add_dark_mode_fs"
+    ],
+    "21": [
+      "patch",
+      "patch_content",
+      "patch_fs"
+    ],
+    "22": [
+      "patch2",
+      "patch2_content",
+      "patch2_fs"
+    ],
+    "23": [
+      "patch3",
+      "patch3_content",
+      "patch3_fs"
+    ],
+    "24": [
+      "patch4",
+      "patch4_content",
+      "patch4_fs"
+    ],
+    "25": [
+      "patch4b",
+      "patch4b_content",
+      "patch4b_fs"
+    ],
+    "26": [
+      "patch4c",
+      "patch4c_content",
+      "patch4c_fs"
+    ],
+    "27": [
+      "patch_add_provider",
+      "patch_add_provider_content",
+      "patch_add_provider_fs"
+    ],
+    "28": [
+      "patch_css",
+      "patch_css_content",
+      "patch_css_fs"
+    ],
+    "29": [
+      "patch_onboarding",
+      "patch_onboarding_content",
+      "patch_onboarding_fs"
+    ],
+    "30": [
+      "patch_onboarding2",
+      "patch_onboarding2_content",
+      "patch_onboarding2_fs"
+    ],
+    "31": [
+      "patch_page_darkmode",
+      "patch_page_darkmode_code",
+      "patch_page_darkmode_fs"
+    ],
+    "32": [
+      "patch_page_db_put",
+      "patch_page_db_put_code",
+      "patch_page_db_put_fs"
+    ],
+    "33": [
+      "patch_page_db_put2",
+      "patch_page_db_put2_code",
+      "patch_page_db_put2_fs"
+    ],
+    "34": [
+      "patch_page_methods",
+      "patch_page_methods_code",
+      "patch_page_methods_fs"
+    ],
+    "35": [
+      "patch_page_methods_types",
+      "patch_page_methods_types_code",
+      "patch_page_methods_types_fs"
+    ],
+    "36": [
+      "patch_page_methods_types2",
+      "patch_page_methods_types2_code",
+      "patch_page_methods_types2_fs"
+    ],
+    "37": [
+      "patch_page_methods_types3",
+      "patch_page_methods_types3_code",
+      "patch_page_methods_types3_fs"
+    ],
+    "38": [
+      "patch_page_settings_btn",
+      "patch_page_settings_btn_code",
+      "patch_page_settings_btn_fs"
+    ],
+    "39": [
+      "patch_syntax",
+      "patch_syntax_content",
+      "patch_syntax_fs"
+    ],
+    "40": [
+      "patch_teachergate",
+      "patch_teachergate_code",
+      "patch_teachergate_fs"
+    ],
+    "41": [
+      "patch_teachergate_final",
+      "patch_teachergate_final_code",
+      "patch_teachergate_final_fs"
+    ],
+    "42": [
+      "patch_ui",
+      "patch_ui_content",
+      "patch_ui_fs"
+    ],
+    "43": [
+      "piano_companion_fetch_invidious2",
+      "piano_companion_fetch_invidious2_instances",
+      "piano_companion_fetch_invidious2_tryfetch"
+    ],
+    "44": [
+      "piano_companion_parse_html",
+      "piano_companion_parse_html_html",
+      "piano_companion_parse_html_match"
+    ],
+    "45": [
+      "piano_companion_parse_html2",
+      "piano_companion_parse_html2_html",
+      "piano_companion_parse_html2_videos"
+    ],
+    "46": [
+      "piano_companion_parse_html3",
+      "piano_companion_parse_html3_html",
+      "piano_companion_parse_html3_videos"
+    ],
+    "47": [
+      "piano_companion_parse_html4",
+      "piano_companion_parse_html4_html",
+      "piano_companion_parse_html4_match"
+    ],
+    "48": [
+      "piano_companion_patch_db",
+      "piano_companion_patch_db_content",
+      "piano_companion_patch_db_fs"
+    ],
+    "49": [
+      "piano_companion_patch_page",
+      "piano_companion_patch_page_content",
+      "piano_companion_patch_page_fs"
+    ],
+    "50": [
+      "piano_companion_scripts_verify_sonority_and_slang",
+      "piano_companion_scripts_verify_sonority_and_slang_analyze_finalists",
+      "piano_companion_scripts_verify_sonority_and_slang_rationale_1"
+    ],
+    "51": [
+      "fetch_playlist",
+      "fetch_playlist_chromium"
+    ],
+    "52": [
+      "piano_companion_make_pngs",
+      "piano_companion_make_pngs_fs"
+    ],
+    "53": [
+      "piano_companion_render_icons",
+      "piano_companion_render_icons_rendericons"
+    ],
+    "54": [
+      "piano_companion_src_app_d",
+      "piano_companion_src_app_d_app"
+    ],
+    "55": [
+      "piano_companion_src_lib_components_chaptertimeline",
+      "piano_companion_src_lib_components_chaptertimeline_formattime"
+    ],
+    "56": [
+      "piano_companion_src_lib_components_metronome",
+      "piano_companion_src_lib_components_metronome_stopmetronome"
+    ],
+    "57": [
+      "piano_companion_src_lib_components_teachergate",
+      "piano_companion_src_lib_components_teachergate_onsuccess"
+    ],
+    "58": [
+      "piano_companion_test_icons",
+      "piano_companion_test_icons_verifyicons"
+    ],
+    "59": [
+      "piano_companion_test_kids_multiview",
+      "piano_companion_test_kids_multiview_runtest"
+    ],
+    "60": [
+      "piano_companion_test_sequential_kids_flow",
+      "piano_companion_test_sequential_kids_flow_runsequentialkidsflowtest"
+    ],
+    "61": [
+      "test_live",
+      "test_live_chromium"
+    ],
+    "62": [
+      "test_yt",
+      "test_yt_https"
+    ],
+    "63": [
+      "test_yt2",
+      "test_yt2_https"
+    ],
+    "64": [
+      "test_yt3",
+      "test_yt3_https"
+    ],
+    "65": [
+      "lib_components_mascotpip_svelte_mascotpip_svelte_10d3f0"
+    ],
+    "66": [
+      "lib_components_mascotpip_svelte_mascotpip_svelte_e0b3dc"
+    ],
+    "67": [
+      "lib_components_teachergate_svelte_teachergate_svelte_5efdd3"
+    ],
+    "68": [
+      "lib_components_teachergate_svelte_teachergate_svelte_c325e2"
+    ],
+    "69": [
+      "lib_db_db_js_db_js_2036cb"
+    ],
+    "70": [
+      "lib_db_db_js_db_js_ba2711"
+    ],
+    "71": [
+      "lib_types_educator_js_educator_js_39753c"
+    ],
+    "72": [
+      "lib_types_educator_js_educator_js_433575"
+    ],
+    "73": [
+      "lib_types_studentprofile_js_studentprofile_js_99b30c"
+    ],
+    "74": [
+      "lib_types_studentprofile_js_studentprofile_js_c2904d"
+    ],
+    "75": [
+      "piano_companion_fetch_band2_chapters"
+    ],
+    "76": [
+      "piano_companion_fetch_band2_playlist"
+    ],
+    "77": [
+      "piano_companion_fetch_chapters"
+    ],
+    "78": [
+      "piano_companion_fetch_chapters2"
+    ],
+    "79": [
+      "piano_companion_fetch_dom"
+    ],
+    "80": [
+      "piano_companion_fetch_invidious"
+    ],
+    "81": [
+      "piano_companion_fetch_playlist"
+    ],
+    "82": [
+      "piano_companion_src_lib_components_kids_kidsbottomnav"
+    ],
+    "83": [
+      "piano_companion_src_lib_components_mascotpip"
+    ],
+    "84": [
+      "piano_companion_src_lib_components_onboardingmodal"
+    ],
+    "85": [
+      "piano_companion_src_lib_components_screens_appsplashscreen"
+    ],
+    "86": [
+      "piano_companion_src_lib_components_screens_settingsscreen"
+    ],
+    "87": [
+      "piano_companion_src_routes_layout"
+    ],
+    "88": [
+      "piano_companion_test_custom_dropdown"
+    ],
+    "89": [
+      "piano_companion_test_live"
+    ],
+    "90": [
+      "piano_companion_test_live_index"
+    ],
+    "91": [
+      "piano_companion_test_local_preview"
+    ],
+    "92": [
+      "piano_companion_vite_config"
+    ],
+    "93": [
+      "svelte_svelte"
+    ],
+    "94": [
+      "test_local_preview"
+    ],
+    "95": [
+      "test_ui"
+    ]
+  },
+  "cohesion": {
+    "0": 0.09523809523809523,
+    "1": 0.10526315789473684,
+    "2": 0.1111111111111111,
+    "3": 0.12418300653594772,
+    "4": 0.14285714285714285,
+    "5": 0.20512820512820512,
+    "6": 0.2,
+    "7": 0.3333333333333333,
+    "8": 0.2222222222222222,
+    "9": 0.2222222222222222,
+    "10": 0.2857142857142857,
+    "11": 0.2857142857142857,
+    "12": 0.3333333333333333,
+    "13": 0.3333333333333333,
+    "14": 0.3333333333333333,
+    "15": 0.3333333333333333,
+    "16": 0.4666666666666667,
+    "17": 0.5,
+    "18": 0.5,
+    "19": 0.5,
+    "20": 0.6666666666666666,
+    "21": 0.6666666666666666,
+    "22": 0.6666666666666666,
+    "23": 0.6666666666666666,
+    "24": 0.6666666666666666,
+    "25": 0.6666666666666666,
+    "26": 0.6666666666666666,
+    "27": 0.6666666666666666,
+    "28": 0.6666666666666666,
+    "29": 0.6666666666666666,
+    "30": 0.6666666666666666,
+    "31": 0.6666666666666666,
+    "32": 0.6666666666666666,
+    "33": 0.6666666666666666,
+    "34": 0.6666666666666666,
+    "35": 0.6666666666666666,
+    "36": 0.6666666666666666,
+    "37": 0.6666666666666666,
+    "38": 0.6666666666666666,
+    "39": 0.6666666666666666,
+    "40": 0.6666666666666666,
+    "41": 0.6666666666666666,
+    "42": 0.6666666666666666,
+    "43": 0.6666666666666666,
+    "44": 0.6666666666666666,
+    "45": 0.6666666666666666,
+    "46": 0.6666666666666666,
+    "47": 0.6666666666666666,
+    "48": 0.6666666666666666,
+    "49": 0.6666666666666666,
+    "50": 0.6666666666666666,
+    "51": 1.0,
+    "52": 1.0,
+    "53": 1.0,
+    "54": 1.0,
+    "55": 1.0,
+    "56": 1.0,
+    "57": 1.0,
+    "58": 1.0,
+    "59": 1.0,
+    "60": 1.0,
+    "61": 1.0,
+    "62": 1.0,
+    "63": 1.0,
+    "64": 1.0,
+    "65": 1.0,
+    "66": 1.0,
+    "67": 1.0,
+    "68": 1.0,
+    "69": 1.0,
+    "70": 1.0,
+    "71": 1.0,
+    "72": 1.0,
+    "73": 1.0,
+    "74": 1.0,
+    "75": 1.0,
+    "76": 1.0,
+    "77": 1.0,
+    "78": 1.0,
+    "79": 1.0,
+    "80": 1.0,
+    "81": 1.0,
+    "82": 1.0,
+    "83": 1.0,
+    "84": 1.0,
+    "85": 1.0,
+    "86": 1.0,
+    "87": 1.0,
+    "88": 1.0,
+    "89": 1.0,
+    "90": 1.0,
+    "91": 1.0,
+    "92": 1.0,
+    "93": 1.0,
+    "94": 1.0,
+    "95": 1.0
+  },
+  "gods": [
+    {
+      "id": "piano_companion_package_scripts",
+      "label": "scripts",
+      "degree": 8
+    },
+    {
+      "id": "piano_companion_src_lib_actions_longpress_longpress",
+      "label": "longpress()",
+      "degree": 5
+    },
+    {
+      "id": "piano_companion_src_lib_actions_youtubeplayer_svelte_youtubelooper",
+      "label": "youtubeLooper()",
+      "degree": 5
+    },
+    {
+      "id": "piano_companion_src_lib_audio_audiorecorder_svelte_audiorecorderengine",
+      "label": "AudioRecorderEngine",
+      "degree": 5
+    },
+    {
+      "id": "piano_companion_src_lib_stores_teacherauth_svelte_teacherauthstore",
+      "label": "TeacherAuthStore",
+      "degree": 5
+    },
+    {
+      "id": "piano_companion_src_lib_actions_youtubeplayer_svelte_youtubelooper_initplayer",
+      "label": "initPlayer()",
+      "degree": 4
+    },
+    {
+      "id": "piano_companion_tsconfig_compileroptions",
+      "label": "compilerOptions",
+      "degree": 4
+    },
+    {
+      "id": "piano_companion_generate_full_seed_timetoseconds",
+      "label": "timeToSeconds()",
+      "degree": 3
+    },
+    {
+      "id": "piano_companion_src_lib_actions_youtubeplayer_svelte_youtubelooper_startloopwatcher",
+      "label": "startLoopWatcher()",
+      "degree": 3
+    },
+    {
+      "id": "piano_companion_src_lib_actions_youtubeplayer_svelte_youtubelooper_stoploopwatcher",
+      "label": "stopLoopWatcher()",
+      "degree": 3
+    }
+  ],
+  "surprises": [],
+  "tokens": {
+    "input": 2050,
+    "output": 188
+  }
+}

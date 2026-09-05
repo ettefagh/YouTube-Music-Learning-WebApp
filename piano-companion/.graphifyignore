@@ -1,0 +1,12 @@
+﻿.agents/
+**/.agents/**
+*.log
+dist/
+build/
+.svelte-kit/
+.wrangler/
+**/node_modules/**
+page.html
+video-page.html
+ytInitialData.json
+extracted-*.json
