@@ -58,7 +58,7 @@
 <!-- Interactive Breadcrumbs Strip (Visible in Library, Practice, and Studio) -->
 {#if ['library', 'player', 'studio'].includes(activeScreen)}
   <nav class="kids-breadcrumbs-bar neo-card">
-    <button class="crumb-chip" onclick={() => onSelectScreen('profile')} title="Switch Kid Profile">
+    <button class="crumb-chip crumb-profile" onclick={() => onSelectScreen('profile')} title="Switch Kid Profile">
       <span class="crumb-avatar" style="background-color: {activeProfile.color}">
         {getAvatarEmoji(activeProfile.avatarKey)}
       </span>
@@ -68,7 +68,7 @@
     <span class="crumb-arrow">›</span>
 
     <button
-      class="crumb-chip {activeScreen === 'library' ? 'current' : ''}"
+      class="crumb-chip crumb-book {activeScreen === 'library' ? 'current' : ''}"
       onclick={() => onSelectScreen('library')}
       title="Change Book or Song"
     >
@@ -79,7 +79,7 @@
     {#if selectedProvider}
       <span class="crumb-arrow">›</span>
       <button
-        class="crumb-chip"
+        class="crumb-chip crumb-teacher"
         onclick={() => onSelectScreen('library')}
         title="Teacher Filter"
       >
@@ -91,7 +91,7 @@
     {#if currentLesson}
       <span class="crumb-arrow">›</span>
       <button
-        class="crumb-chip {activeScreen === 'player' ? 'current' : ''}"
+        class="crumb-chip crumb-song {activeScreen === 'player' ? 'current' : ''}"
         onclick={() => onSelectScreen('player')}
         title="Active Song"
       >
@@ -264,16 +264,21 @@
     display: inline-flex;
     align-items: center;
     gap: 6px;
-    background: #F5F5F5;
+    background: #FAFAFA;
     border: 2px solid #000;
-    border-radius: 8px;
-    padding: 4px 10px;
+    border-radius: 9px;
+    padding: 4px 11px;
     font-size: 0.82rem;
     font-weight: 800;
     cursor: pointer;
-    box-shadow: 1.5px 1.5px 0 #000;
-    transition: transform 0.1s ease, background 0.15s ease;
+    box-shadow: 2px 2px 0 #000;
+    transition: transform 0.12s ease, box-shadow 0.12s ease, background-color 0.15s ease;
     flex-shrink: 0;
+  }
+
+  .crumb-chip:hover {
+    transform: translateY(-1px);
+    box-shadow: 2.5px 2.5px 0 #000;
   }
 
   .crumb-chip:active {
@@ -281,9 +286,36 @@
     box-shadow: 0.5px 0.5px 0 #000;
   }
 
-  .crumb-chip.current {
+  .crumb-chip.crumb-profile {
     background: #FFF9C4;
+  }
+
+  .crumb-chip.crumb-book {
+    background: #FFE0B2;
+  }
+  .crumb-chip.crumb-book .crumb-text {
+    color: #BF360C;
+  }
+
+  .crumb-chip.crumb-teacher {
+    background: #E8F5E9;
+  }
+  .crumb-chip.crumb-teacher .crumb-text {
+    color: #1B5E20;
+  }
+
+  .crumb-chip.crumb-song {
+    background: #E1F5FE;
+  }
+  .crumb-chip.crumb-song .crumb-text {
+    color: #0D47A1;
+  }
+
+  .crumb-chip.current {
+    box-shadow: 3px 3px 0 #000;
     border-color: #E65100;
+    outline: 2px solid #FF9800;
+    outline-offset: 1px;
   }
 
   .crumb-avatar {

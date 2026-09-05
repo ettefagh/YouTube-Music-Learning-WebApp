@@ -250,18 +250,31 @@
   }
 
   .book-3d-cover {
-    width: 68px;
-    height: 88px;
-    background: #FF7043;
+    width: 72px;
+    height: 92px;
+    background: linear-gradient(135deg, #FF7043 0%, #E64A19 100%);
     border: 3px solid #000;
-    border-radius: 10px;
+    border-right: 6px solid #FFCCBC;
+    border-radius: 8px 12px 12px 8px;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    box-shadow: 3px 3px 0 #000;
+    box-shadow: 3.5px 3.5px 0 #000;
     color: #fff;
     flex-shrink: 0;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .book-3d-cover::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 8px;
+    bottom: 0;
+    width: 2px;
+    background: rgba(0, 0, 0, 0.25);
   }
 
   .cover-icon {
@@ -365,12 +378,17 @@
     gap: 10px;
     background: #FAFAFA;
     border: 2px solid #000;
-    border-radius: 12px;
-    padding: 8px 12px;
+    border-radius: 14px;
+    padding: 9px 13px;
     cursor: pointer;
     text-align: left;
     box-shadow: 2px 2px 0 #000;
-    transition: transform 0.1s ease, background 0.12s ease;
+    transition: transform 0.12s ease, box-shadow 0.12s ease, background-color 0.12s ease;
+  }
+
+  .teacher-pill-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 3px 3px 0 #000;
   }
 
   .teacher-pill-btn:active {
@@ -381,7 +399,7 @@
   .teacher-pill-btn.selected {
     background: #E8F5E9;
     border-color: #2E7D32;
-    box-shadow: 3px 3px 0 #2E7D32;
+    box-shadow: 3.5px 3.5px 0 #2E7D32;
   }
 
   .pill-avatar {
@@ -569,12 +587,17 @@
     gap: 12px;
     background: #ffffff;
     border: 2px solid #000;
-    border-radius: 12px;
-    padding: 10px 14px;
+    border-radius: 14px;
+    padding: 12px 16px;
     cursor: pointer;
     text-align: left;
-    box-shadow: 2px 2px 0 #000;
-    transition: transform 0.1s ease;
+    box-shadow: 2.5px 2.5px 0 #000;
+    transition: transform 0.12s ease, box-shadow 0.12s ease, background-color 0.15s ease;
+  }
+
+  .song-grid-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 3.5px 3.5px 0 #000;
   }
 
   .song-grid-card:active {
@@ -585,6 +608,7 @@
   .song-grid-card.current {
     background: #FFF9C4;
     border-color: #E65100;
+    box-shadow: 3.5px 3.5px 0 #E65100;
   }
 
   .song-card-num {
@@ -592,8 +616,8 @@
     font-weight: 900;
     background: #EEEEEE;
     border: 1.5px solid #000;
-    border-radius: 6px;
-    padding: 3px 6px;
+    border-radius: 7px;
+    padding: 4px 7px;
     flex-shrink: 0;
   }
 
@@ -613,9 +637,9 @@
   }
 
   .song-card-chapter {
-    font-size: 0.7rem;
+    font-size: 0.72rem;
     font-weight: 700;
-    color: #888;
+    color: #666;
   }
 
   .song-card-action {
@@ -626,17 +650,23 @@
   }
 
   .song-card-star {
-    font-size: 1.1rem;
+    font-size: 1.15rem;
   }
 
   .song-play-tag {
     background: #4CAF50;
     color: #fff;
     border: 1.5px solid #000;
-    border-radius: 6px;
-    font-size: 0.75rem;
+    border-radius: 8px;
+    font-size: 0.78rem;
     font-weight: 900;
-    padding: 4px 8px;
+    padding: 5px 10px;
+    box-shadow: 1px 1px 0 #000;
+    transition: transform 0.12s ease;
+  }
+
+  .song-grid-card:hover .song-play-tag {
+    transform: scale(1.04);
   }
 
   /* Modal Backdrop & Drawer */

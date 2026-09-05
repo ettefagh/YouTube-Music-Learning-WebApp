@@ -23,7 +23,7 @@
     <div class="dock-inner">
       <!-- Tab 1: Library -->
       <button
-        class="dock-btn {activeScreen === 'library' ? 'active' : ''}"
+        class="dock-btn dock-btn-library {activeScreen === 'library' ? 'active' : ''}"
         onclick={() => onSelectScreen('library')}
       >
         <span class="dock-icon">📚</span>
@@ -32,7 +32,7 @@
 
       <!-- Tab 2: Practice Player -->
       <button
-        class="dock-btn {activeScreen === 'player' ? 'active' : ''}"
+        class="dock-btn dock-btn-player {activeScreen === 'player' ? 'active' : ''}"
         onclick={() => onSelectScreen('player')}
       >
         <span class="dock-icon">🎹</span>
@@ -44,7 +44,7 @@
 
       <!-- Tab 3: Combined Studio (Trophy & Audio) -->
       <button
-        class="dock-btn {activeScreen === 'studio' ? 'active' : ''}"
+        class="dock-btn dock-btn-studio {activeScreen === 'studio' ? 'active' : ''}"
         onclick={() => onSelectScreen('studio')}
       >
         <span class="dock-icon">⭐</span>
@@ -96,9 +96,13 @@
     padding: 6px 20px;
     cursor: pointer;
     position: relative;
-    transition: all 0.12s ease;
+    transition: all 0.14s ease;
     min-width: 90px;
     height: 58px;
+  }
+
+  .dock-btn:hover:not(.active) {
+    transform: translateY(-2px);
   }
 
   .dock-btn:active {
@@ -106,10 +110,21 @@
   }
 
   .dock-btn.active {
-    background: #FFF9C4;
     border: 2.5px solid #000000;
-    box-shadow: 2.5px 2.5px 0 #000000;
-    transform: translateY(-3px);
+    box-shadow: 3px 3px 0 #000000;
+    transform: translateY(-4px);
+  }
+
+  .dock-btn.active.dock-btn-library {
+    background: #FFF8E1;
+  }
+
+  .dock-btn.active.dock-btn-player {
+    background: #E8F5E9;
+  }
+
+  .dock-btn.active.dock-btn-studio {
+    background: #FFF9C4;
   }
 
   .dock-icon {
@@ -127,12 +142,19 @@
   .dock-pill-indicator {
     position: absolute;
     top: 6px;
-    right: 22px;
-    width: 9px;
-    height: 9px;
+    right: 20px;
+    width: 10px;
+    height: 10px;
     background: #4CAF50;
     border: 1.5px solid #000000;
     border-radius: 50%;
+    animation: livePulse 2s infinite ease-in-out;
+  }
+
+  @keyframes livePulse {
+    0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(76, 175, 80, 0.7); }
+    70% { transform: scale(1.15); box-shadow: 0 0 0 6px rgba(76, 175, 80, 0); }
+    100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(76, 175, 80, 0); }
   }
 
   .dock-badge-stars {

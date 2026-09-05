@@ -2440,16 +2440,16 @@
   }
 
   .scrubber-knob {
-    width: 20px;
-    height: 20px;
+    width: 22px;
+    height: 22px;
     background: #FFB300;
-    border: 2px solid #000;
+    border: 2.5px solid #000;
     border-radius: 50%;
     position: absolute;
     top: 50%;
     transform: translate(-50%, -50%);
     pointer-events: none;
-    box-shadow: 1px 1px 0 #000;
+    box-shadow: 2px 2px 0 #000;
   }
 
   .loop-marker {
@@ -2530,48 +2530,76 @@
   .play-toggle-btn {
     background: #4CAF50;
     color: #ffffff;
-    border: 2px solid #000;
-    border-radius: 8px;
+    border: 2.5px solid #000;
+    border-radius: 10px;
     font-weight: 900;
     font-size: 0.95rem;
     padding: 8px 16px;
     cursor: pointer;
-    box-shadow: 2px 2px 0 #000;
+    box-shadow: 2.5px 2.5px 0 #000;
+    transition: transform 0.12s ease, box-shadow 0.12s ease, background 0.15s ease;
+  }
+
+  .play-toggle-btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 3px 3px 0 #000;
   }
 
   .play-toggle-btn:active {
-    transform: translate(2px, 2px);
-    box-shadow: 0 0 0 #000;
+    transform: translate(1px, 1px);
+    box-shadow: 0.5px 0.5px 0 #000;
   }
 
   .play-toggle-btn.playing {
-    background: #FF9800;
+    background: #FF1A35;
   }
 
   .skip-btn {
     background: #ffffff;
     border: 2px solid #000;
-    border-radius: 8px;
+    border-radius: 9px;
     font-weight: 800;
     font-size: 0.8rem;
-    padding: 8px 10px;
+    padding: 8px 11px;
     cursor: pointer;
-    box-shadow: 1px 1px 0 #000;
+    box-shadow: 2px 2px 0 #000;
+    transition: transform 0.12s ease, box-shadow 0.12s ease;
+  }
+
+  .skip-btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 2.5px 2.5px 0 #000;
+  }
+
+  .skip-btn:active {
+    transform: translate(1px, 1px);
+    box-shadow: 0.5px 0.5px 0 #000;
   }
 
   .loop-toggle-btn {
     background: #ffffff;
     border: 2px solid #000;
-    border-radius: 8px;
-    font-weight: 800;
-    font-size: 0.8rem;
-    padding: 8px 10px;
+    border-radius: 9px;
+    font-weight: 900;
+    font-size: 0.82rem;
+    padding: 8px 12px;
     cursor: pointer;
-    box-shadow: 1px 1px 0 #000;
+    box-shadow: 2px 2px 0 #000;
+    transition: transform 0.12s ease, box-shadow 0.12s ease, background 0.15s ease;
+  }
+
+  .loop-toggle-btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 2.5px 2.5px 0 #000;
+  }
+
+  .loop-toggle-btn:active {
+    transform: translate(1px, 1px);
+    box-shadow: 0.5px 0.5px 0 #000;
   }
 
   .loop-toggle-btn.active {
-    background: #2196F3;
+    background: #0288D1;
     color: #ffffff;
   }
 
@@ -3194,41 +3222,52 @@
 
   /* Quick Count-in & Practice Lab Transport Buttons */
   .count-in-quick-btn {
-    background: #FFF9C4;
+    background: #FFCA28;
     border: 2px solid #000;
-    border-radius: 8px;
-    font-weight: 800;
-    font-size: 0.8rem;
-    padding: 8px 10px;
+    border-radius: 9px;
+    font-weight: 900;
+    font-size: 0.82rem;
+    padding: 8px 12px;
     cursor: pointer;
-    box-shadow: 1px 1px 0 #000;
-    color: #E65100;
-    transition: transform 0.1s ease;
+    box-shadow: 2px 2px 0 #000;
+    color: #121212;
+    transition: transform 0.12s ease, box-shadow 0.12s ease;
+  }
+
+  .count-in-quick-btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 2.5px 2.5px 0 #000;
   }
 
   .count-in-quick-btn:active {
     transform: translate(1px, 1px);
+    box-shadow: 0.5px 0.5px 0 #000;
   }
 
   .practice-lab-trigger-btn {
-    background: #FFE082;
-    border: 2px solid #000;
-    border-radius: 8px;
+    background: #EDE7F6;
+    border: 2px solid #7E57C2;
+    border-radius: 9px;
     font-weight: 900;
-    font-size: 0.85rem;
-    padding: 8px 14px;
+    font-size: 0.82rem;
+    padding: 8px 13px;
     cursor: pointer;
-    box-shadow: 2px 2px 0 #000;
-    color: #3E2723;
+    box-shadow: 2px 2px 0 #7E57C2;
+    color: #4A148C;
     display: inline-flex;
     align-items: center;
-    gap: 4px;
-    transition: transform 0.1s ease, box-shadow 0.1s ease;
+    gap: 5px;
+    transition: transform 0.12s ease, box-shadow 0.12s ease;
+  }
+
+  .practice-lab-trigger-btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 2.5px 2.5px 0 #7E57C2;
   }
 
   .practice-lab-trigger-btn:active {
     transform: translate(1px, 1px);
-    box-shadow: 1px 1px 0 #000;
+    box-shadow: 0.5px 0.5px 0 #7E57C2;
   }
 
   .record-btn-row {

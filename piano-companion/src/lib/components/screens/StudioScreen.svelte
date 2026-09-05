@@ -396,12 +396,17 @@
     gap: 12px;
     background: #FAFAFA;
     border: 2px solid #000;
-    border-radius: 12px;
-    padding: 10px 14px;
+    border-radius: 14px;
+    padding: 12px 16px;
     cursor: pointer;
     text-align: left;
-    box-shadow: 2px 2px 0 #000;
-    transition: all 0.12s ease;
+    box-shadow: 2.5px 2.5px 0 #000;
+    transition: transform 0.12s ease, box-shadow 0.12s ease, background-color 0.15s ease;
+  }
+
+  .checkpoint-item:hover {
+    transform: translateY(-2px);
+    box-shadow: 3.5px 3.5px 0 #000;
   }
 
   .checkpoint-item:active {
@@ -412,24 +417,31 @@
   .checkpoint-item.checked {
     background: #E8F5E9;
     border-color: #2E7D32;
+    box-shadow: 3.5px 3.5px 0 #2E7D32;
+  }
+
+  .checkpoint-item.checked:hover {
+    box-shadow: 4.5px 4.5px 0 #2E7D32;
   }
 
   .star-bubble {
-    width: 34px;
-    height: 34px;
+    width: 36px;
+    height: 36px;
     border-radius: 50%;
     border: 2px solid #000;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 1.3rem;
+    font-size: 1.35rem;
     background: #ffffff;
     flex-shrink: 0;
+    transition: transform 0.12s ease;
   }
 
   .star-bubble.lit {
     background: #FFD54F;
     color: #E65100;
+    box-shadow: 1px 1px 0 #000;
   }
 
   .checkpoint-label {
@@ -442,11 +454,12 @@
   .done-tag {
     background: #4CAF50;
     color: #fff;
-    border-radius: 6px;
+    border-radius: 7px;
     font-size: 0.72rem;
     font-weight: 900;
-    padding: 2px 6px;
-    border: 1px solid #000;
+    padding: 3px 8px;
+    border: 1.5px solid #000;
+    box-shadow: 1px 1px 0 #000;
   }
 
   .goals-footer-row {
@@ -582,7 +595,12 @@
     border: 2px solid #000;
     cursor: pointer;
     box-shadow: 2px 2px 0 #000;
-    transition: transform 0.1s ease;
+    transition: transform 0.12s ease, box-shadow 0.12s ease;
+  }
+
+  .record-trigger-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 3.5px 3.5px 0 #000;
   }
 
   .record-trigger-btn:active {
