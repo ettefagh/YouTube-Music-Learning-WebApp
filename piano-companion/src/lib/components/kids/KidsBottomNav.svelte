@@ -20,40 +20,42 @@
 
 {#if isVisible}
   <nav class="kids-bottom-dock">
-    <!-- Tab 1: Library -->
-    <button
-      class="dock-btn {activeScreen === 'library' ? 'active' : ''}"
-      onclick={() => onSelectScreen('library')}
-    >
-      <span class="dock-icon">📚</span>
-      <span class="dock-label">Library</span>
-    </button>
+    <div class="dock-inner">
+      <!-- Tab 1: Library -->
+      <button
+        class="dock-btn {activeScreen === 'library' ? 'active' : ''}"
+        onclick={() => onSelectScreen('library')}
+      >
+        <span class="dock-icon">📚</span>
+        <span class="dock-label">Library</span>
+      </button>
 
-    <!-- Tab 2: Practice Player -->
-    <button
-      class="dock-btn {activeScreen === 'player' ? 'active' : ''}"
-      onclick={() => onSelectScreen('player')}
-    >
-      <span class="dock-icon">🎹</span>
-      <span class="dock-label">Practice</span>
-      {#if hasCurrentLesson}
-        <span class="dock-pill-indicator"></span>
-      {/if}
-    </button>
+      <!-- Tab 2: Practice Player -->
+      <button
+        class="dock-btn {activeScreen === 'player' ? 'active' : ''}"
+        onclick={() => onSelectScreen('player')}
+      >
+        <span class="dock-icon">🎹</span>
+        <span class="dock-label">Practice</span>
+        {#if hasCurrentLesson}
+          <span class="dock-pill-indicator"></span>
+        {/if}
+      </button>
 
-    <!-- Tab 3: Combined Studio (Trophy & Audio) -->
-    <button
-      class="dock-btn {activeScreen === 'studio' ? 'active' : ''}"
-      onclick={() => onSelectScreen('studio')}
-    >
-      <span class="dock-icon">⭐</span>
-      <span class="dock-label">My Studio</span>
-      {#if completedStarsCount > 0}
-        <span class="dock-badge-stars">{completedStarsCount}⭐</span>
-      {:else if hasStudentTrack}
-        <span class="dock-badge-success">🎙️</span>
-      {/if}
-    </button>
+      <!-- Tab 3: Combined Studio (Trophy & Audio) -->
+      <button
+        class="dock-btn {activeScreen === 'studio' ? 'active' : ''}"
+        onclick={() => onSelectScreen('studio')}
+      >
+        <span class="dock-icon">⭐</span>
+        <span class="dock-label">My Studio</span>
+        {#if completedStarsCount > 0}
+          <span class="dock-badge-stars">{completedStarsCount}⭐</span>
+        {:else if hasStudentTrack}
+          <span class="dock-badge-success">🎙️</span>
+        {/if}
+      </button>
+    </div>
   </nav>
 {/if}
 
@@ -68,10 +70,18 @@
     border-top: 3.5px solid #000000;
     box-shadow: 0 -4px 0 rgba(0, 0, 0, 0.12);
     display: flex;
-    justify-content: space-around;
+    justify-content: center;
     align-items: center;
     padding: 0 16px;
     z-index: 1000;
+  }
+
+  .dock-inner {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    width: 100%;
+    max-width: 720px;
   }
 
   .dock-btn {

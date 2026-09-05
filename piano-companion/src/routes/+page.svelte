@@ -1906,9 +1906,24 @@
 <style>
   /* Layout Root */
   .cockpit-container {
-    max-width: 860px;
+    width: 100%;
+    max-width: 1400px;
     margin: 0 auto;
-    padding: 16px 12px 32px 12px;
+    padding: 16px 24px 96px 24px;
+    box-sizing: border-box;
+  }
+
+  @media (min-width: 1600px) {
+    .cockpit-container {
+      max-width: 1560px;
+      padding: 20px 32px 104px 32px;
+    }
+  }
+
+  @media (max-width: 640px) {
+    .cockpit-container {
+      padding: 10px 8px 88px 8px;
+    }
   }
 
   /* Neo-brutalist Base Cards */
@@ -2305,22 +2320,28 @@
   }
 
   /* Player Card & Scrubber */
-  .player-card {
+  .player-card,
+  .player-stage-card {
     background: #000000;
     overflow: hidden;
     margin-bottom: 20px;
     transition: max-width 0.25s ease, width 0.25s ease;
   }
 
-  .player-card.theater-mode {
-    max-width: 1100px;
-    width: min(96vw, 1100px);
-    margin-left: 50%;
-    transform: translateX(-50%);
+  .player-card.theater-mode,
+  .player-stage-card.is-theater {
+    max-width: 100%;
+    width: 100%;
   }
 
   .player-stage-card:fullscreen,
-  .player-stage-card:-webkit-full-screen {
+  .player-stage-card:-webkit-full-screen,
+  .player-stage-card.is-fullscreen {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
     width: 100vw !important;
     height: 100vh !important;
     max-width: none !important;
@@ -2328,19 +2349,53 @@
     border: none !important;
     display: flex !important;
     flex-direction: column !important;
-    justify-content: space-between !important;
-    background: #000 !important;
+    background: #000000 !important;
     margin: 0 !important;
     transform: none !important;
     box-shadow: none !important;
+    z-index: 999999 !important;
+  }
+
+  .player-stage-card:fullscreen .cockpit-card-wrap,
+  .player-stage-card:-webkit-full-screen .cockpit-card-wrap,
+  .player-stage-card.is-fullscreen .cockpit-card-wrap {
+    flex-shrink: 0;
+  }
+
+  .player-stage-card:fullscreen .player-box,
+  .player-stage-card:-webkit-full-screen .player-box,
+  .player-stage-card.is-fullscreen .player-box {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    min-height: 0;
+    width: 100%;
+    background: #000000;
   }
 
   .player-stage-card:fullscreen .yt-frame,
-  .player-stage-card:-webkit-full-screen .yt-frame {
+  .player-stage-card:-webkit-full-screen .yt-frame,
+  .player-stage-card.is-fullscreen .yt-frame {
     flex: 1;
-    height: auto !important;
-    aspect-ratio: auto;
-    max-height: calc(100vh - 130px);
+    width: 100%;
+    min-height: 0;
+    height: 100% !important;
+    aspect-ratio: 16 / 9;
+    max-width: calc((100vh - 130px) * 16 / 9);
+    margin: 0 auto;
+    background: #000000;
+    border: none;
+    object-fit: contain;
+  }
+
+  .player-stage-card:fullscreen .scrubber-track,
+  .player-stage-card:-webkit-full-screen .scrubber-track,
+  .player-stage-card.is-fullscreen .scrubber-track,
+  .player-stage-card:fullscreen .transport-bar,
+  .player-stage-card:-webkit-full-screen .transport-bar,
+  .player-stage-card.is-fullscreen .transport-bar {
+    flex-shrink: 0;
   }
 
   .yt-frame {
@@ -4454,6 +4509,9 @@
     display: flex;
     flex-direction: column;
     gap: 16px;
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
   }
 
   .player-header-strip {

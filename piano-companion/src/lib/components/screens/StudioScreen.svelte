@@ -263,6 +263,9 @@
     flex-direction: column;
     gap: 16px;
     padding-bottom: 84px;
+    max-width: 1200px;
+    margin: 0 auto;
+    width: 100%;
   }
 
   .no-lesson-box {

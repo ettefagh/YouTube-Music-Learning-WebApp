@@ -144,7 +144,7 @@
     flex-direction: column;
     gap: 20px;
     padding-bottom: 40px;
-    max-width: 900px;
+    max-width: 1200px;
     margin: 0 auto;
     width: 100%;
   }
