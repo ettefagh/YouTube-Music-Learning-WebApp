@@ -30,15 +30,6 @@ export const KNOWN_EDUCATORS: Record<string, EducatorChannelInfo> = {
     description: 'Warm, expressive piano demonstrations in structured playlists for children and beginner pianists.',
     channelHandle: '@VikaPiano'
   },
-  'Piano Companion (Chapters)': {
-    name: 'Piano Companion (Chapters)',
-    educatorName: 'Piano Companion Studio',
-    avatarEmoji: '🎧',
-    avatarBgColor: '#BBDEFB',
-    bannerColor: '#1976D2',
-    description: 'Comprehensive single-video masterclasses with precision YouTube chapter bookmarks for entire books.',
-    channelHandle: '@PianoCompanion'
-  },
   'Anikó Drabon (Playlist)': {
     name: 'Anikó Drabon (Playlist)',
     educatorName: 'Anikó Drabon',

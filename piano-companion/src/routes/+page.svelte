@@ -74,7 +74,6 @@
   const BUILTIN_PROVIDERS = [
     'Anikó Drabon (Singles)',
     'VikaPiano (Playlist)',
-    'Piano Companion (Chapters)',
     'Anikó Drabon (Playlist)',
     'Gavin Brady (Chapters)'
   ];
@@ -194,7 +193,10 @@
     }
 
     const savedDefault = localStorage.getItem('defaultProvider');
-    if (savedDefault) {
+    if (savedDefault === 'Piano Companion (Chapters)' || savedDefault === 'Piano') {
+      defaultProvider = 'Gavin Brady (Chapters)';
+      localStorage.setItem('defaultProvider', 'Gavin Brady (Chapters)');
+    } else if (savedDefault) {
       defaultProvider = savedDefault;
     }
 
@@ -222,6 +224,16 @@
     if (savedProfiles) {
       try {
         studentProfiles = JSON.parse(savedProfiles);
+        let profilesChanged = false;
+        for (const p of studentProfiles) {
+          if (p.lastProvider === 'Piano Companion (Chapters)' || p.lastProvider === 'Piano') {
+            p.lastProvider = 'Gavin Brady (Chapters)';
+            profilesChanged = true;
+          }
+        }
+        if (profilesChanged) {
+          localStorage.setItem('student_profiles', JSON.stringify(studentProfiles));
+        }
       } catch (e) {
         console.warn('Failed to parse student_profiles:', e);
       }

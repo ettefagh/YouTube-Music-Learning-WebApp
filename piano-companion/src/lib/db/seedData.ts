@@ -758,7 +758,7 @@ export const SEED_LESSONS: LocalLesson[] = [
   {
     "id": "ch1-0",
     "bookId": "tastenzauberei-1",
-    "providerName": "Piano Companion (Chapters)",
+    "providerName": "Gavin Brady (Chapters)",
     "title": "Schaukeln",
     "sequenceIndex": 1,
     "youtubeVideoId": "lguxe5bEqXo",
@@ -772,7 +772,7 @@ export const SEED_LESSONS: LocalLesson[] = [
   {
     "id": "ch1-1",
     "bookId": "tastenzauberei-1",
-    "providerName": "Piano Companion (Chapters)",
+    "providerName": "Gavin Brady (Chapters)",
     "title": "Gespräch in der Höhle",
     "sequenceIndex": 2,
     "youtubeVideoId": "lguxe5bEqXo",
@@ -786,7 +786,7 @@ export const SEED_LESSONS: LocalLesson[] = [
   {
     "id": "ch1-2",
     "bookId": "tastenzauberei-1",
-    "providerName": "Piano Companion (Chapters)",
+    "providerName": "Gavin Brady (Chapters)",
     "title": "Gespenster?",
     "sequenceIndex": 3,
     "youtubeVideoId": "lguxe5bEqXo",
@@ -800,7 +800,7 @@ export const SEED_LESSONS: LocalLesson[] = [
   {
     "id": "ch1-3",
     "bookId": "tastenzauberei-1",
-    "providerName": "Piano Companion (Chapters)",
+    "providerName": "Gavin Brady (Chapters)",
     "title": "Nach dem Gewitter",
     "sequenceIndex": 4,
     "youtubeVideoId": "lguxe5bEqXo",
@@ -814,7 +814,7 @@ export const SEED_LESSONS: LocalLesson[] = [
   {
     "id": "ch1-4",
     "bookId": "tastenzauberei-1",
-    "providerName": "Piano Companion (Chapters)",
+    "providerName": "Gavin Brady (Chapters)",
     "title": "Pitsche - patsch",
     "sequenceIndex": 5,
     "youtubeVideoId": "lguxe5bEqXo",
@@ -828,7 +828,7 @@ export const SEED_LESSONS: LocalLesson[] = [
   {
     "id": "ch1-5",
     "bookId": "tastenzauberei-1",
-    "providerName": "Piano Companion (Chapters)",
+    "providerName": "Gavin Brady (Chapters)",
     "title": "Old Mac Donald",
     "sequenceIndex": 6,
     "youtubeVideoId": "lguxe5bEqXo",
@@ -842,7 +842,7 @@ export const SEED_LESSONS: LocalLesson[] = [
   {
     "id": "ch1-6",
     "bookId": "tastenzauberei-1",
-    "providerName": "Piano Companion (Chapters)",
+    "providerName": "Gavin Brady (Chapters)",
     "title": "Laterne, laterne",
     "sequenceIndex": 7,
     "youtubeVideoId": "lguxe5bEqXo",
@@ -856,7 +856,7 @@ export const SEED_LESSONS: LocalLesson[] = [
   {
     "id": "ch1-7",
     "bookId": "tastenzauberei-1",
-    "providerName": "Piano Companion (Chapters)",
+    "providerName": "Gavin Brady (Chapters)",
     "title": "Jingle Bells",
     "sequenceIndex": 8,
     "youtubeVideoId": "lguxe5bEqXo",
@@ -870,7 +870,7 @@ export const SEED_LESSONS: LocalLesson[] = [
   {
     "id": "ch1-8",
     "bookId": "tastenzauberei-1",
-    "providerName": "Piano Companion (Chapters)",
+    "providerName": "Gavin Brady (Chapters)",
     "title": "Morgen kommt der Weihnachtsmann",
     "sequenceIndex": 9,
     "youtubeVideoId": "lguxe5bEqXo",
@@ -884,7 +884,7 @@ export const SEED_LESSONS: LocalLesson[] = [
   {
     "id": "ch1-9",
     "bookId": "tastenzauberei-1",
-    "providerName": "Piano Companion (Chapters)",
+    "providerName": "Gavin Brady (Chapters)",
     "title": "Kuckuck, kuckuck",
     "sequenceIndex": 10,
     "youtubeVideoId": "lguxe5bEqXo",
@@ -898,7 +898,7 @@ export const SEED_LESSONS: LocalLesson[] = [
   {
     "id": "ch1-10",
     "bookId": "tastenzauberei-1",
-    "providerName": "Piano Companion (Chapters)",
+    "providerName": "Gavin Brady (Chapters)",
     "title": "Noten lesen & Ganztonleiter",
     "sequenceIndex": 11,
     "youtubeVideoId": "lguxe5bEqXo",
@@ -912,7 +912,7 @@ export const SEED_LESSONS: LocalLesson[] = [
   {
     "id": "ch1-11",
     "bookId": "tastenzauberei-1",
-    "providerName": "Piano Companion (Chapters)",
+    "providerName": "Gavin Brady (Chapters)",
     "title": "Der Zauberspiegel",
     "sequenceIndex": 12,
     "youtubeVideoId": "lguxe5bEqXo",
@@ -926,7 +926,7 @@ export const SEED_LESSONS: LocalLesson[] = [
   {
     "id": "ch1-12",
     "bookId": "tastenzauberei-1",
-    "providerName": "Piano Companion (Chapters)",
+    "providerName": "Gavin Brady (Chapters)",
     "title": "Herr C",
     "sequenceIndex": 13,
     "youtubeVideoId": "lguxe5bEqXo",
@@ -940,7 +940,7 @@ export const SEED_LESSONS: LocalLesson[] = [
   {
     "id": "ch1-13",
     "bookId": "tastenzauberei-1",
-    "providerName": "Piano Companion (Chapters)",
+    "providerName": "Gavin Brady (Chapters)",
     "title": "Im Zauberspiegel: Dino und Hase",
     "sequenceIndex": 14,
     "youtubeVideoId": "lguxe5bEqXo",
@@ -954,7 +954,7 @@ export const SEED_LESSONS: LocalLesson[] = [
   {
     "id": "ch1-14",
     "bookId": "tastenzauberei-1",
-    "providerName": "Piano Companion (Chapters)",
+    "providerName": "Gavin Brady (Chapters)",
     "title": "Regenwalzer",
     "sequenceIndex": 15,
     "youtubeVideoId": "lguxe5bEqXo",
@@ -968,7 +968,7 @@ export const SEED_LESSONS: LocalLesson[] = [
   {
     "id": "ch1-15",
     "bookId": "tastenzauberei-1",
-    "providerName": "Piano Companion (Chapters)",
+    "providerName": "Gavin Brady (Chapters)",
     "title": "Im Zauberspiegel: Elefant und Affe",
     "sequenceIndex": 16,
     "youtubeVideoId": "lguxe5bEqXo",
@@ -982,7 +982,7 @@ export const SEED_LESSONS: LocalLesson[] = [
   {
     "id": "ch1-16",
     "bookId": "tastenzauberei-1",
-    "providerName": "Piano Companion (Chapters)",
+    "providerName": "Gavin Brady (Chapters)",
     "title": "Feuer!",
     "sequenceIndex": 17,
     "youtubeVideoId": "lguxe5bEqXo",
@@ -996,7 +996,7 @@ export const SEED_LESSONS: LocalLesson[] = [
   {
     "id": "ch1-17",
     "bookId": "tastenzauberei-1",
-    "providerName": "Piano Companion (Chapters)",
+    "providerName": "Gavin Brady (Chapters)",
     "title": "Alle zusammen",
     "sequenceIndex": 18,
     "youtubeVideoId": "lguxe5bEqXo",
@@ -1010,7 +1010,7 @@ export const SEED_LESSONS: LocalLesson[] = [
   {
     "id": "ch1-18",
     "bookId": "tastenzauberei-1",
-    "providerName": "Piano Companion (Chapters)",
+    "providerName": "Gavin Brady (Chapters)",
     "title": "Legato - staccato",
     "sequenceIndex": 19,
     "youtubeVideoId": "lguxe5bEqXo",
@@ -1024,7 +1024,7 @@ export const SEED_LESSONS: LocalLesson[] = [
   {
     "id": "ch1-19",
     "bookId": "tastenzauberei-1",
-    "providerName": "Piano Companion (Chapters)",
+    "providerName": "Gavin Brady (Chapters)",
     "title": "Piratenlied",
     "sequenceIndex": 20,
     "youtubeVideoId": "lguxe5bEqXo",
@@ -1038,7 +1038,7 @@ export const SEED_LESSONS: LocalLesson[] = [
   {
     "id": "ch1-20",
     "bookId": "tastenzauberei-1",
-    "providerName": "Piano Companion (Chapters)",
+    "providerName": "Gavin Brady (Chapters)",
     "title": "Musik in der Nacht",
     "sequenceIndex": 21,
     "youtubeVideoId": "lguxe5bEqXo",
@@ -1052,7 +1052,7 @@ export const SEED_LESSONS: LocalLesson[] = [
   {
     "id": "ch1-21",
     "bookId": "tastenzauberei-1",
-    "providerName": "Piano Companion (Chapters)",
+    "providerName": "Gavin Brady (Chapters)",
     "title": "Im Zauberspiegel: Ferdinand und Geri",
     "sequenceIndex": 22,
     "youtubeVideoId": "lguxe5bEqXo",
@@ -1066,7 +1066,7 @@ export const SEED_LESSONS: LocalLesson[] = [
   {
     "id": "ch1-22",
     "bookId": "tastenzauberei-1",
-    "providerName": "Piano Companion (Chapters)",
+    "providerName": "Gavin Brady (Chapters)",
     "title": "Tanzparty",
     "sequenceIndex": 23,
     "youtubeVideoId": "lguxe5bEqXo",
@@ -1080,7 +1080,7 @@ export const SEED_LESSONS: LocalLesson[] = [
   {
     "id": "ch1-23",
     "bookId": "tastenzauberei-1",
-    "providerName": "Piano Companion (Chapters)",
+    "providerName": "Gavin Brady (Chapters)",
     "title": "Streiterei",
     "sequenceIndex": 24,
     "youtubeVideoId": "lguxe5bEqXo",
@@ -1094,7 +1094,7 @@ export const SEED_LESSONS: LocalLesson[] = [
   {
     "id": "ch1-24",
     "bookId": "tastenzauberei-1",
-    "providerName": "Piano Companion (Chapters)",
+    "providerName": "Gavin Brady (Chapters)",
     "title": "Gradeaus!",
     "sequenceIndex": 25,
     "youtubeVideoId": "lguxe5bEqXo",
@@ -1108,7 +1108,7 @@ export const SEED_LESSONS: LocalLesson[] = [
   {
     "id": "ch1-25",
     "bookId": "tastenzauberei-1",
-    "providerName": "Piano Companion (Chapters)",
+    "providerName": "Gavin Brady (Chapters)",
     "title": "Yankee Doodle",
     "sequenceIndex": 26,
     "youtubeVideoId": "lguxe5bEqXo",
@@ -1122,7 +1122,7 @@ export const SEED_LESSONS: LocalLesson[] = [
   {
     "id": "ch1-26",
     "bookId": "tastenzauberei-1",
-    "providerName": "Piano Companion (Chapters)",
+    "providerName": "Gavin Brady (Chapters)",
     "title": "Froschkonzert",
     "sequenceIndex": 27,
     "youtubeVideoId": "lguxe5bEqXo",
@@ -1136,7 +1136,7 @@ export const SEED_LESSONS: LocalLesson[] = [
   {
     "id": "ch1-27",
     "bookId": "tastenzauberei-1",
-    "providerName": "Piano Companion (Chapters)",
+    "providerName": "Gavin Brady (Chapters)",
     "title": "Im Zauberspiegel: “Schlüssel-Geri” und “Schlüssel-Ferdinand”",
     "sequenceIndex": 28,
     "youtubeVideoId": "lguxe5bEqXo",
@@ -1150,7 +1150,7 @@ export const SEED_LESSONS: LocalLesson[] = [
   {
     "id": "ch1-28",
     "bookId": "tastenzauberei-1",
-    "providerName": "Piano Companion (Chapters)",
+    "providerName": "Gavin Brady (Chapters)",
     "title": "Glocken",
     "sequenceIndex": 29,
     "youtubeVideoId": "lguxe5bEqXo",
@@ -1164,7 +1164,7 @@ export const SEED_LESSONS: LocalLesson[] = [
   {
     "id": "ch1-29",
     "bookId": "tastenzauberei-1",
-    "providerName": "Piano Companion (Chapters)",
+    "providerName": "Gavin Brady (Chapters)",
     "title": "Treppensteigen",
     "sequenceIndex": 30,
     "youtubeVideoId": "lguxe5bEqXo",
@@ -1178,7 +1178,7 @@ export const SEED_LESSONS: LocalLesson[] = [
   {
     "id": "ch1-30",
     "bookId": "tastenzauberei-1",
-    "providerName": "Piano Companion (Chapters)",
+    "providerName": "Gavin Brady (Chapters)",
     "title": "Joseph Haydn: Thema aus der Paukenschlag-Symphonie",
     "sequenceIndex": 31,
     "youtubeVideoId": "lguxe5bEqXo",
@@ -1192,7 +1192,7 @@ export const SEED_LESSONS: LocalLesson[] = [
   {
     "id": "ch1-31",
     "bookId": "tastenzauberei-1",
-    "providerName": "Piano Companion (Chapters)",
+    "providerName": "Gavin Brady (Chapters)",
     "title": "Zwei Spechte",
     "sequenceIndex": 32,
     "youtubeVideoId": "lguxe5bEqXo",
@@ -1206,7 +1206,7 @@ export const SEED_LESSONS: LocalLesson[] = [
   {
     "id": "ch1-32",
     "bookId": "tastenzauberei-1",
-    "providerName": "Piano Companion (Chapters)",
+    "providerName": "Gavin Brady (Chapters)",
     "title": "Happy Birthday",
     "sequenceIndex": 33,
     "youtubeVideoId": "lguxe5bEqXo",
@@ -1220,7 +1220,7 @@ export const SEED_LESSONS: LocalLesson[] = [
   {
     "id": "ch1-33",
     "bookId": "tastenzauberei-1",
-    "providerName": "Piano Companion (Chapters)",
+    "providerName": "Gavin Brady (Chapters)",
     "title": "Finde die Quinte!",
     "sequenceIndex": 34,
     "youtubeVideoId": "lguxe5bEqXo",
@@ -1234,7 +1234,7 @@ export const SEED_LESSONS: LocalLesson[] = [
   {
     "id": "ch1-34",
     "bookId": "tastenzauberei-1",
-    "providerName": "Piano Companion (Chapters)",
+    "providerName": "Gavin Brady (Chapters)",
     "title": "Hopplaho!",
     "sequenceIndex": 35,
     "youtubeVideoId": "lguxe5bEqXo",
@@ -1248,7 +1248,7 @@ export const SEED_LESSONS: LocalLesson[] = [
   {
     "id": "ch1-35",
     "bookId": "tastenzauberei-1",
-    "providerName": "Piano Companion (Chapters)",
+    "providerName": "Gavin Brady (Chapters)",
     "title": "Spiegelbildlich und parallel",
     "sequenceIndex": 36,
     "youtubeVideoId": "lguxe5bEqXo",
@@ -1262,7 +1262,7 @@ export const SEED_LESSONS: LocalLesson[] = [
   {
     "id": "ch1-36",
     "bookId": "tastenzauberei-1",
-    "providerName": "Piano Companion (Chapters)",
+    "providerName": "Gavin Brady (Chapters)",
     "title": "Fingersport",
     "sequenceIndex": 37,
     "youtubeVideoId": "lguxe5bEqXo",
@@ -1276,7 +1276,7 @@ export const SEED_LESSONS: LocalLesson[] = [
   {
     "id": "ch1-37",
     "bookId": "tastenzauberei-1",
-    "providerName": "Piano Companion (Chapters)",
+    "providerName": "Gavin Brady (Chapters)",
     "title": "Im Regen",
     "sequenceIndex": 38,
     "youtubeVideoId": "lguxe5bEqXo",
@@ -1290,7 +1290,7 @@ export const SEED_LESSONS: LocalLesson[] = [
   {
     "id": "ch1-38",
     "bookId": "tastenzauberei-1",
-    "providerName": "Piano Companion (Chapters)",
+    "providerName": "Gavin Brady (Chapters)",
     "title": "Unglaublich",
     "sequenceIndex": 39,
     "youtubeVideoId": "lguxe5bEqXo",
@@ -1304,7 +1304,7 @@ export const SEED_LESSONS: LocalLesson[] = [
   {
     "id": "ch1-39",
     "bookId": "tastenzauberei-1",
-    "providerName": "Piano Companion (Chapters)",
+    "providerName": "Gavin Brady (Chapters)",
     "title": "Bärentanz",
     "sequenceIndex": 40,
     "youtubeVideoId": "lguxe5bEqXo",
@@ -1318,7 +1318,7 @@ export const SEED_LESSONS: LocalLesson[] = [
   {
     "id": "ch1-40",
     "bookId": "tastenzauberei-1",
-    "providerName": "Piano Companion (Chapters)",
+    "providerName": "Gavin Brady (Chapters)",
     "title": "Traumlied",
     "sequenceIndex": 41,
     "youtubeVideoId": "lguxe5bEqXo",
@@ -1332,7 +1332,7 @@ export const SEED_LESSONS: LocalLesson[] = [
   {
     "id": "ch1-41",
     "bookId": "tastenzauberei-1",
-    "providerName": "Piano Companion (Chapters)",
+    "providerName": "Gavin Brady (Chapters)",
     "title": "Im Zirkus",
     "sequenceIndex": 42,
     "youtubeVideoId": "lguxe5bEqXo",
@@ -1346,7 +1346,7 @@ export const SEED_LESSONS: LocalLesson[] = [
   {
     "id": "ch1-42",
     "bookId": "tastenzauberei-1",
-    "providerName": "Piano Companion (Chapters)",
+    "providerName": "Gavin Brady (Chapters)",
     "title": "Die Versetzungszeichen",
     "sequenceIndex": 43,
     "youtubeVideoId": "lguxe5bEqXo",
@@ -1360,7 +1360,7 @@ export const SEED_LESSONS: LocalLesson[] = [
   {
     "id": "ch1-43",
     "bookId": "tastenzauberei-1",
-    "providerName": "Piano Companion (Chapters)",
+    "providerName": "Gavin Brady (Chapters)",
     "title": "Der Fisch",
     "sequenceIndex": 44,
     "youtubeVideoId": "lguxe5bEqXo",
@@ -1374,7 +1374,7 @@ export const SEED_LESSONS: LocalLesson[] = [
   {
     "id": "ch1-44",
     "bookId": "tastenzauberei-1",
-    "providerName": "Piano Companion (Chapters)",
+    "providerName": "Gavin Brady (Chapters)",
     "title": "Der Besen",
     "sequenceIndex": 45,
     "youtubeVideoId": "lguxe5bEqXo",
@@ -1388,7 +1388,7 @@ export const SEED_LESSONS: LocalLesson[] = [
   {
     "id": "ch1-45",
     "bookId": "tastenzauberei-1",
-    "providerName": "Piano Companion (Chapters)",
+    "providerName": "Gavin Brady (Chapters)",
     "title": "Das Auflösungszeichen",
     "sequenceIndex": 46,
     "youtubeVideoId": "lguxe5bEqXo",
@@ -1402,7 +1402,7 @@ export const SEED_LESSONS: LocalLesson[] = [
   {
     "id": "ch1-46",
     "bookId": "tastenzauberei-1",
-    "providerName": "Piano Companion (Chapters)",
+    "providerName": "Gavin Brady (Chapters)",
     "title": "Oh, When the Saints…",
     "sequenceIndex": 47,
     "youtubeVideoId": "lguxe5bEqXo",
@@ -1416,7 +1416,7 @@ export const SEED_LESSONS: LocalLesson[] = [
   {
     "id": "ch1-47",
     "bookId": "tastenzauberei-1",
-    "providerName": "Piano Companion (Chapters)",
+    "providerName": "Gavin Brady (Chapters)",
     "title": "Alle Vögel…",
     "sequenceIndex": 48,
     "youtubeVideoId": "lguxe5bEqXo",
@@ -1430,7 +1430,7 @@ export const SEED_LESSONS: LocalLesson[] = [
   {
     "id": "ch1-48",
     "bookId": "tastenzauberei-1",
-    "providerName": "Piano Companion (Chapters)",
+    "providerName": "Gavin Brady (Chapters)",
     "title": "Big Ben",
     "sequenceIndex": 49,
     "youtubeVideoId": "lguxe5bEqXo",
@@ -1444,7 +1444,7 @@ export const SEED_LESSONS: LocalLesson[] = [
   {
     "id": "ch1-49",
     "bookId": "tastenzauberei-1",
-    "providerName": "Piano Companion (Chapters)",
+    "providerName": "Gavin Brady (Chapters)",
     "title": "Die Spieluhr",
     "sequenceIndex": 50,
     "youtubeVideoId": "lguxe5bEqXo",
@@ -1458,7 +1458,7 @@ export const SEED_LESSONS: LocalLesson[] = [
   {
     "id": "ch1-50",
     "bookId": "tastenzauberei-1",
-    "providerName": "Piano Companion (Chapters)",
+    "providerName": "Gavin Brady (Chapters)",
     "title": "Das Karussell",
     "sequenceIndex": 51,
     "youtubeVideoId": "lguxe5bEqXo",
@@ -1472,7 +1472,7 @@ export const SEED_LESSONS: LocalLesson[] = [
   {
     "id": "ch1-51",
     "bookId": "tastenzauberei-1",
-    "providerName": "Piano Companion (Chapters)",
+    "providerName": "Gavin Brady (Chapters)",
     "title": "Die Lokomotive",
     "sequenceIndex": 52,
     "youtubeVideoId": "lguxe5bEqXo",
@@ -1486,7 +1486,7 @@ export const SEED_LESSONS: LocalLesson[] = [
   {
     "id": "ch1-52",
     "bookId": "tastenzauberei-1",
-    "providerName": "Piano Companion (Chapters)",
+    "providerName": "Gavin Brady (Chapters)",
     "title": "Hokuspo-Blues",
     "sequenceIndex": 53,
     "youtubeVideoId": "lguxe5bEqXo",
@@ -1500,7 +1500,7 @@ export const SEED_LESSONS: LocalLesson[] = [
   {
     "id": "ch1-53",
     "bookId": "tastenzauberei-1",
-    "providerName": "Piano Companion (Chapters)",
+    "providerName": "Gavin Brady (Chapters)",
     "title": "Beethoven: An die Freude",
     "sequenceIndex": 54,
     "youtubeVideoId": "lguxe5bEqXo",

@@ -96,6 +96,12 @@ export async function initDatabase() {
     await db.books.bulkPut(SEED_BOOKS);
   }
 
+  // Migrate any legacy "Piano Companion (Chapters)" to "Gavin Brady (Chapters)"
+  const legacyCount = await db.lessons.where('providerName').equals('Piano Companion (Chapters)').count();
+  if (legacyCount > 0) {
+    await db.lessons.where('providerName').equals('Piano Companion (Chapters)').modify({ providerName: 'Gavin Brady (Chapters)' });
+  }
+
   // Since we added so many tracks, force seed injection if lesson count is low
   const lessonCount = await db.lessons.count();
   if (lessonCount < 100) {
