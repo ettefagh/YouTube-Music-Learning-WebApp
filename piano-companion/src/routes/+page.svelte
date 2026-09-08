@@ -1168,18 +1168,16 @@
         >
           <!-- Special chapter timeline if chapters mode -->
           {#if currentListType === 'chapters'}
-            <div class="cockpit-card-wrap">
-              <ChapterTimeline
-                {lessons}
-                currentLessonId={currentLesson.id}
-                {videoCurrentTime}
-                {videoDuration}
-                onSelectChapter={(lesson) => {
-                  selectLesson(lesson);
-                  videoSeekTarget = lesson.startTime;
-                }}
-              />
-            </div>
+            <ChapterTimeline
+              {lessons}
+              currentLessonId={currentLesson.id}
+              {videoCurrentTime}
+              {videoDuration}
+              onSelectChapter={(lesson) => {
+                selectLesson(lesson);
+                videoSeekTarget = lesson.startTime;
+              }}
+            />
           {/if}
 
           <!-- YouTube Player Container -->
@@ -2356,12 +2354,6 @@
     z-index: 999999 !important;
   }
 
-  .player-stage-card:fullscreen .cockpit-card-wrap,
-  .player-stage-card:-webkit-full-screen .cockpit-card-wrap,
-  .player-stage-card.is-fullscreen .cockpit-card-wrap {
-    flex-shrink: 0;
-  }
-
   .player-stage-card:fullscreen .player-box,
   .player-stage-card:-webkit-full-screen .player-box,
   .player-stage-card.is-fullscreen .player-box {
@@ -3156,13 +3148,6 @@
     text-align: center;
   }
 
-  /* Collapsible Cockpit Sections */
-  .cockpit-card-wrap {
-    margin-bottom: 16px;
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-  }
 
   .section-collapse-header {
     background: #ffffff;
