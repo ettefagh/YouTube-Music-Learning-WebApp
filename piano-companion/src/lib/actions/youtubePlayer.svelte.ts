@@ -24,6 +24,7 @@ export interface LooperOptions {
   onPlayerStateChange?: (state: 'unstarted' | 'ended' | 'playing' | 'paused' | 'buffering' | 'cued') => void;
   onSegmentComplete?: () => void;
   onTimeUpdate?: (time: number, duration: number) => void;
+  onError?: (errorCode: number) => void;
   seekTarget?: () => number | null;
   _trigger?: any; // Used to force Svelte update hook
 }
@@ -113,6 +114,8 @@ export function youtubeLooper(node: HTMLElement, options: LooperOptions) {
     lastVideoId = vId;
     lastStartTime = options.startTime();
 
+    const origin = typeof window !== 'undefined' ? window.location.origin : undefined;
+
     const playerVars: any = {
       autoplay: 0,
       controls: 0,
@@ -120,7 +123,9 @@ export function youtubeLooper(node: HTMLElement, options: LooperOptions) {
       fs: 0,
       modestbranding: 1,
       rel: 0,
-      iv_load_policy: 3
+      iv_load_policy: 3,
+      enablejsapi: 1,
+      ...(origin ? { origin } : {})
     };
 
     if (pId) {
@@ -129,6 +134,7 @@ export function youtubeLooper(node: HTMLElement, options: LooperOptions) {
     }
 
     player = new window.YT.Player(node, {
+      host: 'https://www.youtube.com',
       videoId: vId,
       playerVars: playerVars,
       events: {
@@ -168,6 +174,10 @@ export function youtubeLooper(node: HTMLElement, options: LooperOptions) {
           } else {
             stopLoopWatcher();
           }
+        },
+        onError: (event: any) => {
+          console.warn('[YouTube Player] Playback error code:', event.data);
+          options.onError?.(event.data);
         }
       }
     });
