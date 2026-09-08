@@ -35,7 +35,7 @@
 
     let maxPathY = $derived.by(() => {
         if (mapNodes.length === 0) return 800;
-        return mapNodes[mapNodes.length - 1].y + 200;
+        return mapNodes[mapNodes.length - 1].y + 260;
     });
 
     onMount(() => {
@@ -95,95 +95,93 @@
     bind:this={scrollContainer}
     onscroll={handleScroll}
 >
-    <!-- Background Patterns / Biomes could go here based on `worlds` -->
-    <div class="absolute inset-0 pointer-events-none opacity-20">
-        <!-- Mock background texture -->
-    </div>
+    <!-- Centered Journey Track Canvas -->
+    <div class="relative mx-auto w-full max-w-[420px]" style="height: {maxPathY}px; padding-bottom: 140px;">
+        <!-- The SVG Path Spine -->
+        <svg
+            class="absolute top-0 left-0 w-full pointer-events-none"
+            style="height: {maxPathY}px;"
+        >
+            <defs>
+                <linearGradient id="goldCyan" x1="0%" y1="0%" x2="0%" y2="100%">
+                    <stop offset="0%" stop-color="#FBBF24" />
+                    <stop offset="100%" stop-color="#22D3EE" />
+                </linearGradient>
+            </defs>
 
-    <!-- The SVG Path Spine -->
-    <svg
-        class="absolute top-0 left-0 w-full pointer-events-none"
-        style="height: {maxPathY}px; min-width: 320px;"
-    >
-        <defs>
-            <linearGradient id="goldCyan" x1="0%" y1="0%" x2="0%" y2="100%">
-                <stop offset="0%" stop-color="#FBBF24" />
-                <stop offset="100%" stop-color="#22D3EE" />
-            </linearGradient>
-        </defs>
+            <!-- Under-track shadow -->
+            <path d="{paths.completedPath} {paths.futurePath}" stroke="black" stroke-width="22" fill="none" stroke-linecap="round" stroke-linejoin="round" class="opacity-10 dark:opacity-40" />
 
-        <!-- Under-track shadow -->
-        <path d="{paths.completedPath} {paths.futurePath}" stroke="black" stroke-width="22" fill="none" stroke-linecap="round" stroke-linejoin="round" class="opacity-10 dark:opacity-40" />
+            <!-- Future Locked Track (Dashed) -->
+            <path d={paths.futurePath} stroke="#CBD5E1" stroke-width="14" fill="none" stroke-dasharray="20 15" stroke-linecap="round" />
 
-        <!-- Future Locked Track (Dashed) -->
-        <path d={paths.futurePath} stroke="#CBD5E1" stroke-width="14" fill="none" stroke-dasharray="20 15" stroke-linecap="round" />
+            <!-- Completed Track (Solid Gradient) -->
+            <path d={paths.completedPath} stroke="url(#goldCyan)" stroke-width="14" fill="none" stroke-linecap="round" />
+        </svg>
 
-        <!-- Completed Track (Solid Gradient) -->
-        <path d={paths.completedPath} stroke="url(#goldCyan)" stroke-width="14" fill="none" stroke-linecap="round" />
-    </svg>
-
-    <!-- Nodes -->
-    <div class="relative w-full" style="height: {maxPathY}px;">
-        {#each mapNodes as node (node.id)}
-            <JourneyNodeComponent
-                {node}
-                isActive={selectedNode?.id === node.id}
-                onclick={handleNodeSelect}
-            />
-        {/each}
+        <!-- Nodes -->
+        <div class="relative w-full" style="height: {maxPathY}px;">
+            {#each mapNodes as node (node.id)}
+                <JourneyNodeComponent
+                    {node}
+                    isActive={selectedNode?.id === node.id}
+                    onclick={handleNodeSelect}
+                />
+            {/each}
+        </div>
     </div>
 
     <!-- Floating Action Button: Find Pip -->
     {#if showScrollToPip}
         <button
-            class="fixed bottom-24 right-4 z-40 bg-white dark:bg-slate-800 text-slate-800 dark:text-white px-4 py-3 rounded-full shadow-[0_4px_14px_0_rgba(0,0,0,0.2)] font-bold flex items-center gap-2 border-2 border-slate-200 transition-transform active:scale-95"
+            class="fixed bottom-24 right-6 z-[1050] bg-white dark:bg-slate-800 text-slate-800 dark:text-white px-4 py-3 rounded-full shadow-[0_4px_14px_0_rgba(0,0,0,0.3)] font-black flex items-center gap-2 border-2.5 border-black transition-transform active:scale-95 cursor-pointer"
             onclick={scrollToActive}
         >
-            <span>🐥</span> Find Pip
+            <span class="text-xl">🐥</span> Find Pip
         </button>
     {/if}
 
-    <!-- Node Practice Hub (Floating Preview Card) -->
+    <!-- Node Practice Hub (Floating Preview Card elevated above bottom dock) -->
     {#if selectedNode}
-        <!-- Backdrop -->
-        <div class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-50 transition-opacity flex flex-col justify-end" onclick={() => selectedNode = null}>
+        <!-- Backdrop with z-[1100] to sit above fixed bottom dock (z-1000) -->
+        <div class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[1100] transition-opacity flex flex-col justify-end p-4 pb-24 md:pb-28" onclick={() => selectedNode = null}>
 
-            <!-- Drawer -->
+            <!-- Drawer Card -->
             <!-- svelte-ignore a11y_click_events_have_key_events -->
             <!-- svelte-ignore a11y_no_static_element_interactions -->
             <div
-                class="bg-white dark:bg-[#1E1B4B] w-full rounded-t-[16px] p-6 shadow-2xl transform transition-transform"
+                class="bg-white dark:bg-[#1E1B4B] w-full max-w-md mx-auto rounded-3xl p-6 shadow-2xl border-3 border-black transform transition-transform"
                 onclick={(e) => e.stopPropagation()}
             >
-                <div class="w-12 h-1.5 bg-slate-200 dark:bg-slate-700 rounded-full mx-auto mb-6"></div>
+                <div class="w-12 h-1.5 bg-slate-300 dark:bg-slate-700 rounded-full mx-auto mb-4"></div>
 
                 <div class="flex items-start justify-between mb-2">
-                    <h2 class="text-2xl font-bold text-slate-900 dark:text-white leading-tight">
+                    <h2 class="text-2xl font-black text-slate-900 dark:text-white leading-tight">
                         {selectedNode.title}
                     </h2>
-                    <span class="text-sm font-bold text-slate-400 bg-slate-100 dark:bg-slate-800 px-3 py-1 rounded-full">
+                    <span class="text-sm font-black text-slate-800 dark:text-slate-200 bg-amber-200 dark:bg-slate-800 px-3 py-1 rounded-full border-2 border-black">
                         #{selectedNode.sequenceIndex + 1}
                     </span>
                 </div>
 
-                <p class="text-slate-500 dark:text-slate-400 text-sm mb-6">
+                <p class="text-slate-600 dark:text-slate-300 font-bold text-sm mb-4">
                     {selectedNode.nodeType === 'chapter_boss' ? '🏆 Chapter Finale' :
                      selectedNode.nodeType === 'star_checkpoint' ? '🏕️ Checkpoint' : '🎵 Practice Piece'}
                 </p>
 
                 <!-- Teacher Chips -->
-                <div class="flex flex-wrap gap-2 mb-8">
+                <div class="flex flex-wrap gap-2 mb-6">
                     {#each selectedNode.teacherTakes as teacher}
-                        <div class="bg-indigo-50 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-300 px-3 py-1.5 rounded-xl text-sm font-semibold flex items-center gap-1.5 border border-indigo-100 dark:border-indigo-800">
+                        <div class="bg-indigo-50 dark:bg-indigo-900/40 text-indigo-800 dark:text-indigo-200 px-3 py-1.5 rounded-xl text-sm font-bold flex items-center gap-1.5 border-2 border-slate-300 dark:border-indigo-800">
                             {#if teacher === "Anikó"}👩‍🏫{:else if teacher === "Gavin"}👨‍🏫{:else}🎹{/if}
                             {teacher}
                         </div>
                     {/each}
                 </div>
 
-                <!-- Giant 56px Stadium Capsule Button -->
+                <!-- Giant 56px Stadium Capsule Button (unblocked and completely visible) -->
                 <button
-                    class="w-full h-[56px] rounded-full bg-slate-900 dark:bg-emerald-400 text-white dark:text-slate-900 font-bold text-lg shadow-[0_8px_16px_rgba(0,0,0,0.2)] active:scale-[0.98] transition-transform flex items-center justify-center gap-2"
+                    class="w-full h-[56px] rounded-full bg-[#FF3366] text-white font-black text-lg shadow-[4px_4px_0_#000] border-3 border-black active:translate-x-0.5 active:translate-y-0.5 active:shadow-[1px_1px_0_#000] transition-all flex items-center justify-center gap-2 cursor-pointer"
                     onclick={handleStartPractice}
                 >
                     <span class="text-xl">▶</span> START PRACTICE

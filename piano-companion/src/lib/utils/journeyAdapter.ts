@@ -82,10 +82,11 @@ export function partitionIntoWorlds(lessons: LocalLesson[], currentBookId: strin
 export function calculateMapCoordinates(lessons: LocalLesson[], activeLessonId?: string): JourneyNode[] {
     const nodes: JourneyNode[] = [];
 
-    // Serpentine sine wave
-    const X_CENTER = 200;
-    const X_AMP = 120; // amplitude
+    // Centered Serpentine sine wave inside 420px track
+    const X_CENTER = 210;
+    const X_AMP = 105; // amplitude keeps stones within 105px..315px (safe from edges)
     const Y_SPACING = 150;
+    const START_Y = 180; // generous headroom so Pip + speech bubble never clip top header
     const FREQUENCY = 0.5; // full wave every 2 / 0.5 = 4 items
 
     let activeFound = false;
@@ -110,17 +111,17 @@ export function calculateMapCoordinates(lessons: LocalLesson[], activeLessonId?:
                 status = 'upcoming';
             }
         } else {
-             // If no active id, first one is current
-             if (index === 0) {
-                 status = 'current';
-                 activeFound = true;
-             } else if (index === 1) {
-                 status = 'upcoming';
-             }
+            // If no active id, first one is current
+            if (index === 0) {
+                status = 'current';
+                activeFound = true;
+            } else if (index === 1) {
+                status = 'upcoming';
+            }
         }
 
-        // Use a Math.sin for serpentine
-        const y = index * Y_SPACING + 100;
+        // Use Math.sin for serpentine path
+        const y = index * Y_SPACING + START_Y;
         const x = X_CENTER + Math.sin(index * FREQUENCY * Math.PI) * X_AMP;
 
         // Mock teacher takes based on some logic, or just a default list

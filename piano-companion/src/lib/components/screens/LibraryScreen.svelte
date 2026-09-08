@@ -88,7 +88,7 @@
   </div>
 
   {#if viewMode === 'journey'}
-    <div class="flex-1 w-full relative">
+    <div class="journey-viewport-frame w-full relative rounded-2xl overflow-hidden border-3 border-black shadow-[4px_4px_0_#000]">
         <JourneyMapScreen
             {lessons}
             currentBookId={selectedBookId}
@@ -268,7 +268,13 @@
     display: flex;
     flex-direction: column;
     gap: 16px;
-    padding-bottom: 84px; /* clearance for bottom dock */
+    padding-bottom: 96px; /* clearance for bottom dock */
+  }
+
+  .journey-viewport-frame {
+    height: calc(100vh - 170px);
+    min-height: 520px;
+    background: var(--bg-canvas, #F5F3FF);
   }
 
   /* Active Shelf */

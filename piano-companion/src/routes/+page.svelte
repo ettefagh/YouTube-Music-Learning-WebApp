@@ -4657,6 +4657,7 @@
     width: 100%;
     max-width: 1200px;
     margin: 0 auto;
+    padding-bottom: 96px;
     transition: background-color 0.4s ease;
   }
 
