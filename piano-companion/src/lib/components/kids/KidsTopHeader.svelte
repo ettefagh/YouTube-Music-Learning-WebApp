@@ -62,7 +62,13 @@
             title="Active Song"
           >
             <span class="crumb-icon">🎵</span>
-            <span class="crumb-label">#{currentLesson.sequenceIndex} {currentLesson.title}</span>
+            <span class="crumb-label">
+              {#if activeScreen === 'player'}
+                #{currentLesson.sequenceIndex}
+              {:else}
+                #{currentLesson.sequenceIndex} {currentLesson.title}
+              {/if}
+            </span>
           </button>
         {/if}
       </nav>
@@ -203,9 +209,6 @@
     padding: 3px 6px;
     border-radius: 6px;
     transition: color 0.15s ease, background-color 0.15s ease;
-    max-width: 180px;
-    overflow: hidden;
-    text-overflow: ellipsis;
     white-space: nowrap;
   }
 
@@ -264,9 +267,6 @@
   @media (max-width: 680px) {
     .gear-label {
       display: none;
-    }
-    .crumb-link {
-      max-width: 120px;
     }
   }
 </style>

@@ -14,7 +14,6 @@
   import { teacherAuth } from '#lib/stores/teacherAuth.svelte.js';
   import MascotPip from '#lib/components/MascotPip.svelte';
   import Metronome from '#lib/components/Metronome.svelte';
-  import ChapterTimeline from '#lib/components/ChapterTimeline.svelte';
   import OnboardingModal from '#lib/components/OnboardingModal.svelte';
   import TeacherGate from '#lib/components/TeacherGate.svelte';
   import { longpress } from '#lib/actions/longpress.js';
@@ -1217,7 +1216,6 @@
           <div class="player-song-meta">
             <span class="player-song-idx">#{currentLesson.sequenceIndex}</span>
             <h2 class="player-song-title">{currentLesson.title}</h2>
-            <span class="player-book-label">{currentBook?.title ?? ''}</span>
           </div>
 
           <!-- In-Player Teacher Switcher: 1-tap switch preserving piece -->
@@ -1278,18 +1276,6 @@
           class="stage-viewport player-stage-card {isFullscreen ? 'is-fullscreen' : ''} {isTheaterMode ? 'is-theater' : ''}"
           bind:this={playerCardElement}
         >
-          {#if currentListType === 'chapters'}
-            <ChapterTimeline
-              {lessons}
-              currentLessonId={currentLesson.id}
-              {videoCurrentTime}
-              {videoDuration}
-              onSelectChapter={(lesson) => {
-                selectLesson(lesson);
-                videoSeekTarget = lesson.startTime;
-              }}
-            />
-          {/if}
 
           <!-- Video Stage Frame -->
           <div class="player-box">
