@@ -1120,9 +1120,6 @@
       {#if currentLesson}
         <!-- Top Lesson Header Strip -->
         <div class="player-header-strip neo-card">
-          <button class="back-to-hub-btn" onclick={() => selectScreen('library')}>
-            ← 📚 Back to Library
-          </button>
           <div class="player-song-title-wrap">
             <span class="player-song-index">#{currentLesson.sequenceIndex}</span>
             <h2 class="player-song-title">{currentLesson.title}</h2>
@@ -4548,22 +4545,11 @@
     gap: 10px;
   }
 
-  .back-to-hub-btn {
-    background: #FFF9C4;
-    border: 2px solid #000;
-    border-radius: 8px;
-    font-weight: 900;
-    font-size: 0.85rem;
-    padding: 6px 12px;
-    cursor: pointer;
-    box-shadow: 2px 2px 0 #000;
-  }
-
   .player-song-title-wrap {
     display: flex;
     flex-direction: column;
-    align-items: center;
-    text-align: center;
+    align-items: flex-start;
+    text-align: left;
     flex: 1;
     min-width: 180px;
   }
