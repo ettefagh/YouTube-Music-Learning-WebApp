@@ -1,0 +1,5 @@
+node_modules/
+graphify-out/
+piano-companion/node_modules/
+.svelte-kit/
+.env
