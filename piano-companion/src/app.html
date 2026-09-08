@@ -12,51 +12,86 @@
 
     <style>
       :root {
-        --bg-canvas: #FAF5ED;
-        --text-main: #181818;
-        --text-muted: #555555;
-        --card-bg: #ffffff;
-        --border-color: #000000;
+        /* Canvas & Surface - Direction 2 (Retro Arcade Pop) */
+        --bg-canvas: #F5F3FF;
+        --text-main: #0F0E17;
+        --text-muted: #5F5E6B;
+        --card-bg: #FFFFFF;
+        --border-color: #0F0E17;
         --border-width: 3px;
         --shadow-color: #000000;
         --shadow-depth: 4px 4px 0px #000000;
 
         /* Brand & Semantic Accents */
-        --brand-red: #FF1A35;
-        --accent-gold: #FFC107;
-        --accent-amber: #FFB300;
-        --accent-mint: #4CAF50;
-        --accent-sky: #0288D1;
-        --accent-purple: #7E57C2;
-        --accent-coral: #FF7043;
+        --brand-red: #FF3366;
+        --accent-cyan: #00D2D3;
+        --accent-gold: #FFB703;
+        --accent-amber: #FF9F43;
+        --accent-mint: #38EF7D;
+        --accent-sky: #4D96FF;
+        --accent-purple: #A66CFF;
+        --accent-coral: #FF6B6B;
+        --star-gold: #FFD000;
+        --cinema-stage: #EBE8F8;
+
+        /* Teacher Identity Colors */
+        --avatar-aniko: #FF6B6B;
+        --avatar-gavin: #4D96FF;
+        --avatar-vika: #A66CFF;
+        --avatar-overhead: #38EF7D;
+        --avatar-studio: #FF9F43;
 
         /* Soft Neo-Brutalist Card Pastels */
         --tint-yellow: #FFF8E1;
         --tint-mint: #E8F5E9;
         --tint-blue: #E1F5FE;
-        --tint-purple: #EDE7F6;
-        --tint-coral: #FBE9E7;
+        --tint-purple: #F3E8FF;
+        --tint-coral: #FFE4E6;
+
+        /* Strict Geometric Grammar (Max 3 Primary Shapes) */
+        --radius-stage: 16px;
+        --radius-capsule: 9999px;
+        --radius-token: 50%;
+        --min-tap-lg: 64px;
+        --min-tap-md: 48px;
+        --min-tap-sm: 40px;
       }
       @media (prefers-color-scheme: dark) {
         :root {
-          --bg-canvas: #1C1B1A;
-          --text-main: #F5F5F5;
-          --text-muted: #B0B0B0;
-          --card-bg: #262524;
+          /* Canvas & Surface - Direction 2 (Cyber-Studio Dark) */
+          --bg-canvas: #0F0E17;
+          --text-main: #FFFFFE;
+          --text-muted: #A7A9BE;
+          --card-bg: #1A192B;
           --border-color: #000000;
           --shadow-color: #000000;
-          --brand-red: #FF334B;
-          --accent-gold: #FFD54F;
-          --accent-amber: #FFCA28;
-          --accent-mint: #66BB6A;
-          --accent-sky: #42A5F5;
-          --accent-purple: #9575CD;
-          --accent-coral: #FF8A65;
-          --tint-yellow: #332E1C;
-          --tint-mint: #1B3022;
-          --tint-blue: #162B38;
-          --tint-purple: #271E36;
-          --tint-coral: #36221C;
+          --shadow-depth: 4px 4px 0px #000000;
+
+          /* Cyber Neon Accents */
+          --brand-red: #FF0055;
+          --accent-cyan: #00F5D4;
+          --accent-gold: #FFDE59;
+          --accent-amber: #FFA94D;
+          --accent-mint: #00FFA3;
+          --accent-sky: #6BCB77;
+          --accent-purple: #C084FC;
+          --accent-coral: #FF8E8E;
+          --star-gold: #FFE600;
+          --cinema-stage: #08070D;
+
+          /* Teacher Identity Colors */
+          --avatar-aniko: #FF8E8E;
+          --avatar-gavin: #6BCB77;
+          --avatar-vika: #C084FC;
+          --avatar-overhead: #00FFA3;
+          --avatar-studio: #FFA94D;
+
+          /* Dark Mode Surfaces */
+          --tint-yellow: #2B2618;
+          --tint-mint: #15291E;
+          --tint-blue: #132738;
+          --tint-purple: #261638;
+          --tint-coral: #331520;
         }
       }
       *, *::before, *::after {

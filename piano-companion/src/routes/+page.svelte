@@ -42,6 +42,10 @@
   let isAppReady = $state<boolean>(false);
   let showInitialSplash = $state<boolean>(true);
 
+  // --- Option A Practice Cinema State ---
+  let isCinemaMode = $state<boolean>(false);
+  let cinemaTimer: any = null;
+
   // --- Kid Profiles State ---
   let studentProfiles = $state<StudentProfile[]>(DEFAULT_STUDENT_PROFILES);
   let activeProfileId = $state<string>('profile-leo');
@@ -273,6 +277,7 @@
   });
 
   onDestroy(() => {
+    clearCinemaTimer();
     if (typeof document !== 'undefined') {
       document.removeEventListener('fullscreenchange', handleFullscreenChange);
       document.removeEventListener('webkitfullscreenchange', handleFullscreenChange);
@@ -319,6 +324,55 @@
     }
   }
 
+  function switchTeacherPreservingPiece(newProvider: string) {
+    if (newProvider === selectedProvider) return;
+    const oldLesson = currentLesson;
+    const oldDuration = videoDuration || (oldLesson?.endTime && oldLesson?.startTime ? oldLesson.endTime - oldLesson.startTime : 1);
+    const oldStart = oldLesson?.startTime ?? 0;
+    const oldElapsed = Math.max(0, videoCurrentTime - oldStart);
+    const progressRatio = oldDuration > 0 ? Math.min(1, Math.max(0, oldElapsed / oldDuration)) : 0;
+    const wasPlaying = isVideoPlaying;
+
+    let relLoopA: number | null = null;
+    let relLoopB: number | null = null;
+    if (customLoopA !== null) {
+      relLoopA = (customLoopA - oldStart) / oldDuration;
+    }
+    if (customLoopB !== null) {
+      relLoopB = (customLoopB - oldStart) / oldDuration;
+    }
+
+    selectedProvider = newProvider;
+    lessons = allLessons.filter(l => l.providerName === newProvider);
+
+    let matchedLesson = lessons.find(l => oldLesson && (l.sequenceIndex === oldLesson.sequenceIndex || l.title.trim().toLowerCase() === oldLesson.title.trim().toLowerCase()));
+    if (!matchedLesson && lessons.length > 0) {
+      matchedLesson = lessons[0];
+    }
+
+    if (matchedLesson) {
+      selectLesson(matchedLesson);
+      const newDuration = matchedLesson.endTime && matchedLesson.startTime ? (matchedLesson.endTime - matchedLesson.startTime) : (matchedLesson.endTime ?? 0);
+      const newStart = matchedLesson.startTime ?? 0;
+      
+      const targetTime = newStart + (progressRatio * (newDuration > 0 ? newDuration : 0));
+      videoSeekTarget = targetTime;
+
+      if (relLoopA !== null && newDuration > 0) {
+        customLoopA = Math.round(newStart + (relLoopA * newDuration));
+      }
+      if (relLoopB !== null && newDuration > 0) {
+        customLoopB = Math.round(newStart + (relLoopB * newDuration));
+      }
+
+      if (wasPlaying) {
+        setTimeout(() => {
+          playerController?.play();
+        }, 300);
+      }
+    }
+  }
+
   async function selectLesson(lesson: LocalLesson) {
     currentLesson = lesson;
     isDropdownOpen = false;
@@ -354,8 +408,37 @@
     videoDuration = duration;
   }
 
+  function clearCinemaTimer() {
+    if (cinemaTimer) {
+      clearTimeout(cinemaTimer);
+      cinemaTimer = null;
+    }
+  }
+
+  function resetCinemaTimer() {
+    clearCinemaTimer();
+    if (isVideoPlaying && activeScreen === 'player') {
+      cinemaTimer = setTimeout(() => {
+        if (isVideoPlaying && activeScreen === 'player') {
+          isCinemaMode = true;
+        }
+      }, 3500);
+    }
+  }
+
+  function wakeCinemaHUD() {
+    isCinemaMode = false;
+    resetCinemaTimer();
+  }
+
   function handlePlayerStateChange(state: 'unstarted' | 'ended' | 'playing' | 'paused' | 'buffering' | 'cued') {
     isVideoPlaying = state === 'playing';
+    if (state === 'playing') {
+      resetCinemaTimer();
+    } else {
+      clearCinemaTimer();
+      isCinemaMode = false;
+    }
   }
 
   function handleSegmentComplete() {
@@ -473,6 +556,10 @@
   }
 
   function selectScreen(screen: ActiveScreen) {
+    if (screen !== 'player') {
+      clearCinemaTimer();
+      isCinemaMode = false;
+    }
     if ((screen === 'player' || screen === 'studio') && !currentLesson) {
       if (lessons.length > 0) {
         selectLesson(lessons[0]);
@@ -1116,18 +1203,46 @@
 
   <!-- ================= SCREEN 2: Dedicated Player Stage ================= -->
   {:else if activeScreen === 'player'}
-    <div class="screen-player">
+    <div
+      class="screen-player {isCinemaMode ? 'is-cinema-mode' : ''}"
+      onclick={wakeCinemaHUD}
+      onpointermove={wakeCinemaHUD}
+      tabindex="0"
+      role="region"
+      aria-label="Practice Cinema Stage"
+    >
       {#if currentLesson}
-        <!-- Top Lesson Header Strip -->
-        <div class="player-header-strip neo-card">
-          <div class="player-song-title-wrap">
-            <span class="player-song-index">#{currentLesson.sequenceIndex}</span>
+        <!-- Practice Cinema Wayfinding & Instructor Switcher Strip -->
+        <div class="player-top-strip">
+          <div class="player-song-meta">
+            <span class="player-song-idx">#{currentLesson.sequenceIndex}</span>
             <h2 class="player-song-title">{currentLesson.title}</h2>
-            <span class="player-meta-badge">{currentBook?.title ?? ''} • {selectedProvider}</span>
+            <span class="player-book-label">{currentBook?.title ?? ''}</span>
           </div>
-          <div class="player-header-right">
+
+          <!-- In-Player Teacher Switcher: 1-tap switch preserving piece -->
+          <div class="in-player-teacher-strip" role="tablist" aria-label="Switch instructor">
+            {#each providers as pName}
+              {@const isCurrentTeacher = pName === selectedProvider}
+              <button
+                class="teacher-pill {isCurrentTeacher ? 'active' : ''}"
+                onclick={() => switchTeacherPreservingPiece(pName)}
+                title="Switch instructor to {pName}"
+                role="tab"
+                aria-selected={isCurrentTeacher}
+              >
+                <span class="teacher-token-avatar">
+                  {pName.includes('Anikó') ? '👩‍🏫' : pName.includes('Gavin') ? '👨‍🏫' : pName.includes('Vika') ? '🎹' : '🎬'}
+                </span>
+                <span class="teacher-pill-name">{pName.split(' ')[0]}</span>
+              </button>
+            {/each}
+          </div>
+
+          <!-- Top Actions (Piece Prev/Next & Metronome) -->
+          <div class="player-top-actions">
             <button
-              class="nav-icon-btn prev-btn"
+              class="token-disc-btn prev-btn"
               disabled={!hasPrevLesson}
               onclick={prevLesson}
               title="Previous piece"
@@ -1135,7 +1250,7 @@
               ⏮
             </button>
             <button
-              class="nav-icon-btn next-btn"
+              class="token-disc-btn next-btn"
               disabled={!hasNextLesson}
               onclick={nextLesson}
               title="Next piece"
@@ -1143,7 +1258,7 @@
               ⏭
             </button>
             <button
-              class="metronome-quick-btn {showMetronome ? 'active' : ''}"
+              class="capsule-metronome-btn {showMetronome ? 'active' : ''}"
               onclick={() => showMetronome = !showMetronome}
               title="Toggle metronome"
             >
@@ -1158,12 +1273,11 @@
           </div>
         {/if}
 
-        <!-- Main Video Card with Scrubber and Chunky Transport Bar -->
+        <!-- Stage Window: Single Viewport with Scrubber and Tactile Command Island -->
         <section
-          class="player-stage-card neo-card {isFullscreen ? 'is-fullscreen' : ''} {isTheaterMode ? 'is-theater' : ''}"
+          class="stage-viewport player-stage-card {isFullscreen ? 'is-fullscreen' : ''} {isTheaterMode ? 'is-theater' : ''}"
           bind:this={playerCardElement}
         >
-          <!-- Special chapter timeline if chapters mode -->
           {#if currentListType === 'chapters'}
             <ChapterTimeline
               {lessons}
@@ -1177,7 +1291,7 @@
             />
           {/if}
 
-          <!-- YouTube Player Container -->
+          <!-- Video Stage Frame -->
           <div class="player-box">
             {#key currentLesson.youtubeVideoId}
               <div
@@ -1202,7 +1316,7 @@
               ></div>
             {/key}
 
-            <!-- Interactive Progress Scrubber with A/B Loop Markers & Chapter Boundaries -->
+            <!-- Integrated Border-Free Scrubber -->
             <div
               class="scrubber-track"
               role="slider"
@@ -1276,77 +1390,85 @@
             </div>
           </div>
 
-          <!-- Chunky Kid Transport Bar -->
-          <div class="transport-bar">
-            <div class="transport-left">
-              <button
-                class="play-toggle-btn {isVideoPlaying ? 'playing' : ''}"
-                use:longpress={{
-                  duration: 500,
-                  onLongPress: () => { if (!isVideoPlaying) startCountIn('play'); },
-                  onClick: togglePlayVideo
-                }}
-                title="Tap to Play/Pause • Hold for 3s count-in pre-roll"
-              >
-                {isVideoPlaying ? '⏸ Pause' : '▶ Play'}
-              </button>
+          <!-- Tactile Command Island -->
+          <div class="tactile-command-island">
+            <!-- Giant 64px Stadium Capsule Pill -->
+            <button
+              class="command-giant-pill {isVideoPlaying ? 'is-playing' : ''}"
+              use:longpress={{
+                duration: 500,
+                onLongPress: () => { if (!isVideoPlaying) startCountIn('play'); },
+                onClick: togglePlayVideo
+              }}
+              title="Tap to Play/Pause • Hold for 3s count-in pre-roll"
+            >
+              <span class="giant-icon">{isVideoPlaying ? '⏸' : '▶'}</span>
+              <span class="giant-label">{isVideoPlaying ? 'PAUSE' : 'PRACTICE'}</span>
+            </button>
 
-              {#if !isVideoPlaying}
-                <button
-                  class="count-in-quick-btn"
-                  onclick={() => startCountIn('play')}
-                  title="Start with 3-second countdown to get hands on the keys"
-                >
-                  ⏳ 3s Play
-                </button>
-              {/if}
-
+            <!-- 48px Tactile Action Discs -->
+            <div class="tactile-discs-cluster">
               <button
-                class="restart-btn utility-btn"
+                class="tactile-disc replay-disc"
                 use:longpress={{
                   duration: 600,
                   onLongPress: deepReset,
                   onClick: restartPiece
                 }}
-                title="Tap to restart song • Hold for Deep Reset"
+                title="Tap to restart piece • Hold for Deep Reset"
               >
-                ⏮ Restart
+                ↺
               </button>
 
-              <button class="skip-btn" onclick={() => seekBy(-5)} title="Rewind 5s">⏪ 5s</button>
-              <button class="skip-btn" onclick={() => seekBy(5)} title="Forward 5s">5s ⏩</button>
-            </div>
+              <button class="tactile-disc seek-disc" onclick={() => seekBy(-5)} title="Rewind 5s">
+                ⏪ 5s
+              </button>
 
-            <div class="transport-middle">
+              <button class="tactile-disc seek-disc" onclick={() => seekBy(5)} title="Forward 5s">
+                5s ⏩
+              </button>
+
               <button
-                class="loop-toggle-btn {isLooping ? 'active' : ''}"
+                class="tactile-disc loop-disc {isLooping ? 'is-active' : ''}"
                 onclick={() => isLooping = !isLooping}
-                title="Toggle infinite loop between boundaries"
+                title="Toggle infinite loop"
               >
-                {isLooping ? '🔄 Loop ON' : '➡️ Loop OFF'}
-              </button>
-
-              <button
-                class="practice-lab-trigger-btn"
-                onclick={() => showPracticeLabModal = true}
-                title="Open Practice Lab (Tempo, Micro-Loops, Fullscreen)"
-              >
-                🎛️ Practice Lab ({playbackRate}x)
+                🔄
               </button>
             </div>
 
-            <div class="transport-right">
+            <!-- Discrete Secondary Capsule Bar -->
+            <div class="tactile-secondary-strip">
+              {#if !isVideoPlaying}
+                <button
+                  class="secondary-capsule count-in-pill"
+                  onclick={() => startCountIn('play')}
+                  title="3-second pre-roll countdown"
+                >
+                  ⏳ 3s Countdown
+                </button>
+              {/if}
+
               <button
-                class="utility-btn {isMuted ? 'muted' : ''}"
+                class="secondary-capsule lab-pill"
+                onclick={() => showPracticeLabModal = true}
+                title="Practice Lab: Tempo & Micro-Loops"
+              >
+                🎛️ Tempo ({playbackRate}x)
+              </button>
+
+              <button
+                class="secondary-capsule mute-pill {isMuted ? 'muted' : ''}"
                 onclick={toggleMute}
                 title={isMuted ? 'Unmute' : 'Mute'}
               >
                 {isMuted ? '🔇 Muted' : '🔊 Sound'}
               </button>
+
               <button
-                class="utility-btn"
+                class="secondary-capsule fullscreen-pill"
                 onclick={toggleFullscreen}
-                title="Fullscreen"
+                title="Toggle fullscreen stage"
               >
                 ⛶ Fullscreen
               </button>
@@ -1355,20 +1477,22 @@
         </section>
 
         <!-- Mascot Pip Encouragement -->
-        <MascotPip state={mascotState} message={mascotMessage} />
+        <div class="player-mascot-row">
+          <MascotPip state={mascotState} message={mascotMessage} />
+        </div>
 
-        <!-- Quick Jump to Studio -->
+        <!-- Clean Quick Action Strip -->
         <div class="player-quick-action-strip">
-          <button class="quick-nav-card studio-cta" onclick={() => selectScreen('studio')}>
-            <span class="cta-emoji">🎙️</span>
+          <button class="quick-nav-capsule studio-cta" onclick={() => selectScreen('studio')}>
+            <span class="cta-token">🎙️</span>
             <div class="cta-text-col">
               <strong>Record My Practice Take</strong>
               <small>{studentTrack ? 'Take recorded! Listen in Studio' : 'Record yourself playing this piece'}</small>
             </div>
             <span class="cta-arrow">→</span>
           </button>
-          <button class="quick-nav-card goals-cta" onclick={() => selectScreen('studio')}>
-            <span class="cta-emoji">⭐</span>
+          <button class="quick-nav-capsule goals-cta" onclick={() => selectScreen('studio')}>
+            <span class="cta-token">⭐</span>
             <div class="cta-text-col">
               <strong>Practice Checkpoints</strong>
               <small>View learning goals & earn stars</small>
@@ -4525,7 +4649,7 @@
     box-shadow: 1px 1px 0 #000;
   }
 
-  /* ================= SCREEN 2: Player Stage Styles ================= */
+  /* ================= SCREEN 2: Practice Cinema Player Stage Styles ================= */
   .screen-player {
     display: flex;
     flex-direction: column;
@@ -4533,89 +4657,345 @@
     width: 100%;
     max-width: 1200px;
     margin: 0 auto;
+    transition: background-color 0.4s ease;
   }
 
-  .player-header-strip {
+  /* Option A Practice Cinema Auto-Dimming Mode */
+  .screen-player.is-cinema-mode {
+    background: var(--cinema-stage, #08070D);
+    border-radius: var(--radius-stage, 16px);
+    padding: 12px;
+  }
+
+  .screen-player.is-cinema-mode .player-top-strip,
+  .screen-player.is-cinema-mode .player-mascot-row,
+  .screen-player.is-cinema-mode .player-quick-action-strip {
+    opacity: 0;
+    pointer-events: none;
+    transform: translateY(-8px);
+    transition: opacity 0.5s ease, transform 0.5s ease;
+  }
+
+  .screen-player.is-cinema-mode .stage-viewport {
+    box-shadow: 0 0 45px rgba(0, 210, 211, 0.2), 0 16px 36px rgba(0, 0, 0, 0.7);
+    border-color: rgba(0, 210, 211, 0.5);
+  }
+
+  /* 1. Wayfinding Top Strip (Zero-Border, Frameless) */
+  .player-top-strip {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 10px 16px;
-    background: #ffffff;
+    padding: 6px 8px;
     flex-wrap: wrap;
-    gap: 10px;
+    gap: 12px;
+    transition: opacity 0.25s ease, transform 0.25s ease;
   }
 
-  .player-song-title-wrap {
+  .player-song-meta {
     display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    text-align: left;
-    flex: 1;
-    min-width: 180px;
+    align-items: baseline;
+    gap: 10px;
+    flex-wrap: wrap;
   }
 
-  .player-song-index {
-    font-size: 0.75rem;
-    font-weight: 800;
-    color: #E65100;
+  .player-song-idx {
+    font-size: 0.85rem;
+    font-weight: 900;
+    color: var(--retro-pink, #FF3366);
+    letter-spacing: 0.04em;
   }
 
   .player-song-title {
     margin: 0;
-    font-size: 1.2rem;
+    font-size: 1.35rem;
     font-weight: 900;
-    color: #121212;
+    color: var(--text-heading, #121212);
+    letter-spacing: -0.02em;
   }
 
-  .player-meta-badge {
-    font-size: 0.75rem;
+  .player-book-label {
+    font-size: 0.8rem;
     font-weight: 700;
-    color: #666;
+    color: var(--text-muted, #71717A);
   }
 
-  .player-header-right {
+  /* In-Player Teacher Switcher (Tactile Capsule Pills) */
+  .in-player-teacher-strip {
     display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+
+  .teacher-pill {
+    display: inline-flex;
+    align-items: center;
     gap: 6px;
+    padding: 5px 12px 5px 6px;
+    border-radius: var(--radius-capsule, 9999px);
+    border: 2px solid var(--border-dark, #0F0E17);
+    background: var(--card-bg, #ffffff);
+    color: var(--text-heading, #121212);
+    font-size: 0.82rem;
+    font-weight: 800;
+    cursor: pointer;
+    box-shadow: 2.5px 2.5px 0 var(--border-dark, #0F0E17);
+    transition: transform 0.12s ease, box-shadow 0.12s ease, background 0.15s ease;
+  }
+
+  .teacher-pill:hover {
+    transform: translateY(-1px);
+    box-shadow: 3.5px 3.5px 0 var(--border-dark, #0F0E17);
+  }
+
+  .teacher-pill:active {
+    transform: translate(1px, 1px);
+    box-shadow: 1px 1px 0 var(--border-dark, #0F0E17);
+  }
+
+  .teacher-pill.active {
+    background: var(--retro-pink, #FF3366);
+    color: #ffffff;
+    box-shadow: 2.5px 2.5px 0 var(--border-dark, #0F0E17);
+  }
+
+  .teacher-token-avatar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 26px;
+    height: 26px;
+    border-radius: var(--radius-token, 50%);
+    background: rgba(0, 0, 0, 0.08);
+    font-size: 0.9rem;
+  }
+
+  .teacher-pill.active .teacher-token-avatar {
+    background: rgba(255, 255, 255, 0.25);
+  }
+
+  .teacher-pill-name {
+    letter-spacing: 0.02em;
+  }
+
+  /* Top Right Actions (Tokens & Capsules) */
+  .player-top-actions {
+    display: flex;
+    gap: 8px;
     align-items: center;
   }
 
-  .nav-icon-btn {
-    background: #ffffff;
-    border: 2px solid #000;
-    border-radius: 8px;
-    width: 36px;
-    height: 36px;
+  .token-disc-btn {
+    background: var(--card-bg, #ffffff);
+    border: 2px solid var(--border-dark, #0F0E17);
+    border-radius: var(--radius-token, 50%);
+    width: 38px;
+    height: 38px;
     font-size: 0.9rem;
     font-weight: 900;
     cursor: pointer;
-    box-shadow: 1px 1px 0 #000;
+    box-shadow: 2px 2px 0 var(--border-dark, #0F0E17);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.12s ease, box-shadow 0.12s ease;
   }
 
-  .metronome-quick-btn {
-    background: #ffffff;
-    border: 2px solid #000;
-    border-radius: 8px;
-    padding: 6px 10px;
+  .token-disc-btn:disabled {
+    opacity: 0.35;
+    cursor: not-allowed;
+    box-shadow: none;
+  }
+
+  .token-disc-btn:not(:disabled):hover {
+    transform: translateY(-1px);
+    box-shadow: 3px 3px 0 var(--border-dark, #0F0E17);
+  }
+
+  .capsule-metronome-btn {
+    background: var(--card-bg, #ffffff);
+    border: 2px solid var(--border-dark, #0F0E17);
+    border-radius: var(--radius-capsule, 9999px);
+    padding: 6px 14px;
     font-size: 0.85rem;
     font-weight: 800;
     cursor: pointer;
-    box-shadow: 1px 1px 0 #000;
+    box-shadow: 2px 2px 0 var(--border-dark, #0F0E17);
+    transition: transform 0.12s ease, background 0.15s ease;
   }
 
-  .metronome-quick-btn.active {
-    background: #FFD54F;
+  .capsule-metronome-btn.active {
+    background: var(--retro-gold, #FEE75C);
+    color: #0F0E17;
   }
 
-  .player-stage-card {
-    padding: 0;
+  /* 2. Stage Viewport (16px Radius Stage Window) */
+  .stage-viewport {
+    background: #000000;
+    border: 3px solid var(--border-dark, #0F0E17);
+    border-radius: var(--radius-stage, 16px);
     overflow: hidden;
+    box-shadow: 6px 6px 0 var(--border-dark, #0F0E17);
+    display: flex;
+    flex-direction: column;
+    transition: box-shadow 0.3s ease, border-color 0.3s ease;
+    margin-bottom: 8px;
   }
 
+  /* 3. Tactile Command Island */
+  .tactile-command-island {
+    background: var(--card-bg, #ffffff);
+    border-top: 3px solid var(--border-dark, #0F0E17);
+    padding: 16px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+
+  /* Giant 64px Stadium Capsule Pill */
+  .command-giant-pill {
+    height: var(--min-tap-lg, 64px);
+    padding: 0 32px;
+    border-radius: var(--radius-capsule, 9999px);
+    border: 3px solid var(--border-dark, #0F0E17);
+    background: var(--arcade-cyan, #00D2D3);
+    color: #0F0E17;
+    font-size: 1.15rem;
+    font-weight: 900;
+    letter-spacing: 0.05em;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    box-shadow: 4px 4px 0 var(--border-dark, #0F0E17);
+    transition: transform 0.12s ease, box-shadow 0.12s ease, background 0.15s ease;
+  }
+
+  .command-giant-pill:hover {
+    transform: translateY(-2px);
+    box-shadow: 5px 5px 0 var(--border-dark, #0F0E17);
+  }
+
+  .command-giant-pill:active {
+    transform: translate(2px, 2px);
+    box-shadow: 1px 1px 0 var(--border-dark, #0F0E17);
+  }
+
+  .command-giant-pill.is-playing {
+    background: var(--retro-pink, #FF3366);
+    color: #ffffff;
+  }
+
+  .command-giant-pill .giant-icon {
+    font-size: 1.35rem;
+  }
+
+  /* 48px Tactile Discs Cluster */
+  .tactile-discs-cluster {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .tactile-disc {
+    width: var(--min-tap-md, 48px);
+    height: var(--min-tap-md, 48px);
+    border-radius: var(--radius-token, 50%);
+    border: 2.5px solid var(--border-dark, #0F0E17);
+    background: var(--card-bg, #ffffff);
+    color: var(--text-heading, #121212);
+    font-size: 0.95rem;
+    font-weight: 900;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 3px 3px 0 var(--border-dark, #0F0E17);
+    transition: transform 0.12s ease, box-shadow 0.12s ease, background 0.15s ease;
+  }
+
+  .tactile-disc:hover {
+    transform: translateY(-1px);
+    box-shadow: 4px 4px 0 var(--border-dark, #0F0E17);
+  }
+
+  .tactile-disc:active {
+    transform: translate(1px, 1px);
+    box-shadow: 1px 1px 0 var(--border-dark, #0F0E17);
+  }
+
+  .tactile-disc.loop-disc.is-active {
+    background: var(--cyber-accent, #54A0FF);
+    color: #ffffff;
+  }
+
+  .tactile-disc.seek-disc {
+    font-size: 0.78rem;
+    letter-spacing: -0.02em;
+  }
+
+  /* Discrete Secondary Capsule Bar */
+  .tactile-secondary-strip {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+
+  .secondary-capsule {
+    padding: 8px 14px;
+    border-radius: var(--radius-capsule, 9999px);
+    border: 2px solid var(--border-dark, #0F0E17);
+    background: var(--surface-secondary, #F4F3FA);
+    color: var(--text-heading, #121212);
+    font-size: 0.8rem;
+    font-weight: 800;
+    cursor: pointer;
+    box-shadow: 2px 2px 0 var(--border-dark, #0F0E17);
+    transition: transform 0.12s ease, box-shadow 0.12s ease;
+  }
+
+  .secondary-capsule:hover {
+    transform: translateY(-1px);
+    box-shadow: 3px 3px 0 var(--border-dark, #0F0E17);
+  }
+
+  .secondary-capsule.count-in-pill {
+    background: #FECA57;
+  }
+
+  .secondary-capsule.mute-pill.muted {
+    background: #FF6B6B;
+    color: white;
+  }
+
+  /* Responsive Command Island */
+  @media (max-width: 820px) {
+    .tactile-command-island {
+      justify-content: center;
+      gap: 12px;
+    }
+    .command-giant-pill {
+      width: 100%;
+      justify-content: center;
+    }
+  }
+
+  /* Mascot Row */
+  .player-mascot-row {
+    transition: opacity 0.25s ease, transform 0.25s ease;
+  }
+
+  /* Clean Quick Action Strip (Capsule & Stage 16px) */
   .player-quick-action-strip {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 12px;
-    margin-top: 8px;
+    margin-top: 4px;
+    transition: opacity 0.25s ease, transform 0.25s ease;
   }
 
   @media (max-width: 580px) {
@@ -4624,37 +5004,46 @@
     }
   }
 
-  .quick-nav-card {
+  .quick-nav-capsule {
     display: flex;
     align-items: center;
-    gap: 12px;
-    border: 2.5px solid #000;
-    border-radius: 14px;
+    gap: 14px;
+    border: 2.5px solid var(--border-dark, #0F0E17);
+    border-radius: var(--radius-stage, 16px);
     padding: 14px;
     cursor: pointer;
-    box-shadow: 3px 3px 0 #000;
+    box-shadow: 3.5px 3.5px 0 var(--border-dark, #0F0E17);
     text-align: left;
-    background: #ffffff;
-    transition: transform 0.1s ease;
+    background: var(--card-bg, #ffffff);
+    transition: transform 0.1s ease, box-shadow 0.1s ease;
   }
 
-  .quick-nav-card:active {
+  .quick-nav-capsule:active {
     transform: translate(1px, 1px);
-    box-shadow: 1px 1px 0 #000;
+    box-shadow: 1px 1px 0 var(--border-dark, #0F0E17);
   }
 
-  .quick-nav-card.studio-cta {
-    background: #E8F5E9;
-    border-color: #2E7D32;
+  .quick-nav-capsule.studio-cta {
+    background: rgba(0, 210, 211, 0.12);
+    border-color: var(--arcade-cyan, #00D2D3);
   }
 
-  .quick-nav-card.goals-cta {
-    background: #FFFDE7;
-    border-color: #F57F17;
+  .quick-nav-capsule.goals-cta {
+    background: rgba(254, 231, 92, 0.2);
+    border-color: #E1B12C;
   }
 
-  .cta-emoji {
-    font-size: 1.8rem;
+  .cta-token {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    border-radius: var(--radius-token, 50%);
+    background: var(--card-bg, #ffffff);
+    border: 2px solid var(--border-dark, #0F0E17);
+    font-size: 1.4rem;
+    flex-shrink: 0;
   }
 
   .cta-text-col {
@@ -4666,16 +5055,18 @@
   .cta-text-col strong {
     font-size: 0.95rem;
     font-weight: 900;
+    color: var(--text-heading, #121212);
   }
 
   .cta-text-col small {
     font-size: 0.75rem;
-    color: #555;
+    color: var(--text-muted, #71717A);
   }
 
   .cta-arrow {
     font-size: 1.3rem;
     font-weight: 900;
+    color: var(--text-heading, #121212);
   }
 
   /* ================= SCREEN 3: Studio Styles ================= */
