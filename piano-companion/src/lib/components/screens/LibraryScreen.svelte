@@ -1,6 +1,7 @@
 <script lang="ts">
   import type { LocalBook, LocalLesson } from '#lib/db/db.js';
   import { getEducatorInfo } from '#lib/types/educator.js';
+  import JourneyMapScreen from '../journey/JourneyMapScreen.svelte';
 
   let {
     books,
@@ -37,6 +38,15 @@
   let showBookPickerModal = $state<boolean>(false);
   let lessonSearch = $state<string>('');
 
+  let viewMode = $state<'journey' | 'list'>(typeof window !== 'undefined' ? (localStorage.getItem('journey_view_mode') as 'journey' | 'list') || 'journey' : 'journey');
+
+  function setViewMode(mode: 'journey' | 'list') {
+    viewMode = mode;
+    if (typeof window !== 'undefined') {
+        localStorage.setItem('journey_view_mode', mode);
+    }
+  }
+
   let filteredLessons = $derived(
     lessons.filter((l: LocalLesson) =>
       l.title.toLowerCase().includes(lessonSearch.toLowerCase()) ||
@@ -58,6 +68,35 @@
 </script>
 
 <div class="screen-library">
+
+  <!-- View Mode Switcher -->
+  <div class="flex justify-center mb-6">
+    <div class="bg-slate-200/50 dark:bg-slate-800/50 p-1 rounded-full flex gap-1 w-fit border border-slate-200 dark:border-slate-700/50">
+      <button
+        class="px-5 py-2 rounded-full font-bold text-sm transition-all {viewMode === 'journey' ? 'bg-white dark:bg-slate-700 text-slate-900 dark:text-white shadow-sm' : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200'}"
+        onclick={() => setViewMode('journey')}
+      >
+        🗺️ Adventure Map
+      </button>
+      <button
+        class="px-5 py-2 rounded-full font-bold text-sm transition-all {viewMode === 'list' ? 'bg-white dark:bg-slate-700 text-slate-900 dark:text-white shadow-sm' : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200'}"
+        onclick={() => setViewMode('list')}
+      >
+        📑 Book Index
+      </button>
+    </div>
+  </div>
+
+  {#if viewMode === 'journey'}
+    <div class="flex-1 w-full relative">
+        <JourneyMapScreen
+            {lessons}
+            currentBookId={selectedBookId}
+            activeLessonId={lastPracticedLesson?.id}
+            onLessonSelect={onSelectLesson}
+        />
+    </div>
+  {:else}
   <!-- Tier 1: Active Piano Book Shelf Card -->
   <section class="book-active-shelf neo-card">
     <div class="shelf-left">
@@ -183,6 +222,7 @@
       {/each}
     </div>
   </section>
+  {/if}
 </div>
 
 <!-- Book Picker Modal (When "Change Book" is tapped) -->
