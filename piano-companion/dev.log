@@ -1,0 +1,12 @@
+
+> piano-companion@0.0.1 dev
+> vite dev
+
+(node:102970) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+12:29:12 AM [vite] (client) Forced re-optimization of dependencies
+
+  VITE v8.2.2  ready in 3095 ms
+
+  ➜  Local:   http://localhost:5173/
+  ➜  Network: use --host to expose
