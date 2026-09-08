@@ -1,0 +1,1403 @@
+{
+  "title": "Tastenzauberei - Offizielles Curriculum",
+  "author": "Anikó Drabon",
+  "description": "Vollständiges, verifiziertes Lektionen- und Stücke-Verzeichnis für Tastenzauberei Band 1, Band 2 und Band 3.",
+  "books": [
+    {
+      "bookId": "band-1",
+      "bookTitle": "Tastenzauberei Band 1",
+      "author": "Anikó Drabon",
+      "totalPieces": 69,
+      "chapters": [
+        {
+          "chapterNumber": 1,
+          "chapterTitle": "Kapitel 1: Vornotation",
+          "pageRange": "6–23",
+          "lessons": [
+            {
+              "pieceNumber": 1,
+              "title": "Die Entdeckung",
+              "topic": "Kennenlernen des Klaviers",
+              "page": 6
+            },
+            {
+              "pieceNumber": 2,
+              "title": "Der Tastanienbaum",
+              "topic": "Orientierung auf der Tastatur",
+              "page": 8
+            },
+            {
+              "pieceNumber": 3,
+              "title": "Hände und Finger",
+              "topic": "Rechte und linke Hand, Fingersätze",
+              "page": 10
+            },
+            {
+              "pieceNumber": 4,
+              "title": "Die Geheimsprache",
+              "topic": "Rhythmus und Grundschlag",
+              "page": 12
+            },
+            {
+              "pieceNumber": 5,
+              "title": "Ein Gewitter kommt",
+              "topic": "Improvisieren mit festem Rhythmus",
+              "page": 14
+            },
+            {
+              "pieceNumber": 6,
+              "title": "Donnerwetter",
+              "topic": "Freie Improvisation, Dynamik",
+              "page": 16
+            },
+            {
+              "pieceNumber": 7,
+              "title": "Gespräch in der Höhle",
+              "topic": "Spiel nach Fingersätzen",
+              "page": 17
+            },
+            {
+              "pieceNumber": 8,
+              "title": "Gespenster?",
+              "topic": "Echo",
+              "page": 18
+            },
+            {
+              "pieceNumber": 9,
+              "title": "Nach dem Gewitter",
+              "topic": "Spiel nach Gehör",
+              "page": 20
+            },
+            {
+              "pieceNumber": 10,
+              "title": "Pitsche – patsch...",
+              "topic": "Beide Hände spielen zusammen",
+              "page": 21
+            },
+            {
+              "pieceNumber": 11,
+              "title": "Der Rhythmuskuchen",
+              "topic": "Notenwerte und Takt",
+              "page": 22
+            },
+            {
+              "pieceNumber": 12,
+              "title": "Old Mac Donald",
+              "topic": "Viervierteltakt",
+              "page": 23
+            }
+          ]
+        },
+        {
+          "chapterNumber": 2,
+          "chapterTitle": "Kapitel 2: Repertoire",
+          "pageRange": "24–33",
+          "lessons": [
+            {
+              "pieceNumber": 13,
+              "title": "Laterne, Laterne",
+              "topic": "Auftakt",
+              "page": 24
+            },
+            {
+              "pieceNumber": 14,
+              "title": "Jingle Bells",
+              "topic": "Repertoire",
+              "page": 25
+            },
+            {
+              "pieceNumber": 15,
+              "title": "Morgen kommt der Weihnachtsmann",
+              "topic": "Repertoire",
+              "page": 26
+            },
+            {
+              "pieceNumber": 16,
+              "title": "Kuckuck",
+              "topic": "Dreivierteltakt",
+              "page": 27
+            },
+            {
+              "pieceNumber": 17,
+              "title": "Noten lesen",
+              "topic": "Zweivierteltakt",
+              "page": 29
+            },
+            {
+              "pieceNumber": 18,
+              "title": "Der Zauberspiegel",
+              "topic": "Spiegelbildliches Spiel",
+              "page": 30
+            },
+            {
+              "pieceNumber": 19,
+              "title": "Die Notenschlüssel",
+              "topic": "Vorbereitung auf Notation mit Linien",
+              "page": 32
+            }
+          ]
+        },
+        {
+          "chapterNumber": 3,
+          "chapterTitle": "Kapitel 3: Spiel nach Noten (C-D-E, C-H-A)",
+          "pageRange": "34–49",
+          "lessons": [
+            {
+              "pieceNumber": 20,
+              "title": "Herr C...",
+              "topic": "Das C",
+              "page": 34
+            },
+            {
+              "pieceNumber": 21,
+              "title": "Die Tastennamen",
+              "topic": "Tastennamen Übersicht",
+              "page": 36
+            },
+            {
+              "pieceNumber": 22,
+              "title": "Dino und Hase",
+              "topic": "D und H",
+              "page": 38
+            },
+            {
+              "pieceNumber": 23,
+              "title": "Regenwalzer",
+              "topic": "Spiel nach Noten",
+              "page": 39
+            },
+            {
+              "pieceNumber": 24,
+              "title": "Elefant und Affe",
+              "topic": "E und A",
+              "page": 40
+            },
+            {
+              "pieceNumber": 25,
+              "title": "Feuer!",
+              "topic": "Spiel nach Noten",
+              "page": 41
+            },
+            {
+              "pieceNumber": 26,
+              "title": "Alle zusammen",
+              "topic": "D und H, E und A",
+              "page": 42
+            },
+            {
+              "pieceNumber": 27,
+              "title": "Legato – staccato",
+              "topic": "Legato – staccato Artikulation",
+              "page": 43
+            },
+            {
+              "pieceNumber": 28,
+              "title": "Fingertanz",
+              "topic": "Improvisation",
+              "page": 44
+            },
+            {
+              "pieceNumber": 29,
+              "title": "Piratenlied",
+              "topic": "Legatospiel",
+              "page": 45
+            },
+            {
+              "pieceNumber": 30,
+              "title": "Hunde und Herzen",
+              "topic": "Sekunde und Terz",
+              "page": 46
+            },
+            {
+              "pieceNumber": 31,
+              "title": "Ankunft der „Piraten“",
+              "topic": "Improvisation",
+              "page": 47
+            },
+            {
+              "pieceNumber": 32,
+              "title": "Notenrätsel",
+              "topic": "Notenübung",
+              "page": 48
+            },
+            {
+              "pieceNumber": 33,
+              "title": "Musik in der Nacht",
+              "topic": "Melodie und Begleitung",
+              "page": 49
+            }
+          ]
+        },
+        {
+          "chapterNumber": 4,
+          "chapterTitle": "Kapitel 4: Erweiterung des Tonraumes",
+          "pageRange": "50–65",
+          "lessons": [
+            {
+              "pieceNumber": 34,
+              "title": "Ferdinand und Geri",
+              "topic": "F und G, Quarte",
+              "page": 50
+            },
+            {
+              "pieceNumber": 35,
+              "title": "Tanzparty",
+              "topic": "Synkope",
+              "page": 51
+            },
+            {
+              "pieceNumber": 36,
+              "title": "Streiterei",
+              "topic": "Erweiterung des Tonraumes",
+              "page": 52
+            },
+            {
+              "pieceNumber": 37,
+              "title": "Gradeaus!",
+              "topic": "Erweiterung des Tonraumes",
+              "page": 53
+            },
+            {
+              "pieceNumber": 38,
+              "title": "Yankee Doodle",
+              "topic": "Bekanntes Lied",
+              "page": 54
+            },
+            {
+              "pieceNumber": 39,
+              "title": "Froschkonzert",
+              "topic": "Erweiterung des Tonraumes",
+              "page": 55
+            },
+            {
+              "pieceNumber": 40,
+              "title": "Schlüssel-G und Schlüssel-F",
+              "topic": "Die Schlüsselnoten, Quinte",
+              "page": 56
+            },
+            {
+              "pieceNumber": 41,
+              "title": "Glocken",
+              "topic": "Intervalle",
+              "page": 57
+            },
+            {
+              "pieceNumber": 42,
+              "title": "Treppensteigen",
+              "topic": "Sekund- und Terzschritte",
+              "page": 58
+            },
+            {
+              "pieceNumber": 43,
+              "title": "Zwei Spechte",
+              "topic": "Fingertraining",
+              "page": 59
+            },
+            {
+              "pieceNumber": 44,
+              "title": "Happy Birthday",
+              "topic": "Klavierduo",
+              "page": 60
+            },
+            {
+              "pieceNumber": 45,
+              "title": "Puzzles",
+              "topic": "Spiel nach Gehör",
+              "page": 62
+            },
+            {
+              "pieceNumber": 46,
+              "title": "Rätsel",
+              "topic": "Wiederholung",
+              "page": 64
+            }
+          ]
+        },
+        {
+          "chapterNumber": 5,
+          "chapterTitle": "Kapitel 5: Spiel in anderen Fünf-Finger-Lagen",
+          "pageRange": "66–75",
+          "lessons": [
+            {
+              "pieceNumber": 47,
+              "title": "Finde die Quinte!",
+              "topic": "Neue Lage",
+              "page": 66
+            },
+            {
+              "pieceNumber": 48,
+              "title": "Hopplaho!",
+              "topic": "Haltebogen",
+              "page": 67
+            },
+            {
+              "pieceNumber": 49,
+              "title": "Fingersport",
+              "topic": "Spiegelbildlich und parallel",
+              "page": 68
+            },
+            {
+              "pieceNumber": 50,
+              "title": "Im Regen",
+              "topic": "Pedal",
+              "page": 70
+            },
+            {
+              "pieceNumber": 51,
+              "title": "Unglaublich",
+              "topic": "Lagenwechsel",
+              "page": 71
+            },
+            {
+              "pieceNumber": 52,
+              "title": "Bärentanz",
+              "topic": "Da Capo al Fine",
+              "page": 72
+            },
+            {
+              "pieceNumber": 53,
+              "title": "Traumlied",
+              "topic": "Ausdruck",
+              "page": 73
+            },
+            {
+              "pieceNumber": 54,
+              "title": "Im Zirkus",
+              "topic": "Freie Improvisation",
+              "page": 74
+            },
+            {
+              "pieceNumber": 55,
+              "title": "Die erste Zauberei",
+              "topic": "Halb- und Ganztonschritte",
+              "page": 75
+            }
+          ]
+        },
+        {
+          "chapterNumber": 6,
+          "chapterTitle": "Kapitel 6: Verschiedenes",
+          "pageRange": "76–91",
+          "lessons": [
+            {
+              "pieceNumber": 56,
+              "title": "Die Versetzungszeichen",
+              "topic": "Kreuz und B",
+              "page": 76
+            },
+            {
+              "pieceNumber": 57,
+              "title": "Der Fisch",
+              "topic": "Fis",
+              "page": 77
+            },
+            {
+              "pieceNumber": 58,
+              "title": "Der Besen",
+              "topic": "B",
+              "page": 78
+            },
+            {
+              "pieceNumber": 59,
+              "title": "Das Auflösungszeichen",
+              "topic": "Auflösungszeichen Einführung",
+              "page": 79
+            },
+            {
+              "pieceNumber": 60,
+              "title": "Oh, When the Saints",
+              "topic": "Dreiklang",
+              "page": 80
+            },
+            {
+              "pieceNumber": 61,
+              "title": "Alle Vögel",
+              "topic": "Die punktierte Viertelnote",
+              "page": 81
+            },
+            {
+              "pieceNumber": 62,
+              "title": "Big Ben und Spieluhr",
+              "topic": "Klavierduo",
+              "page": 82
+            },
+            {
+              "pieceNumber": 63,
+              "title": "Das Karussell",
+              "topic": "Taktklammern",
+              "page": 84
+            },
+            {
+              "pieceNumber": 64,
+              "title": "Die Lokomotive",
+              "topic": "Sexte",
+              "page": 85
+            },
+            {
+              "pieceNumber": 65,
+              "title": "Hokuspo-Blues",
+              "topic": "Mit „Swing“",
+              "page": 86
+            },
+            {
+              "pieceNumber": 66,
+              "title": "Beethoven: An die Freude",
+              "topic": "Solo",
+              "page": 87
+            },
+            {
+              "pieceNumber": 67,
+              "title": "Beethoven: An die Freude",
+              "topic": "Spiel zu dritt",
+              "page": 88
+            },
+            {
+              "pieceNumber": 68,
+              "title": "Übersicht",
+              "topic": "Notenwerte und Pausen",
+              "page": 90
+            },
+            {
+              "pieceNumber": 69,
+              "title": "Rätsel",
+              "topic": "Wiederholung",
+              "page": 91
+            }
+          ]
+        }
+      ],
+      "appendix": [
+        {
+          "title": "Spiel nach Gehör: Puzzles, Die Autofahrt",
+          "topic": "Gehörbildung",
+          "page": 92
+        },
+        {
+          "title": "Notenpapier",
+          "topic": "Blanko-Notenlinien",
+          "page": 94
+        },
+        {
+          "title": "Aufkleber",
+          "topic": "Belohnungsaufkleber",
+          "page": 95
+        }
+      ]
+    },
+    {
+      "bookId": "band-2",
+      "bookTitle": "Tastenzauberei Band 2",
+      "author": "Anikó Drabon",
+      "totalPieces": 63,
+      "chapters": [
+        {
+          "chapterNumber": 1,
+          "chapterTitle": "Kapitel 1",
+          "pageRange": "6–21",
+          "lessons": [
+            {
+              "pieceNumber": 1,
+              "title": "Neuer Start, Wettrennen",
+              "topic": "Das Noten-Alphabet, Klavierduo",
+              "page": 6
+            },
+            {
+              "pieceNumber": 2,
+              "title": "Ballspiel",
+              "topic": "Wiederholung der Intervalle, mp",
+              "page": 8
+            },
+            {
+              "pieceNumber": 3,
+              "title": "Auf der Wippe",
+              "topic": "mf",
+              "page": 9
+            },
+            {
+              "pieceNumber": 4,
+              "title": "Durch Berg und Tal",
+              "topic": "Form-Analyse",
+              "page": 10
+            },
+            {
+              "pieceNumber": 5,
+              "title": "Wolkenbilder",
+              "topic": "Pedalwechsel, Improvisation",
+              "page": 12
+            },
+            {
+              "pieceNumber": 6,
+              "title": "Luftballons",
+              "topic": "Pedalwechsel, Fermate",
+              "page": 13
+            },
+            {
+              "pieceNumber": 7,
+              "title": "Dino spielt Schlagzeug",
+              "topic": "Klavierduo",
+              "page": 14
+            },
+            {
+              "pieceNumber": 8,
+              "title": "Schwimmen",
+              "topic": "Pedalwechsel, Ritardando",
+              "page": 16
+            },
+            {
+              "pieceNumber": 9,
+              "title": "Wanzentanz",
+              "topic": "Akzent",
+              "page": 17
+            },
+            {
+              "pieceNumber": 10,
+              "title": "W.A. Mozart, Kleiner Tanz",
+              "topic": "Allgemeine musikalische Bildung",
+              "page": 18
+            },
+            {
+              "pieceNumber": 11,
+              "title": "Komponieren",
+              "topic": "Eigene Stücke erfinden",
+              "page": 19
+            },
+            {
+              "pieceNumber": 12,
+              "title": "Rätsel",
+              "topic": "Wiederholung",
+              "page": 20
+            }
+          ]
+        },
+        {
+          "chapterNumber": 2,
+          "chapterTitle": "Kapitel 2",
+          "pageRange": "22–37",
+          "lessons": [
+            {
+              "pieceNumber": 13,
+              "title": "Wie heißen die schwarzen Tasten?",
+              "topic": "Neue Notennamen",
+              "page": 22
+            },
+            {
+              "pieceNumber": 14,
+              "title": "Eile und Weile",
+              "topic": "Chromatik, Klavierduo",
+              "page": 22
+            },
+            {
+              "pieceNumber": 15,
+              "title": "Neue Noten",
+              "topic": "Erweiterung des Tonraumes",
+              "page": 24
+            },
+            {
+              "pieceNumber": 16,
+              "title": "Neue Lagen",
+              "topic": "Fingerübung",
+              "page": 25
+            },
+            {
+              "pieceNumber": 17,
+              "title": "Fang mich doch!",
+              "topic": "Lagenwechsel",
+              "page": 26
+            },
+            {
+              "pieceNumber": 18,
+              "title": "Honigglas-Boogie",
+              "topic": "Lagenwechsel",
+              "page": 27
+            },
+            {
+              "pieceNumber": 19,
+              "title": "Der Mond ist aufgegangen",
+              "topic": "Lagenwechsel",
+              "page": 28
+            },
+            {
+              "pieceNumber": 20,
+              "title": "Der Wind",
+              "topic": "Überkreuzte Hände",
+              "page": 29
+            },
+            {
+              "pieceNumber": 21,
+              "title": "Ungarischer Sprungtanz",
+              "topic": "Da capo",
+              "page": 30
+            },
+            {
+              "pieceNumber": 22,
+              "title": "Ohne Noten",
+              "topic": "Spiel nach Gehör, Liedbegleitung",
+              "page": 31
+            },
+            {
+              "pieceNumber": 23,
+              "title": "Vogel-Cha-Cha",
+              "topic": "Klavierduo",
+              "page": 32
+            },
+            {
+              "pieceNumber": 24,
+              "title": "Rätsel",
+              "topic": "Wiederholung",
+              "page": 36
+            }
+          ]
+        },
+        {
+          "chapterNumber": 3,
+          "chapterTitle": "Kapitel 3",
+          "pageRange": "38–51",
+          "lessons": [
+            {
+              "pieceNumber": 25,
+              "title": "Dur oder Moll?",
+              "topic": "Dur und Moll, Hörübung",
+              "page": 38
+            },
+            {
+              "pieceNumber": 26,
+              "title": "Das Meer",
+              "topic": "Dreiklänge erkennen",
+              "page": 39
+            },
+            {
+              "pieceNumber": 27,
+              "title": "Die Tonleiter",
+              "topic": "Daumenuntersatz",
+              "page": 40
+            },
+            {
+              "pieceNumber": 28,
+              "title": "Autorennen",
+              "topic": "C-Dur-Tonleiter",
+              "page": 41
+            },
+            {
+              "pieceNumber": 29,
+              "title": "Bruder Jakob",
+              "topic": "Transponieren",
+              "page": 42
+            },
+            {
+              "pieceNumber": 30,
+              "title": "What shall we do",
+              "topic": "Traditionelles Lied",
+              "page": 43
+            },
+            {
+              "pieceNumber": 31,
+              "title": "Bella Bimba",
+              "topic": "Klavierduo",
+              "page": 44
+            },
+            {
+              "pieceNumber": 32,
+              "title": "Übersicht der Taktarten",
+              "topic": "Sechsachteltakt",
+              "page": 46
+            },
+            {
+              "pieceNumber": 33,
+              "title": "Tarantella",
+              "topic": "Presto",
+              "page": 47
+            },
+            {
+              "pieceNumber": 34,
+              "title": "Allegretto (A. Diabelli)",
+              "topic": "8va sempre",
+              "page": 48
+            },
+            {
+              "pieceNumber": 35,
+              "title": "Rätsel",
+              "topic": "Wiederholung",
+              "page": 50
+            }
+          ]
+        },
+        {
+          "chapterNumber": 4,
+          "chapterTitle": "Kapitel 4",
+          "pageRange": "52–65",
+          "lessons": [
+            {
+              "pieceNumber": 36,
+              "title": "Übersicht der Notenwerte",
+              "topic": "Sechzehntelnoten",
+              "page": 52
+            },
+            {
+              "pieceNumber": 37,
+              "title": "Die Lok fährt weiter",
+              "topic": "Sechzehntelnoten",
+              "page": 53
+            },
+            {
+              "pieceNumber": 38,
+              "title": "Türkischer Marsch (A. Diabelli)",
+              "topic": "ff (fortissimo)",
+              "page": 54
+            },
+            {
+              "pieceNumber": 39,
+              "title": "Die Affen rasen",
+              "topic": "Bekanntes Kinderlied",
+              "page": 56
+            },
+            {
+              "pieceNumber": 40,
+              "title": "Wiegenlied",
+              "topic": "dolce",
+              "page": 57
+            },
+            {
+              "pieceNumber": 41,
+              "title": "Der fliegende Teppich",
+              "topic": "Improvisation, Klavierduo",
+              "page": 58
+            },
+            {
+              "pieceNumber": 42,
+              "title": "Gondellied",
+              "topic": "neue Intervalle",
+              "page": 60
+            },
+            {
+              "pieceNumber": 43,
+              "title": "Zwei kleine Wölfe",
+              "topic": "Akkordbezeichnungen",
+              "page": 62
+            },
+            {
+              "pieceNumber": 44,
+              "title": "Drei kleine Wölfe",
+              "topic": "Spiel zu dritt, Improvisation",
+              "page": 63
+            },
+            {
+              "pieceNumber": 45,
+              "title": "Rätsel",
+              "topic": "Wiederholung",
+              "page": 64
+            }
+          ]
+        },
+        {
+          "chapterNumber": 5,
+          "chapterTitle": "Kapitel 5",
+          "pageRange": "66–79",
+          "lessons": [
+            {
+              "pieceNumber": 46,
+              "title": "Der reisende Affe",
+              "topic": "Tonarten, Vorzeichen",
+              "page": 66
+            },
+            {
+              "pieceNumber": 47,
+              "title": "Kleine Sonate (C.H. Wilton)",
+              "topic": "C-Dur",
+              "page": 68
+            },
+            {
+              "pieceNumber": 48,
+              "title": "Altes Lied (D.G. Türk)",
+              "topic": "G-Dur",
+              "page": 69
+            },
+            {
+              "pieceNumber": 49,
+              "title": "Eurovisionsmelodie",
+              "topic": "D-Dur, der Pralltriller",
+              "page": 70
+            },
+            {
+              "pieceNumber": 50,
+              "title": "New Song",
+              "topic": "F-Dur",
+              "page": 71
+            },
+            {
+              "pieceNumber": 51,
+              "title": "Nachricht aus dem Weltraum",
+              "topic": "Obertöne",
+              "page": 72
+            },
+            {
+              "pieceNumber": 52,
+              "title": "Marsmännchen",
+              "topic": "accelerando",
+              "page": 73
+            },
+            {
+              "pieceNumber": 53,
+              "title": "Indianertanz (W. Gillock)",
+              "topic": "crescendo, diminuendo",
+              "page": 74
+            },
+            {
+              "pieceNumber": 54,
+              "title": "Scherzo (A. Diabelli)",
+              "topic": "Vorschlagnoten",
+              "page": 76
+            },
+            {
+              "pieceNumber": 55,
+              "title": "Rätsel",
+              "topic": "Wiederholung",
+              "page": 78
+            }
+          ]
+        },
+        {
+          "chapterNumber": 6,
+          "chapterTitle": "Kapitel 6",
+          "pageRange": "80–89",
+          "lessons": [
+            {
+              "pieceNumber": 56,
+              "title": "Hasen-Blues",
+              "topic": "Stufenbezeichnungen, Blues-Form",
+              "page": 80
+            },
+            {
+              "pieceNumber": 57,
+              "title": "Bären-Boogie",
+              "topic": "Blues-Form",
+              "page": 81
+            },
+            {
+              "pieceNumber": 58,
+              "title": "Sanfte Wellen",
+              "topic": "Kantilene / Anschlagskultur",
+              "page": 82
+            },
+            {
+              "pieceNumber": 59,
+              "title": "Terzen-Rock",
+              "topic": "Terz-Fingersatz",
+              "page": 83
+            },
+            {
+              "pieceNumber": 60,
+              "title": "Rondino",
+              "topic": "Rondo-Form",
+              "page": 84
+            },
+            {
+              "pieceNumber": 61,
+              "title": "Ein trauriger Schultag",
+              "topic": "Ausdruck & Charakter",
+              "page": 86
+            },
+            {
+              "pieceNumber": 62,
+              "title": "Endlich Ferien!",
+              "topic": "Spielfreude & Tempo",
+              "page": 87
+            },
+            {
+              "pieceNumber": 63,
+              "title": "Rätsel",
+              "topic": "Wiederholung",
+              "page": 88
+            }
+          ]
+        }
+      ],
+      "appendix": [
+        {
+          "title": "Eine kleine Nachtmusik",
+          "topic": "Klassisches Meisterwerk",
+          "page": 90
+        },
+        {
+          "title": "Flohwalzer, Vogel-Cha-Cha",
+          "topic": "Spiel nach Gehör, Spiel zu dritt",
+          "page": 92
+        },
+        {
+          "title": "Übungen",
+          "topic": "Geläufigkeitsübungen",
+          "page": 93
+        },
+        {
+          "title": "Wörterbuch (Musikalische Fremdwörter)",
+          "topic": "Fachbegriffe",
+          "page": 94
+        },
+        {
+          "title": "Smiley-Aufkleber",
+          "topic": "Belohnung",
+          "page": 95
+        }
+      ]
+    },
+    {
+      "bookId": "band-3",
+      "bookTitle": "Tastenzauberei Band 3",
+      "author": "Anikó Drabon",
+      "totalPieces": 63,
+      "chapters": [
+        {
+          "chapterNumber": 1,
+          "chapterTitle": "Kapitel 1: Intervalle",
+          "pageRange": "6–21",
+          "lessons": [
+            {
+              "pieceNumber": 1,
+              "title": "Licht und Schatten",
+              "topic": "Wiederholung der Notennamen, Klavierduo",
+              "page": 6
+            },
+            {
+              "pieceNumber": 2,
+              "title": "Wilde Jagd",
+              "topic": "Sekundschritte, Spiel im schnellem Tempo",
+              "page": 8
+            },
+            {
+              "pieceNumber": 3,
+              "title": "Kleine und große Intervalle",
+              "topic": "Feinbestimmung Terz und Sekunde, Improvisation",
+              "page": 10
+            },
+            {
+              "pieceNumber": 4,
+              "title": "Drachensteigen",
+              "topic": "Sekund- und Terzschritte",
+              "page": 11
+            },
+            {
+              "pieceNumber": 5,
+              "title": "Aus der Zauberflöte (W. A. Mozart)",
+              "topic": "Terzen, Klavierduo",
+              "page": 12
+            },
+            {
+              "pieceNumber": 6,
+              "title": "Geisterstunde",
+              "topic": "Neue Spieltechniken, Tritonus",
+              "page": 14
+            },
+            {
+              "pieceNumber": 7,
+              "title": "Zerflossene Melodie",
+              "topic": "Quint- und Sextschritte, Arpeggio",
+              "page": 16
+            },
+            {
+              "pieceNumber": 8,
+              "title": "Tanz der Intervalle",
+              "topic": "Von Sekunde bis Sexte",
+              "page": 17
+            },
+            {
+              "pieceNumber": 9,
+              "title": "Singende Oktaven, Übersicht",
+              "topic": "Die Oktavbereiche",
+              "page": 18
+            },
+            {
+              "pieceNumber": 10,
+              "title": "Rätsel",
+              "topic": "Wiederholung",
+              "page": 20
+            }
+          ]
+        },
+        {
+          "chapterNumber": 2,
+          "chapterTitle": "Kapitel 2: Akkorde in Umkehrung",
+          "pageRange": "22–35",
+          "lessons": [
+            {
+              "pieceNumber": 11,
+              "title": "Hauptdreiklänge",
+              "topic": "Hauptdreiklänge",
+              "page": 22
+            },
+            {
+              "pieceNumber": 12,
+              "title": "Drei Chinesen mit dem Kontrabass",
+              "topic": "Begleiten mit Hauptdreiklängen",
+              "page": 23
+            },
+            {
+              "pieceNumber": 13,
+              "title": "Umkehrungen",
+              "topic": "Umkehrungen des Dreiklanges",
+              "page": 24
+            },
+            {
+              "pieceNumber": 14,
+              "title": "Dreiklang-Dance",
+              "topic": "Umkehrungen des Dreiklanges",
+              "page": 25
+            },
+            {
+              "pieceNumber": 15,
+              "title": "Deutscher Tanz (J. Haydn)",
+              "topic": "Der Septakkord",
+              "page": 26
+            },
+            {
+              "pieceNumber": 16,
+              "title": "Oh Susanna",
+              "topic": "Begleiten nach Akkordbezeichnungen",
+              "page": 27
+            },
+            {
+              "pieceNumber": 17,
+              "title": "Greensleeves",
+              "topic": "Dreiklänge erkennen",
+              "page": 28
+            },
+            {
+              "pieceNumber": 18,
+              "title": "Scarborough Fair",
+              "topic": "Begleiten nach Akkordbezeichnungen",
+              "page": 29
+            },
+            {
+              "pieceNumber": 19,
+              "title": "Etüde (C. Czerny)",
+              "topic": "Dreiklänge erkennen",
+              "page": 30
+            },
+            {
+              "pieceNumber": 20,
+              "title": "Thema mit Variation (C. Gurlitt)",
+              "topic": "Dreiklänge erkennen, Triole",
+              "page": 31
+            },
+            {
+              "pieceNumber": 21,
+              "title": "Gurlitt – Rock it!",
+              "topic": "Dreiklänge erkennen",
+              "page": 32
+            },
+            {
+              "pieceNumber": 22,
+              "title": "Rätsel",
+              "topic": "Wiederholung",
+              "page": 34
+            }
+          ]
+        },
+        {
+          "chapterNumber": 3,
+          "chapterTitle": "Kapitel 3: Dur- und Molltonarten",
+          "pageRange": "36–49",
+          "lessons": [
+            {
+              "pieceNumber": 23,
+              "title": "Schwester Schmoll",
+              "topic": "Die Moll-Tonleiter",
+              "page": 36
+            },
+            {
+              "pieceNumber": 24,
+              "title": "Menuett (J. Ph. Rameau)",
+              "topic": "Transposition",
+              "page": 38
+            },
+            {
+              "pieceNumber": 25,
+              "title": "Echospiel in a-Moll",
+              "topic": "Improvisation in a-Moll",
+              "page": 39
+            },
+            {
+              "pieceNumber": 26,
+              "title": "Waschmittel-Werbung",
+              "topic": "C-Dur",
+              "page": 40
+            },
+            {
+              "pieceNumber": 27,
+              "title": "Für Elise (L. v. Beethoven)",
+              "topic": "a-Moll",
+              "page": 41
+            },
+            {
+              "pieceNumber": 28,
+              "title": "Die Wut über den... (L. v. Beethoven)",
+              "topic": "G-Dur",
+              "page": 42
+            },
+            {
+              "pieceNumber": 29,
+              "title": "Auf dem Boot",
+              "topic": "e-Moll",
+              "page": 43
+            },
+            {
+              "pieceNumber": 30,
+              "title": "Musette aus dem Notenbüchlein für A. M. Bach",
+              "topic": "D-Dur",
+              "page": 44
+            },
+            {
+              "pieceNumber": 31,
+              "title": "Badinerie (J. S. Bach)",
+              "topic": "h-Moll",
+              "page": 45
+            },
+            {
+              "pieceNumber": 32,
+              "title": "Regenbogen",
+              "topic": "F-Dur",
+              "page": 46
+            },
+            {
+              "pieceNumber": 33,
+              "title": "Nächtliche Reise (C. Gurlitt)",
+              "topic": "d-Moll",
+              "page": 47
+            },
+            {
+              "pieceNumber": 34,
+              "title": "Rätsel",
+              "topic": "Wiederholung",
+              "page": 48
+            }
+          ]
+        },
+        {
+          "chapterNumber": 4,
+          "chapterTitle": "Kapitel 4: Rhythmen und Tänze",
+          "pageRange": "50–63",
+          "lessons": [
+            {
+              "pieceNumber": 35,
+              "title": "Die Blasmusik zieht vorbei",
+              "topic": "Synkope",
+              "page": 50
+            },
+            {
+              "pieceNumber": 36,
+              "title": "Menuett (L. Mozart)",
+              "topic": "Artikulation",
+              "page": 51
+            },
+            {
+              "pieceNumber": 37,
+              "title": "Zwei Gavottes (Telemann, Witthauer)",
+              "topic": "Alla breve",
+              "page": 52
+            },
+            {
+              "pieceNumber": 38,
+              "title": "The Entertainer (S. Joplin)",
+              "topic": "Ragtime",
+              "page": 53
+            },
+            {
+              "pieceNumber": 39,
+              "title": "Samba-Etüde",
+              "topic": "Klavierduo",
+              "page": 54
+            },
+            {
+              "pieceNumber": 40,
+              "title": "Tango",
+              "topic": "Improvisation",
+              "page": 56
+            },
+            {
+              "pieceNumber": 41,
+              "title": "Rock 'n' Roll",
+              "topic": "Hauptdreiklänge",
+              "page": 57
+            },
+            {
+              "pieceNumber": 42,
+              "title": "Burleske (L. Mozart)",
+              "topic": "Oktavsprünge",
+              "page": 58
+            },
+            {
+              "pieceNumber": 43,
+              "title": "Bourrée (Ch. Graupner)",
+              "topic": "Artikulation",
+              "page": 59
+            },
+            {
+              "pieceNumber": 44,
+              "title": "Bewegter Walzer",
+              "topic": "Walzer",
+              "page": 60
+            },
+            {
+              "pieceNumber": 45,
+              "title": "Tarantella in Blue",
+              "topic": "Prestissimo",
+              "page": 61
+            },
+            {
+              "pieceNumber": 46,
+              "title": "Rätsel",
+              "topic": "Wiederholung",
+              "page": 62
+            }
+          ]
+        },
+        {
+          "chapterNumber": 5,
+          "chapterTitle": "Kapitel 5: Zusammenspiel",
+          "pageRange": "64–77",
+          "lessons": [
+            {
+              "pieceNumber": 47,
+              "title": "Improvisation zu zweit",
+              "topic": "Improvisation",
+              "page": 64
+            },
+            {
+              "pieceNumber": 48,
+              "title": "Zwei Choräle (J. S. Bach)",
+              "topic": "Atembogen",
+              "page": 66
+            },
+            {
+              "pieceNumber": 49,
+              "title": "Zwei ungarische Sprungtänze",
+              "topic": "Accelerando, Body-Percussion",
+              "page": 68
+            },
+            {
+              "pieceNumber": 50,
+              "title": "Abschied",
+              "topic": "Polyphones Spiel",
+              "page": 70
+            },
+            {
+              "pieceNumber": 51,
+              "title": "Die Polizei kommt",
+              "topic": "Klavierduo",
+              "page": 72
+            },
+            {
+              "pieceNumber": 52,
+              "title": "Ungarisch (A. Diabelli)",
+              "topic": "Vorschlagsnoten",
+              "page": 74
+            },
+            {
+              "pieceNumber": 53,
+              "title": "Rätsel",
+              "topic": "Wiederholung",
+              "page": 76
+            }
+          ]
+        },
+        {
+          "chapterNumber": 6,
+          "chapterTitle": "Kapitel 6: Verschiedenes",
+          "pageRange": "78–89",
+          "lessons": [
+            {
+              "pieceNumber": 54,
+              "title": "Zwergentanz",
+              "topic": "Dissonanz",
+              "page": 78
+            },
+            {
+              "pieceNumber": 55,
+              "title": "Menuett (J. Krieger)",
+              "topic": "Polyphones Spiel",
+              "page": 79
+            },
+            {
+              "pieceNumber": 56,
+              "title": "The Pink Panther (H. Mancini)",
+              "topic": "Quinte",
+              "page": 80
+            },
+            {
+              "pieceNumber": 57,
+              "title": "Blues der Intervalle",
+              "topic": "Quinte, Sexte, Septime",
+              "page": 81
+            },
+            {
+              "pieceNumber": 58,
+              "title": "Arabeske (F. Burgmüller)",
+              "topic": "Etüde",
+              "page": 82
+            },
+            {
+              "pieceNumber": 59,
+              "title": "Amazing Grace",
+              "topic": "Akkordbegleitung",
+              "page": 83
+            },
+            {
+              "pieceNumber": 60,
+              "title": "Menuett (L. Mozart)",
+              "topic": "Artikulation",
+              "page": 84
+            },
+            {
+              "pieceNumber": 61,
+              "title": "Die Clowns (D. Kabalevski)",
+              "topic": "Virtuosität & Charakter",
+              "page": 85
+            },
+            {
+              "pieceNumber": 62,
+              "title": "Feuerwerk",
+              "topic": "Klangfarben",
+              "page": 86
+            },
+            {
+              "pieceNumber": 63,
+              "title": "Rätsel",
+              "topic": "Wiederholung",
+              "page": 88
+            }
+          ]
+        }
+      ],
+      "appendix": [
+        {
+          "title": "Echospiel, Puzzle",
+          "topic": "Spiel nach Gehör",
+          "page": 90
+        },
+        {
+          "title": "Feinbestimmung der Intervalle",
+          "topic": "Übersicht der Intervalle",
+          "page": 92
+        },
+        {
+          "title": "Der Quintenzirkel",
+          "topic": "Verwandtschaft der Tonarten",
+          "page": 93
+        },
+        {
+          "title": "Tonleitertabelle",
+          "topic": "Übersicht",
+          "page": 94
+        },
+        {
+          "title": "Wörterbuch (Musikalische Fremdwörter)",
+          "topic": "Fachbegriffe",
+          "page": 96
+        },
+        {
+          "title": "Smiley-Aufkleber",
+          "topic": "Belohnung",
+          "page": 97
+        }
+      ]
+    }
+  ]
+}
