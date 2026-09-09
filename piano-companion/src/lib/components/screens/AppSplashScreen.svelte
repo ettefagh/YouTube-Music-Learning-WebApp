@@ -30,11 +30,11 @@
       }
     }, 600);
 
-    // Ensure splash displays for at least 1.8s for a joyful kid experience
+    // Ensure splash displays for at least 3s for a joyful kid experience
     const minTimer = setTimeout(() => {
       minTimeElapsed = true;
       checkCompletion();
-    }, 1800);
+    }, 3000);
 
     return () => {
       clearInterval(textInterval);

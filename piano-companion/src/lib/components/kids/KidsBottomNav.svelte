@@ -16,10 +16,30 @@
   }>();
 
   let isVisible = $derived(['library', 'player', 'studio'].includes(activeScreen));
+
+  let lastScrollY = $state(0);
+  let isNavHidden = $state(false);
+
+  function handleScroll() {
+    if (typeof window === 'undefined') return;
+    const currentScrollY = window.scrollY;
+
+    // Auto-hide bottom nav bar:
+    // Hide when scrolling down, show when scrolling up or near the top
+    if (currentScrollY > lastScrollY && currentScrollY > 50) {
+      isNavHidden = true;
+    } else {
+      isNavHidden = false;
+    }
+
+    lastScrollY = currentScrollY;
+  }
 </script>
 
+<svelte:window onscroll={handleScroll} />
+
 {#if isVisible}
-  <nav class="kids-bottom-dock">
+  <nav class="kids-bottom-dock {isNavHidden ? 'nav-hidden' : ''}">
     <div class="dock-inner">
       <!-- Tab 1: Library -->
       <button
@@ -74,6 +94,11 @@
     align-items: center;
     padding: 0 16px;
     z-index: 1000;
+    transition: transform 0.3s ease-in-out;
+  }
+
+  .kids-bottom-dock.nav-hidden {
+    transform: translateY(100%);
   }
 
   .dock-inner {

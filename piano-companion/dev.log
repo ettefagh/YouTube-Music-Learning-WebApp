@@ -2,11 +2,1075 @@
 > piano-companion@0.0.1 dev
 > vite dev
 
-(node:102970) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+(node:62385) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
 (Use `node --trace-deprecation ...` to show where the warning was created)
-12:29:12 AM [vite] (client) Forced re-optimization of dependencies
+The following plugins may not work correctly because they use the `transformIndexHtml` hook which is not supported:
 
-  VITE v8.2.2  ready in 3095 ms
+  - vite-plugin-pwa:dev-sw
+  - vite-plugin-pwa:pwa-assets
+12:16:41 PM [vite] (ssr) connected.
+12:16:41 PM [vite] (client) Forced re-optimization of dependencies
+
+  VITE v8.2.2  ready in 4347 ms
 
   ➜  Local:   http://localhost:5173/
   ➜  Network: use --host to expose
+12:17:52 PM [vite-plugin-svelte] src/routes/+page.svelte:1229:4 Visible, non-interactive element `<div>` with a click event must be accompanied by a keyboard event handler. Consider whether an interactive element such as `<button type="button">` or `<a>` might be more appropriate
+https://svelte.dev/e/a11y_click_events_have_key_events
+12:17:52 PM [vite-plugin-svelte] src/routes/+page.svelte:1229:4 noninteractive element cannot have nonnegative tabIndex value
+https://svelte.dev/e/a11y_no_noninteractive_tabindex
+12:17:52 PM [vite-plugin-svelte] src/routes/+page.svelte:1229:4 Non-interactive element `<div>` should not be assigned mouse or keyboard event listeners
+https://svelte.dev/e/a11y_no_noninteractive_element_interactions
+12:17:52 PM [vite-plugin-svelte] src/routes/+page.svelte:2063:2 Unused CSS selector ".curriculum-bar"
+https://svelte.dev/e/css_unused_selector
+12:17:52 PM [vite-plugin-svelte] src/routes/+page.svelte:2072:2 Unused CSS selector ".book-tabs"
+https://svelte.dev/e/css_unused_selector
+12:17:52 PM [vite-plugin-svelte] src/routes/+page.svelte:2078:2 Unused CSS selector ".book-tab"
+https://svelte.dev/e/css_unused_selector
+12:17:52 PM [vite-plugin-svelte] src/routes/+page.svelte:2094:2 Unused CSS selector ".book-tab:active"
+https://svelte.dev/e/css_unused_selector
+12:17:52 PM [vite-plugin-svelte] src/routes/+page.svelte:2099:2 Unused CSS selector ".book-tab.active"
+https://svelte.dev/e/css_unused_selector
+12:17:52 PM [vite-plugin-svelte] src/routes/+page.svelte:2104:2 Unused CSS selector ".top-icon-btn"
+https://svelte.dev/e/css_unused_selector
+12:17:52 PM [vite-plugin-svelte] src/routes/+page.svelte:2115:2 Unused CSS selector ".top-icon-btn.active"
+https://svelte.dev/e/css_unused_selector
+12:17:52 PM [vite-plugin-svelte] src/routes/+page.svelte:2120:2 Unused CSS selector ".provider-bar"
+https://svelte.dev/e/css_unused_selector
+12:17:52 PM [vite-plugin-svelte] src/routes/+page.svelte:2127:2 Unused CSS selector ".provider-badge"
+https://svelte.dev/e/css_unused_selector
+12:17:52 PM [vite-plugin-svelte] src/routes/+page.svelte:2136:2 Unused CSS selector ".provider-pill-scroll"
+https://svelte.dev/e/css_unused_selector
+12:17:52 PM [vite-plugin-svelte] src/routes/+page.svelte:2144:2 Unused CSS selector ".provider-pill"
+https://svelte.dev/e/css_unused_selector
+12:17:52 PM [vite-plugin-svelte] src/routes/+page.svelte:2161:2 Unused CSS selector ".provider-pill:active"
+https://svelte.dev/e/css_unused_selector
+12:17:52 PM [vite-plugin-svelte] src/routes/+page.svelte:2166:2 Unused CSS selector ".provider-pill.active"
+https://svelte.dev/e/css_unused_selector
+12:17:52 PM [vite-plugin-svelte] src/routes/+page.svelte:2175:2 Unused CSS selector ".provider-add-pill"
+https://svelte.dev/e/css_unused_selector
+12:17:52 PM [vite-plugin-svelte] src/routes/+page.svelte:2188:2 Unused CSS selector ".neo-header"
+https://svelte.dev/e/css_unused_selector
+12:17:52 PM [vite-plugin-svelte] src/routes/+page.svelte:2194:2 Unused CSS selector ".header-main-card"
+https://svelte.dev/e/css_unused_selector
+12:17:52 PM [vite-plugin-svelte] src/routes/+page.svelte:2204:2 Unused CSS selector ".header-left"
+https://svelte.dev/e/css_unused_selector
+12:17:52 PM [vite-plugin-svelte] src/routes/+page.svelte:2212:2 Unused CSS selector ".header-icon"
+https://svelte.dev/e/css_unused_selector
+12:17:52 PM [vite-plugin-svelte] src/routes/+page.svelte:2216:2 Unused CSS selector ".header-info"
+https://svelte.dev/e/css_unused_selector
+12:17:52 PM [vite-plugin-svelte] src/routes/+page.svelte:2220:2 Unused CSS selector ".meta-row"
+https://svelte.dev/e/css_unused_selector
+12:17:52 PM [vite-plugin-svelte] src/routes/+page.svelte:2228:2 Unused CSS selector ".book-label"
+https://svelte.dev/e/css_unused_selector
+12:17:52 PM [vite-plugin-svelte] src/routes/+page.svelte:2236:2 Unused CSS selector ".mode-badge"
+https://svelte.dev/e/css_unused_selector
+12:17:52 PM [vite-plugin-svelte] src/routes/+page.svelte:2245:2 Unused CSS selector ".mode-badge.chapters"
+https://svelte.dev/e/css_unused_selector
+12:17:52 PM [vite-plugin-svelte] src/routes/+page.svelte:2250:2 Unused CSS selector ".mode-badge.playlist"
+https://svelte.dev/e/css_unused_selector
+12:17:52 PM [vite-plugin-svelte] src/routes/+page.svelte:2255:2 Unused CSS selector ".mode-badge.singles"
+https://svelte.dev/e/css_unused_selector
+12:17:52 PM [vite-plugin-svelte] src/routes/+page.svelte:2260:2 Unused CSS selector ".title-row"
+https://svelte.dev/e/css_unused_selector
+12:17:52 PM [vite-plugin-svelte] src/routes/+page.svelte:2266:2 Unused CSS selector ".completion-btn"
+https://svelte.dev/e/css_unused_selector
+12:17:52 PM [vite-plugin-svelte] src/routes/+page.svelte:2283:2 Unused CSS selector ".completion-btn.completed"
+https://svelte.dev/e/css_unused_selector
+12:17:52 PM [vite-plugin-svelte] src/routes/+page.svelte:2288:2 Unused CSS selector ".dropdown-trigger-btn"
+https://svelte.dev/e/css_unused_selector
+12:17:52 PM [vite-plugin-svelte] src/routes/+page.svelte:2299:2 Unused CSS selector ".lesson-title"
+https://svelte.dev/e/css_unused_selector
+12:17:52 PM [vite-plugin-svelte] src/routes/+page.svelte:2307:2 Unused CSS selector ".dropdown-arrow"
+https://svelte.dev/e/css_unused_selector
+12:17:52 PM [vite-plugin-svelte] src/routes/+page.svelte:2312:2 Unused CSS selector ".dropdown-arrow.open"
+https://svelte.dev/e/css_unused_selector
+12:17:52 PM [vite-plugin-svelte] src/routes/+page.svelte:2316:2 Unused CSS selector ".lesson-nav-actions"
+https://svelte.dev/e/css_unused_selector
+12:17:52 PM [vite-plugin-svelte] src/routes/+page.svelte:2321:2 Unused CSS selector ".nav-btn"
+https://svelte.dev/e/css_unused_selector
+12:17:52 PM [vite-plugin-svelte] src/routes/+page.svelte:2332:2 Unused CSS selector ".nav-btn:active:not(:disabled)"
+https://svelte.dev/e/css_unused_selector
+12:17:52 PM [vite-plugin-svelte] src/routes/+page.svelte:2337:2 Unused CSS selector ".nav-btn:disabled"
+https://svelte.dev/e/css_unused_selector
+12:17:52 PM [vite-plugin-svelte] src/routes/+page.svelte:2343:2 Unused CSS selector ".lesson-dropdown-panel"
+https://svelte.dev/e/css_unused_selector
+12:17:52 PM [vite-plugin-svelte] src/routes/+page.svelte:2357:2 Unused CSS selector ".search-bar-row"
+https://svelte.dev/e/css_unused_selector
+12:17:52 PM [vite-plugin-svelte] src/routes/+page.svelte:2364:2 Unused CSS selector ".dropdown-search-input"
+https://svelte.dev/e/css_unused_selector
+12:17:52 PM [vite-plugin-svelte] src/routes/+page.svelte:2374:2 Unused CSS selector ".lesson-count"
+https://svelte.dev/e/css_unused_selector
+12:17:52 PM [vite-plugin-svelte] src/routes/+page.svelte:2381:2 Unused CSS selector ".dropdown-list"
+https://svelte.dev/e/css_unused_selector
+12:17:52 PM [vite-plugin-svelte] src/routes/+page.svelte:2391:2 Unused CSS selector ".dropdown-item"
+https://svelte.dev/e/css_unused_selector
+12:17:52 PM [vite-plugin-svelte] src/routes/+page.svelte:2406:2 Unused CSS selector ".dropdown-item:hover"
+https://svelte.dev/e/css_unused_selector
+12:17:52 PM [vite-plugin-svelte] src/routes/+page.svelte:2410:2 Unused CSS selector ".dropdown-item.active"
+https://svelte.dev/e/css_unused_selector
+12:17:52 PM [vite-plugin-svelte] src/routes/+page.svelte:2414:2 Unused CSS selector ".item-status"
+https://svelte.dev/e/css_unused_selector
+12:17:52 PM [vite-plugin-svelte] src/routes/+page.svelte:2418:2 Unused CSS selector ".item-seq"
+https://svelte.dev/e/css_unused_selector
+12:17:52 PM [vite-plugin-svelte] src/routes/+page.svelte:2424:2 Unused CSS selector ".item-title"
+https://svelte.dev/e/css_unused_selector
+12:17:52 PM [vite-plugin-svelte] src/routes/+page.svelte:2429:2 Unused CSS selector ".item-timestamp"
+https://svelte.dev/e/css_unused_selector
+12:17:52 PM [vite-plugin-svelte] src/routes/+page.svelte:2435:2 Unused CSS selector ".no-matches"
+https://svelte.dev/e/css_unused_selector
+12:17:52 PM [vite-plugin-svelte] src/routes/+page.svelte:2443:2 Unused CSS selector ".player-card"
+https://svelte.dev/e/css_unused_selector
+12:17:52 PM [vite-plugin-svelte] src/routes/+page.svelte:2451:2 Unused CSS selector ".player-card.theater-mode"
+https://svelte.dev/e/css_unused_selector
+12:17:52 PM [vite-plugin-svelte] src/routes/+page.svelte:2509:2 Unused CSS selector ".player-stage-card:fullscreen .transport-bar"
+https://svelte.dev/e/css_unused_selector
+12:17:52 PM [vite-plugin-svelte] src/routes/+page.svelte:2510:2 Unused CSS selector ".player-stage-card:-webkit-full-screen .transport-bar"
+https://svelte.dev/e/css_unused_selector
+12:17:52 PM [vite-plugin-svelte] src/routes/+page.svelte:2511:2 Unused CSS selector ".player-stage-card.is-fullscreen .transport-bar"
+https://svelte.dev/e/css_unused_selector
+12:17:52 PM [vite-plugin-svelte] src/routes/+page.svelte:2543:2 Unused CSS selector ".tactile-disc.metronome-disc.is-active"
+https://svelte.dev/e/css_unused_selector
+12:17:52 PM [vite-plugin-svelte] src/routes/+page.svelte:2646:2 Unused CSS selector ".transport-bar"
+https://svelte.dev/e/css_unused_selector
+12:17:52 PM [vite-plugin-svelte] src/routes/+page.svelte:2656:2 Unused CSS selector ".transport-left"
+https://svelte.dev/e/css_unused_selector
+12:17:52 PM [vite-plugin-svelte] src/routes/+page.svelte:2656:19 Unused CSS selector ".transport-middle"
+https://svelte.dev/e/css_unused_selector
+12:17:52 PM [vite-plugin-svelte] src/routes/+page.svelte:2663:2 Unused CSS selector ".play-toggle-btn"
+https://svelte.dev/e/css_unused_selector
+12:17:52 PM [vite-plugin-svelte] src/routes/+page.svelte:2676:2 Unused CSS selector ".play-toggle-btn:hover"
+https://svelte.dev/e/css_unused_selector
+12:17:52 PM [vite-plugin-svelte] src/routes/+page.svelte:2681:2 Unused CSS selector ".play-toggle-btn:active"
+https://svelte.dev/e/css_unused_selector
+12:17:52 PM [vite-plugin-svelte] src/routes/+page.svelte:2686:2 Unused CSS selector ".play-toggle-btn.playing"
+https://svelte.dev/e/css_unused_selector
+12:17:52 PM [vite-plugin-svelte] src/routes/+page.svelte:2690:2 Unused CSS selector ".skip-btn"
+https://svelte.dev/e/css_unused_selector
+12:17:52 PM [vite-plugin-svelte] src/routes/+page.svelte:2702:2 Unused CSS selector ".skip-btn:hover"
+https://svelte.dev/e/css_unused_selector
+12:17:52 PM [vite-plugin-svelte] src/routes/+page.svelte:2707:2 Unused CSS selector ".skip-btn:active"
+https://svelte.dev/e/css_unused_selector
+12:17:52 PM [vite-plugin-svelte] src/routes/+page.svelte:2712:2 Unused CSS selector ".loop-toggle-btn"
+https://svelte.dev/e/css_unused_selector
+12:17:52 PM [vite-plugin-svelte] src/routes/+page.svelte:2724:2 Unused CSS selector ".loop-toggle-btn:hover"
+https://svelte.dev/e/css_unused_selector
+12:17:52 PM [vite-plugin-svelte] src/routes/+page.svelte:2729:2 Unused CSS selector ".loop-toggle-btn:active"
+https://svelte.dev/e/css_unused_selector
+12:17:52 PM [vite-plugin-svelte] src/routes/+page.svelte:2734:2 Unused CSS selector ".loop-toggle-btn.active"
+https://svelte.dev/e/css_unused_selector
+12:17:52 PM [vite-plugin-svelte] src/routes/+page.svelte:2739:2 Unused CSS selector ".transport-right"
+https://svelte.dev/e/css_unused_selector
+12:17:52 PM [vite-plugin-svelte] src/routes/+page.svelte:2746:2 Unused CSS selector ".utility-btn"
+https://svelte.dev/e/css_unused_selector
+12:17:52 PM [vite-plugin-svelte] src/routes/+page.svelte:2761:2 Unused CSS selector ".utility-btn:active"
+https://svelte.dev/e/css_unused_selector
+12:17:52 PM [vite-plugin-svelte] src/routes/+page.svelte:2766:2 Unused CSS selector ".utility-btn.active"
+https://svelte.dev/e/css_unused_selector
+12:17:52 PM [vite-plugin-svelte] src/routes/+page.svelte:2771:2 Unused CSS selector ".utility-btn.muted"
+https://svelte.dev/e/css_unused_selector
+12:17:52 PM [vite-plugin-svelte] src/routes/+page.svelte:2777:2 Unused CSS selector ".restart-btn"
+https://svelte.dev/e/css_unused_selector
+12:17:52 PM [vite-plugin-svelte] src/routes/+page.svelte:2784:2 Unused CSS selector ".audio-studio-grid"
+https://svelte.dev/e/css_unused_selector
+12:17:52 PM [vite-plugin-svelte] src/routes/+page.svelte:2792:4 Unused CSS selector ".audio-studio-grid"
+https://svelte.dev/e/css_unused_selector
+12:17:52 PM [vite-plugin-svelte] src/routes/+page.svelte:2797:2 Unused CSS selector ".studio-card"
+https://svelte.dev/e/css_unused_selector
+12:17:52 PM [vite-plugin-svelte] src/routes/+page.svelte:2804:2 Unused CSS selector ".student-card"
+https://svelte.dev/e/css_unused_selector
+12:17:52 PM [vite-plugin-svelte] src/routes/+page.svelte:2808:2 Unused CSS selector ".teacher-card"
+https://svelte.dev/e/css_unused_selector
+12:17:52 PM [vite-plugin-svelte] src/routes/+page.svelte:2812:2 Unused CSS selector ".studio-header"
+https://svelte.dev/e/css_unused_selector
+12:17:52 PM [vite-plugin-svelte] src/routes/+page.svelte:2818:2 Unused CSS selector ".title-wrap"
+https://svelte.dev/e/css_unused_selector
+12:17:52 PM [vite-plugin-svelte] src/routes/+page.svelte:2824:2 Unused CSS selector ".studio-icon"
+https://svelte.dev/e/css_unused_selector
+12:17:52 PM [vite-plugin-svelte] src/routes/+page.svelte:2828:2 Unused CSS selector ".studio-card h3"
+https://svelte.dev/e/css_unused_selector
+12:17:52 PM [vite-plugin-svelte] src/routes/+page.svelte:2834:2 Unused CSS selector ".trash-btn"
+https://svelte.dev/e/css_unused_selector
+12:17:52 PM [vite-plugin-svelte] src/routes/+page.svelte:2843:2 Unused CSS selector ".audio-player"
+https://svelte.dev/e/css_unused_selector
+12:17:52 PM [vite-plugin-svelte] src/routes/+page.svelte:2848:2 Unused CSS selector ".take-meta"
+https://svelte.dev/e/css_unused_selector
+12:17:52 PM [vite-plugin-svelte] src/routes/+page.svelte:2854:2 Unused CSS selector ".empty-state"
+https://svelte.dev/e/css_unused_selector
+12:17:52 PM [vite-plugin-svelte] src/routes/+page.svelte:2861:2 Unused CSS selector ".record-btn"
+https://svelte.dev/e/css_unused_selector
+12:17:52 PM [vite-plugin-svelte] src/routes/+page.svelte:2874:2 Unused CSS selector ".record-btn:active"
+https://svelte.dev/e/css_unused_selector
+12:17:52 PM [vite-plugin-svelte] src/routes/+page.svelte:2879:2 Unused CSS selector ".record-btn.student"
+https://svelte.dev/e/css_unused_selector
+12:17:52 PM [vite-plugin-svelte] src/routes/+page.svelte:2884:2 Unused CSS selector ".record-btn.teacher"
+https://svelte.dev/e/css_unused_selector
+12:17:52 PM [vite-plugin-svelte] src/routes/+page.svelte:2889:2 Unused CSS selector ".record-btn.recording"
+https://svelte.dev/e/css_unused_selector
+12:17:52 PM [vite-plugin-svelte] src/routes/+page.svelte:2895:2 Unused CSS selector ".vu-wrapper"
+https://svelte.dev/e/css_unused_selector
+12:17:52 PM [vite-plugin-svelte] src/routes/+page.svelte:2902:2 Unused CSS selector ".vu-fill"
+https://svelte.dev/e/css_unused_selector
+12:17:52 PM [vite-plugin-svelte] src/routes/+page.svelte:2907:2 Unused CSS selector ".vu-fill.student"
+https://svelte.dev/e/css_unused_selector
+12:17:52 PM [vite-plugin-svelte] src/routes/+page.svelte:2911:2 Unused CSS selector ".vu-fill.teacher"
+https://svelte.dev/e/css_unused_selector
+12:17:52 PM [vite-plugin-svelte] src/routes/+page.svelte:2916:2 Unused CSS selector ".checkpoints-card"
+https://svelte.dev/e/css_unused_selector
+12:17:52 PM [vite-plugin-svelte] src/routes/+page.svelte:2922:2 Unused CSS selector ".checkpoints-top"
+https://svelte.dev/e/css_unused_selector
+12:17:52 PM [vite-plugin-svelte] src/routes/+page.svelte:2929:2 Unused CSS selector ".title-group"
+https://svelte.dev/e/css_unused_selector
+12:17:52 PM [vite-plugin-svelte] src/routes/+page.svelte:2935:2 Unused CSS selector ".checkpoints-icon"
+https://svelte.dev/e/css_unused_selector
+12:17:52 PM [vite-plugin-svelte] src/routes/+page.svelte:2939:2 Unused CSS selector ".edit-checkpoints-btn"
+https://svelte.dev/e/css_unused_selector
+12:17:52 PM [vite-plugin-svelte] src/routes/+page.svelte:2950:2 Unused CSS selector ".checkpoints-checklist"
+https://svelte.dev/e/css_unused_selector
+12:17:52 PM [vite-plugin-svelte] src/routes/+page.svelte:2959:2 Unused CSS selector ".checkpoint-item"
+https://svelte.dev/e/css_unused_selector
+12:17:52 PM [vite-plugin-svelte] src/routes/+page.svelte:2974:2 Unused CSS selector ".checkpoint-item:active"
+https://svelte.dev/e/css_unused_selector
+12:17:52 PM [vite-plugin-svelte] src/routes/+page.svelte:2979:2 Unused CSS selector ".checkpoint-item.done"
+https://svelte.dev/e/css_unused_selector
+12:17:52 PM [vite-plugin-svelte] src/routes/+page.svelte:2985:2 Unused CSS selector ".check-box"
+https://svelte.dev/e/css_unused_selector
+12:17:52 PM [vite-plugin-svelte] src/routes/+page.svelte:2989:2 Unused CSS selector ".check-text"
+https://svelte.dev/e/css_unused_selector
+12:17:52 PM [vite-plugin-svelte] src/routes/+page.svelte:2994:2 Unused CSS selector ".edit-instructions"
+https://svelte.dev/e/css_unused_selector
+12:17:52 PM [vite-plugin-svelte] src/routes/+page.svelte:3010:2 Unused CSS selector ".edit-btn-row"
+https://svelte.dev/e/css_unused_selector
+12:17:52 PM [vite-plugin-svelte] src/routes/+page.svelte:3018:2 Unused CSS selector ".neo-footer"
+https://svelte.dev/e/css_unused_selector
+12:17:52 PM [vite-plugin-svelte] src/routes/+page.svelte:3024:2 Unused CSS selector ".footer-settings-btn"
+https://svelte.dev/e/css_unused_selector
+12:17:52 PM [vite-plugin-svelte] src/routes/+page.svelte:3035:2 Unused CSS selector ".footer-settings-btn:active"
+https://svelte.dev/e/css_unused_selector
+12:17:52 PM [vite-plugin-svelte] src/routes/+page.svelte:3293:2 Unused CSS selector ".section-collapse-header"
+https://svelte.dev/e/css_unused_selector
+12:17:52 PM [vite-plugin-svelte] src/routes/+page.svelte:3309:2 Unused CSS selector ".section-collapse-header:active"
+https://svelte.dev/e/css_unused_selector
+12:17:52 PM [vite-plugin-svelte] src/routes/+page.svelte:3314:2 Unused CSS selector ".collapse-title-row"
+https://svelte.dev/e/css_unused_selector
+12:17:52 PM [vite-plugin-svelte] src/routes/+page.svelte:3323:2 Unused CSS selector ".collapse-chevron"
+https://svelte.dev/e/css_unused_selector
+12:17:52 PM [vite-plugin-svelte] src/routes/+page.svelte:3329:2 Unused CSS selector ".collapse-summary-badge"
+https://svelte.dev/e/css_unused_selector
+12:17:52 PM [vite-plugin-svelte] src/routes/+page.svelte:3343:2 Unused CSS selector ".collapse-summary-badge.badge-success"
+https://svelte.dev/e/css_unused_selector
+12:17:52 PM [vite-plugin-svelte] src/routes/+page.svelte:3350:2 Unused CSS selector ".count-in-quick-btn"
+https://svelte.dev/e/css_unused_selector
+12:17:52 PM [vite-plugin-svelte] src/routes/+page.svelte:3363:2 Unused CSS selector ".count-in-quick-btn:hover"
+https://svelte.dev/e/css_unused_selector
+12:17:52 PM [vite-plugin-svelte] src/routes/+page.svelte:3368:2 Unused CSS selector ".count-in-quick-btn:active"
+https://svelte.dev/e/css_unused_selector
+12:17:52 PM [vite-plugin-svelte] src/routes/+page.svelte:3373:2 Unused CSS selector ".practice-lab-trigger-btn"
+https://svelte.dev/e/css_unused_selector
+12:17:52 PM [vite-plugin-svelte] src/routes/+page.svelte:3389:2 Unused CSS selector ".practice-lab-trigger-btn:hover"
+https://svelte.dev/e/css_unused_selector
+12:17:52 PM [vite-plugin-svelte] src/routes/+page.svelte:3394:2 Unused CSS selector ".practice-lab-trigger-btn:active"
+https://svelte.dev/e/css_unused_selector
+12:17:52 PM [vite-plugin-svelte] src/routes/+page.svelte:3399:2 Unused CSS selector ".record-btn-row"
+https://svelte.dev/e/css_unused_selector
+12:17:52 PM [vite-plugin-svelte] src/routes/+page.svelte:3406:2 Unused CSS selector ".record-btn-row .record-btn"
+https://svelte.dev/e/css_unused_selector
+12:17:52 PM [vite-plugin-svelte] src/routes/+page.svelte:3411:2 Unused CSS selector ".count-in-record-btn"
+https://svelte.dev/e/css_unused_selector
+12:17:52 PM [vite-plugin-svelte] src/routes/+page.svelte:3767:2 Unused CSS selector ".kids-top-header"
+https://svelte.dev/e/css_unused_selector
+12:17:52 PM [vite-plugin-svelte] src/routes/+page.svelte:3783:2 Unused CSS selector ".kids-brand-btn"
+https://svelte.dev/e/css_unused_selector
+12:17:52 PM [vite-plugin-svelte] src/routes/+page.svelte:3794:2 Unused CSS selector ".brand-piano-icon"
+https://svelte.dev/e/css_unused_selector
+12:17:52 PM [vite-plugin-svelte] src/routes/+page.svelte:3798:2 Unused CSS selector ".brand-text-col"
+https://svelte.dev/e/css_unused_selector
+12:17:52 PM [vite-plugin-svelte] src/routes/+page.svelte:3804:2 Unused CSS selector ".brand-title"
+https://svelte.dev/e/css_unused_selector
+12:17:52 PM [vite-plugin-svelte] src/routes/+page.svelte:3810:2 Unused CSS selector ".kids-pill-badge"
+https://svelte.dev/e/css_unused_selector
+12:17:52 PM [vite-plugin-svelte] src/routes/+page.svelte:3821:2 Unused CSS selector ".active-profile-chip"
+https://svelte.dev/e/css_unused_selector
+12:17:52 PM [vite-plugin-svelte] src/routes/+page.svelte:3834:2 Unused CSS selector ".active-profile-chip:active"
+https://svelte.dev/e/css_unused_selector
+12:17:52 PM [vite-plugin-svelte] src/routes/+page.svelte:3839:2 Unused CSS selector ".avatar-bubble"
+https://svelte.dev/e/css_unused_selector
+12:17:52 PM [vite-plugin-svelte] src/routes/+page.svelte:3850:2 Unused CSS selector ".profile-info-col"
+https://svelte.dev/e/css_unused_selector
+12:17:52 PM [vite-plugin-svelte] src/routes/+page.svelte:3856:2 Unused CSS selector ".profile-name"
+https://svelte.dev/e/css_unused_selector
+12:17:52 PM [vite-plugin-svelte] src/routes/+page.svelte:3864:2 Unused CSS selector ".kids-breadcrumbs-bar"
+https://svelte.dev/e/css_unused_selector
+12:17:52 PM [vite-plugin-svelte] src/routes/+page.svelte:3877:2 Unused CSS selector ".crumb-chip"
+https://svelte.dev/e/css_unused_selector
+12:17:52 PM [vite-plugin-svelte] src/routes/+page.svelte:3893:2 Unused CSS selector ".crumb-chip:active"
+https://svelte.dev/e/css_unused_selector
+12:17:52 PM [vite-plugin-svelte] src/routes/+page.svelte:3898:2 Unused CSS selector ".crumb-chip.current"
+https://svelte.dev/e/css_unused_selector
+12:17:52 PM [vite-plugin-svelte] src/routes/+page.svelte:3903:2 Unused CSS selector ".crumb-avatar"
+https://svelte.dev/e/css_unused_selector
+12:17:52 PM [vite-plugin-svelte] src/routes/+page.svelte:3914:2 Unused CSS selector ".crumb-icon"
+https://svelte.dev/e/css_unused_selector
+12:17:52 PM [vite-plugin-svelte] src/routes/+page.svelte:3918:2 Unused CSS selector ".crumb-text"
+https://svelte.dev/e/css_unused_selector
+12:17:52 PM [vite-plugin-svelte] src/routes/+page.svelte:3925:2 Unused CSS selector ".crumb-arrow"
+https://svelte.dev/e/css_unused_selector
+12:17:52 PM [vite-plugin-svelte] src/routes/+page.svelte:4125:2 Unused CSS selector ".screen-step"
+https://svelte.dev/e/css_unused_selector
+12:17:52 PM [vite-plugin-svelte] src/routes/+page.svelte:4138:2 Unused CSS selector ".step-nav-bar"
+https://svelte.dev/e/css_unused_selector
+12:17:52 PM [vite-plugin-svelte] src/routes/+page.svelte:4145:2 Unused CSS selector ".step-back-btn"
+https://svelte.dev/e/css_unused_selector
+12:17:52 PM [vite-plugin-svelte] src/routes/+page.svelte:4157:2 Unused CSS selector ".step-back-btn:active"
+https://svelte.dev/e/css_unused_selector
+12:17:52 PM [vite-plugin-svelte] src/routes/+page.svelte:4162:2 Unused CSS selector ".step-counter-pill"
+https://svelte.dev/e/css_unused_selector
+12:17:52 PM [vite-plugin-svelte] src/routes/+page.svelte:4172:2 Unused CSS selector ".step-hero-header"
+https://svelte.dev/e/css_unused_selector
+12:17:52 PM [vite-plugin-svelte] src/routes/+page.svelte:4177:2 Unused CSS selector ".step-emoji-hero"
+https://svelte.dev/e/css_unused_selector
+12:17:52 PM [vite-plugin-svelte] src/routes/+page.svelte:4183:2 Unused CSS selector ".step-main-title"
+https://svelte.dev/e/css_unused_selector
+12:17:52 PM [vite-plugin-svelte] src/routes/+page.svelte:4190:2 Unused CSS selector ".step-sub-instruction"
+https://svelte.dev/e/css_unused_selector
+12:17:52 PM [vite-plugin-svelte] src/routes/+page.svelte:4198:2 Unused CSS selector ".profiles-full-grid"
+https://svelte.dev/e/css_unused_selector
+12:17:52 PM [vite-plugin-svelte] src/routes/+page.svelte:4204:2 Unused CSS selector ".profile-jumbo-card"
+https://svelte.dev/e/css_unused_selector
+12:17:52 PM [vite-plugin-svelte] src/routes/+page.svelte:4217:2 Unused CSS selector ".profile-jumbo-card:active"
+https://svelte.dev/e/css_unused_selector
+12:17:52 PM [vite-plugin-svelte] src/routes/+page.svelte:4222:2 Unused CSS selector ".profile-jumbo-card.selected-kid"
+https://svelte.dev/e/css_unused_selector
+12:17:52 PM [vite-plugin-svelte] src/routes/+page.svelte:4228:2 Unused CSS selector ".jumbo-bubble-circle"
+https://svelte.dev/e/css_unused_selector
+12:17:52 PM [vite-plugin-svelte] src/routes/+page.svelte:4240:2 Unused CSS selector ".jumbo-avatar-emoji"
+https://svelte.dev/e/css_unused_selector
+12:17:52 PM [vite-plugin-svelte] src/routes/+page.svelte:4244:2 Unused CSS selector ".jumbo-crown-badge"
+https://svelte.dev/e/css_unused_selector
+12:17:52 PM [vite-plugin-svelte] src/routes/+page.svelte:4252:2 Unused CSS selector ".jumbo-kid-name"
+https://svelte.dev/e/css_unused_selector
+12:17:52 PM [vite-plugin-svelte] src/routes/+page.svelte:4259:2 Unused CSS selector ".jumbo-active-pill"
+https://svelte.dev/e/css_unused_selector
+12:17:52 PM [vite-plugin-svelte] src/routes/+page.svelte:4269:2 Unused CSS selector ".jumbo-tap-pill"
+https://svelte.dev/e/css_unused_selector
+12:17:52 PM [vite-plugin-svelte] src/routes/+page.svelte:4279:2 Unused CSS selector ".add-kid-jumbo-card"
+https://svelte.dev/e/css_unused_selector
+12:17:52 PM [vite-plugin-svelte] src/routes/+page.svelte:4293:2 Unused CSS selector ".add-jumbo-circle"
+https://svelte.dev/e/css_unused_selector
+12:17:52 PM [vite-plugin-svelte] src/routes/+page.svelte:4306:2 Unused CSS selector ".books-full-grid"
+https://svelte.dev/e/css_unused_selector
+12:17:52 PM [vite-plugin-svelte] src/routes/+page.svelte:4312:2 Unused CSS selector ".book-jumbo-card"
+https://svelte.dev/e/css_unused_selector
+12:17:52 PM [vite-plugin-svelte] src/routes/+page.svelte:4323:2 Unused CSS selector ".book-jumbo-card:active"
+https://svelte.dev/e/css_unused_selector
+12:17:52 PM [vite-plugin-svelte] src/routes/+page.svelte:4328:2 Unused CSS selector ".book-jumbo-card.selected-book"
+https://svelte.dev/e/css_unused_selector
+12:17:52 PM [vite-plugin-svelte] src/routes/+page.svelte:4334:2 Unused CSS selector ".book-jumbo-cover"
+https://svelte.dev/e/css_unused_selector
+12:17:52 PM [vite-plugin-svelte] src/routes/+page.svelte:4351:2 Unused CSS selector ".book-icon-hero"
+https://svelte.dev/e/css_unused_selector
+12:17:52 PM [vite-plugin-svelte] src/routes/+page.svelte:4355:2 Unused CSS selector ".book-pub-badge"
+https://svelte.dev/e/css_unused_selector
+12:17:52 PM [vite-plugin-svelte] src/routes/+page.svelte:4363:2 Unused CSS selector ".book-jumbo-body"
+https://svelte.dev/e/css_unused_selector
+12:17:52 PM [vite-plugin-svelte] src/routes/+page.svelte:4371:2 Unused CSS selector ".book-jumbo-title"
+https://svelte.dev/e/css_unused_selector
+12:17:52 PM [vite-plugin-svelte] src/routes/+page.svelte:4378:2 Unused CSS selector ".book-pieces-badge"
+https://svelte.dev/e/css_unused_selector
+12:17:52 PM [vite-plugin-svelte] src/routes/+page.svelte:4384:2 Unused CSS selector ".book-selected-pill"
+https://svelte.dev/e/css_unused_selector
+12:17:52 PM [vite-plugin-svelte] src/routes/+page.svelte:4396:2 Unused CSS selector ".book-tap-pill"
+https://svelte.dev/e/css_unused_selector
+12:17:52 PM [vite-plugin-svelte] src/routes/+page.svelte:4409:2 Unused CSS selector ".teachers-full-grid"
+https://svelte.dev/e/css_unused_selector
+12:17:52 PM [vite-plugin-svelte] src/routes/+page.svelte:4415:2 Unused CSS selector ".teacher-jumbo-card"
+https://svelte.dev/e/css_unused_selector
+12:17:52 PM [vite-plugin-svelte] src/routes/+page.svelte:4427:2 Unused CSS selector ".teacher-jumbo-card:active"
+https://svelte.dev/e/css_unused_selector
+12:17:52 PM [vite-plugin-svelte] src/routes/+page.svelte:4432:2 Unused CSS selector ".teacher-jumbo-card.pip-pick-highlight"
+https://svelte.dev/e/css_unused_selector
+12:17:52 PM [vite-plugin-svelte] src/routes/+page.svelte:4437:2 Unused CSS selector ".pip-pick-banner"
+https://svelte.dev/e/css_unused_selector
+12:17:52 PM [vite-plugin-svelte] src/routes/+page.svelte:4450:2 Unused CSS selector ".teacher-avatar-col"
+https://svelte.dev/e/css_unused_selector
+12:17:52 PM [vite-plugin-svelte] src/routes/+page.svelte:4463:2 Unused CSS selector ".teacher-jumbo-content"
+https://svelte.dev/e/css_unused_selector
+12:17:52 PM [vite-plugin-svelte] src/routes/+page.svelte:4470:2 Unused CSS selector ".teacher-title-row"
+https://svelte.dev/e/css_unused_selector
+12:17:52 PM [vite-plugin-svelte] src/routes/+page.svelte:4478:2 Unused CSS selector ".teacher-jumbo-name"
+https://svelte.dev/e/css_unused_selector
+12:17:52 PM [vite-plugin-svelte] src/routes/+page.svelte:4485:2 Unused CSS selector ".teacher-jumbo-bio"
+https://svelte.dev/e/css_unused_selector
+12:17:52 PM [vite-plugin-svelte] src/routes/+page.svelte:4493:2 Unused CSS selector ".teacher-footer-row"
+https://svelte.dev/e/css_unused_selector
+12:17:52 PM [vite-plugin-svelte] src/routes/+page.svelte:4502:2 Unused CSS selector ".teacher-handle"
+https://svelte.dev/e/css_unused_selector
+12:17:52 PM [vite-plugin-svelte] src/routes/+page.svelte:4508:2 Unused CSS selector ".teacher-lessons-count"
+https://svelte.dev/e/css_unused_selector
+12:17:52 PM [vite-plugin-svelte] src/routes/+page.svelte:4518:2 Unused CSS selector ".teacher-select-pill"
+https://svelte.dev/e/css_unused_selector
+12:17:52 PM [vite-plugin-svelte] src/routes/+page.svelte:4528:2 Unused CSS selector ".add-custom-channel-row"
+https://svelte.dev/e/css_unused_selector
+12:17:52 PM [vite-plugin-svelte] src/routes/+page.svelte:4534:2 Unused CSS selector ".add-channel-full-btn"
+https://svelte.dev/e/css_unused_selector
+12:17:52 PM [vite-plugin-svelte] src/routes/+page.svelte:4544:2 Unused CSS selector ".continue-lesson-card"
+https://svelte.dev/e/css_unused_selector
+12:17:52 PM [vite-plugin-svelte] src/routes/+page.svelte:4555:2 Unused CSS selector ".continue-badge"
+https://svelte.dev/e/css_unused_selector
+12:17:52 PM [vite-plugin-svelte] src/routes/+page.svelte:4564:2 Unused CSS selector ".continue-content-row"
+https://svelte.dev/e/css_unused_selector
+12:17:52 PM [vite-plugin-svelte] src/routes/+page.svelte:4571:2 Unused CSS selector ".continue-num"
+https://svelte.dev/e/css_unused_selector
+12:17:52 PM [vite-plugin-svelte] src/routes/+page.svelte:4580:2 Unused CSS selector ".continue-text-col"
+https://svelte.dev/e/css_unused_selector
+12:17:52 PM [vite-plugin-svelte] src/routes/+page.svelte:4585:2 Unused CSS selector ".continue-text-col h3"
+https://svelte.dev/e/css_unused_selector
+12:17:52 PM [vite-plugin-svelte] src/routes/+page.svelte:4591:2 Unused CSS selector ".continue-text-col span"
+https://svelte.dev/e/css_unused_selector
+12:17:52 PM [vite-plugin-svelte] src/routes/+page.svelte:4597:2 Unused CSS selector ".continue-play-now-btn"
+https://svelte.dev/e/css_unused_selector
+12:17:52 PM [vite-plugin-svelte] src/routes/+page.svelte:4607:2 Unused CSS selector ".lesson-search-bar-row"
+https://svelte.dev/e/css_unused_selector
+12:17:52 PM [vite-plugin-svelte] src/routes/+page.svelte:4616:2 Unused CSS selector ".lesson-search-input"
+https://svelte.dev/e/css_unused_selector
+12:17:52 PM [vite-plugin-svelte] src/routes/+page.svelte:4626:2 Unused CSS selector ".lesson-count-badge"
+https://svelte.dev/e/css_unused_selector
+12:17:52 PM [vite-plugin-svelte] src/routes/+page.svelte:4637:2 Unused CSS selector ".lessons-full-grid"
+https://svelte.dev/e/css_unused_selector
+12:17:52 PM [vite-plugin-svelte] src/routes/+page.svelte:4643:2 Unused CSS selector ".song-step-card"
+https://svelte.dev/e/css_unused_selector
+12:17:52 PM [vite-plugin-svelte] src/routes/+page.svelte:4657:2 Unused CSS selector ".song-star"
+https://svelte.dev/e/css_unused_selector
+12:17:52 PM [vite-plugin-svelte] src/routes/+page.svelte:4661:2 Unused CSS selector ".song-play-btn"
+https://svelte.dev/e/css_unused_selector
+12:17:52 PM [vite-plugin-svelte] src/routes/+page.svelte:4738:2 Unused CSS selector ".player-book-label"
+https://svelte.dev/e/css_unused_selector
+12:17:52 PM [vite-plugin-svelte] src/routes/+page.svelte:4804:2 Unused CSS selector ".player-top-actions"
+https://svelte.dev/e/css_unused_selector
+12:17:52 PM [vite-plugin-svelte] src/routes/+page.svelte:4837:2 Unused CSS selector ".capsule-metronome-btn"
+https://svelte.dev/e/css_unused_selector
+12:17:52 PM [vite-plugin-svelte] src/routes/+page.svelte:4849:2 Unused CSS selector ".capsule-metronome-btn.active"
+https://svelte.dev/e/css_unused_selector
+12:17:52 PM [vite-plugin-svelte] src/routes/+page.svelte:5094:2 Unused CSS selector ".screen-studio"
+https://svelte.dev/e/css_unused_selector
+12:17:52 PM [vite-plugin-svelte] src/routes/+page.svelte:5100:2 Unused CSS selector ".studio-top-bar"
+https://svelte.dev/e/css_unused_selector
+12:17:52 PM [vite-plugin-svelte] src/routes/+page.svelte:5110:2 Unused CSS selector ".studio-top-tag"
+https://svelte.dev/e/css_unused_selector
+12:17:52 PM [vite-plugin-svelte] src/routes/+page.svelte:5118:2 Unused CSS selector ".studio-top-bar h2"
+https://svelte.dev/e/css_unused_selector
+12:17:52 PM [vite-plugin-svelte] src/routes/+page.svelte:5124:2 Unused CSS selector ".back-to-player-btn"
+https://svelte.dev/e/css_unused_selector
+12:17:52 PM [vite-plugin-svelte] src/routes/+page.svelte:5137:2 Unused CSS selector ".screen-goals"
+https://svelte.dev/e/css_unused_selector
+12:17:52 PM [vite-plugin-svelte] src/routes/+page.svelte:5143:2 Unused CSS selector ".goals-hero-card"
+https://svelte.dev/e/css_unused_selector
+12:17:52 PM [vite-plugin-svelte] src/routes/+page.svelte:5156:2 Unused CSS selector ".hero-left"
+https://svelte.dev/e/css_unused_selector
+12:17:52 PM [vite-plugin-svelte] src/routes/+page.svelte:5162:2 Unused CSS selector ".hero-icon"
+https://svelte.dev/e/css_unused_selector
+12:17:52 PM [vite-plugin-svelte] src/routes/+page.svelte:5166:2 Unused CSS selector ".hero-tag"
+https://svelte.dev/e/css_unused_selector
+12:17:52 PM [vite-plugin-svelte] src/routes/+page.svelte:5172:2 Unused CSS selector ".goals-hero-card h2"
+https://svelte.dev/e/css_unused_selector
+12:17:52 PM [vite-plugin-svelte] src/routes/+page.svelte:5178:2 Unused CSS selector ".stars-badge"
+https://svelte.dev/e/css_unused_selector
+12:17:52 PM [vite-plugin-svelte] src/routes/+page.svelte:5187:2 Unused CSS selector ".mastered-badge"
+https://svelte.dev/e/css_unused_selector
+12:17:52 PM [vite-plugin-svelte] src/routes/+page.svelte:5197:2 Unused CSS selector ".hero-right"
+https://svelte.dev/e/css_unused_selector
+12:17:52 PM [vite-plugin-svelte] src/routes/+page.svelte:5203:2 Unused CSS selector ".goals-checklist-grid"
+https://svelte.dev/e/css_unused_selector
+12:17:52 PM [vite-plugin-svelte] src/routes/+page.svelte:5209:2 Unused CSS selector ".goal-card"
+https://svelte.dev/e/css_unused_selector
+12:17:52 PM [vite-plugin-svelte] src/routes/+page.svelte:5223:2 Unused CSS selector ".goal-card:active"
+https://svelte.dev/e/css_unused_selector
+12:17:52 PM [vite-plugin-svelte] src/routes/+page.svelte:5228:2 Unused CSS selector ".goal-card.done"
+https://svelte.dev/e/css_unused_selector
+12:17:52 PM [vite-plugin-svelte] src/routes/+page.svelte:5233:2 Unused CSS selector ".goal-star-bubble"
+https://svelte.dev/e/css_unused_selector
+12:17:52 PM [vite-plugin-svelte] src/routes/+page.svelte:5247:2 Unused CSS selector ".goal-star-bubble.earned"
+https://svelte.dev/e/css_unused_selector
+12:17:52 PM [vite-plugin-svelte] src/routes/+page.svelte:5251:2 Unused CSS selector ".goal-content"
+https://svelte.dev/e/css_unused_selector
+12:17:52 PM [vite-plugin-svelte] src/routes/+page.svelte:5256:2 Unused CSS selector ".goal-number"
+https://svelte.dev/e/css_unused_selector
+12:17:52 PM [vite-plugin-svelte] src/routes/+page.svelte:5262:2 Unused CSS selector ".goal-text"
+https://svelte.dev/e/css_unused_selector
+12:17:52 PM [vite-plugin-svelte] src/routes/+page.svelte:5269:2 Unused CSS selector ".goal-check-pill"
+https://svelte.dev/e/css_unused_selector
+12:17:52 PM [vite-plugin-svelte] src/routes/+page.svelte:5279:2 Unused CSS selector ".goal-check-pill.done"
+https://svelte.dev/e/css_unused_selector
+12:17:52 PM [vite-plugin-svelte] src/routes/+page.svelte:5284:2 Unused CSS selector ".goals-edit-card"
+https://svelte.dev/e/css_unused_selector
+12:17:52 PM [vite-plugin-svelte] src/routes/+page.svelte:5303:2 Unused CSS selector ".kids-bottom-dock"
+https://svelte.dev/e/css_unused_selector
+12:17:52 PM [vite-plugin-svelte] src/routes/+page.svelte:5319:2 Unused CSS selector ".dock-btn"
+https://svelte.dev/e/css_unused_selector
+12:17:52 PM [vite-plugin-svelte] src/routes/+page.svelte:5333:2 Unused CSS selector ".dock-btn:active"
+https://svelte.dev/e/css_unused_selector
+12:17:52 PM [vite-plugin-svelte] src/routes/+page.svelte:5337:2 Unused CSS selector ".dock-btn.active"
+https://svelte.dev/e/css_unused_selector
+12:17:52 PM [vite-plugin-svelte] src/routes/+page.svelte:5343:2 Unused CSS selector ".dock-icon"
+https://svelte.dev/e/css_unused_selector
+12:17:52 PM [vite-plugin-svelte] src/routes/+page.svelte:5347:2 Unused CSS selector ".dock-label"
+https://svelte.dev/e/css_unused_selector
+12:17:52 PM [vite-plugin-svelte] src/routes/+page.svelte:5353:2 Unused CSS selector ".dock-pill-indicator"
+https://svelte.dev/e/css_unused_selector
+12:17:52 PM [vite-plugin-svelte] src/routes/+page.svelte:5364:2 Unused CSS selector ".dock-badge-success"
+https://svelte.dev/e/css_unused_selector
+12:17:52 PM [vite-plugin-svelte] src/routes/+page.svelte:5381:2 Unused CSS selector ".dock-badge-stars"
+https://svelte.dev/e/css_unused_selector
+12:17:53 PM [vite-plugin-svelte] src/lib/components/screens/LibraryScreen.svelte:230:2 Visible, non-interactive element `<div>` with a click event must be accompanied by a keyboard event handler. Consider whether an interactive element such as `<button type="button">` or `<a>` might be more appropriate
+https://svelte.dev/e/a11y_click_events_have_key_events
+12:17:53 PM [vite-plugin-svelte] src/lib/components/screens/LibraryScreen.svelte:230:2 `<div>` with a click handler must have an ARIA role
+https://svelte.dev/e/a11y_no_static_element_interactions
+12:17:53 PM [vite-plugin-svelte] src/lib/components/screens/LibraryScreen.svelte:231:4 Visible, non-interactive element `<div>` with a click event must be accompanied by a keyboard event handler. Consider whether an interactive element such as `<button type="button">` or `<a>` might be more appropriate
+https://svelte.dev/e/a11y_click_events_have_key_events
+12:17:53 PM [vite-plugin-svelte] src/lib/components/screens/LibraryScreen.svelte:231:4 `<div>` with a click handler must have an ARIA role
+https://svelte.dev/e/a11y_no_static_element_interactions
+12:17:53 PM [vite-plugin-svelte] src/lib/components/journey/JourneyMapScreen.svelte:147:8 Visible, non-interactive element `<div>` with a click event must be accompanied by a keyboard event handler. Consider whether an interactive element such as `<button type="button">` or `<a>` might be more appropriate
+https://svelte.dev/e/a11y_click_events_have_key_events
+12:17:53 PM [vite-plugin-svelte] src/lib/components/journey/JourneyMapScreen.svelte:147:8 `<div>` with a click handler must have an ARIA role
+https://svelte.dev/e/a11y_no_static_element_interactions
+12:17:54 PM [vite-plugin-svelte] src/lib/components/screens/ProfileScreen.svelte:99:2 Visible, non-interactive element `<div>` with a click event must be accompanied by a keyboard event handler. Consider whether an interactive element such as `<button type="button">` or `<a>` might be more appropriate
+https://svelte.dev/e/a11y_click_events_have_key_events
+12:17:54 PM [vite-plugin-svelte] src/lib/components/screens/ProfileScreen.svelte:99:2 `<div>` with a click handler must have an ARIA role
+https://svelte.dev/e/a11y_no_static_element_interactions
+12:17:54 PM [vite-plugin-svelte] src/lib/components/screens/ProfileScreen.svelte:100:4 Visible, non-interactive element `<div>` with a click event must be accompanied by a keyboard event handler. Consider whether an interactive element such as `<button type="button">` or `<a>` might be more appropriate
+https://svelte.dev/e/a11y_click_events_have_key_events
+12:17:54 PM [vite-plugin-svelte] src/lib/components/screens/ProfileScreen.svelte:100:4 `<div>` with a click handler must have an ARIA role
+https://svelte.dev/e/a11y_no_static_element_interactions
+12:17:54 PM [vite-plugin-svelte] src/lib/components/screens/SettingsScreen.svelte:24:30 This reference only captures the initial value of `teacherAuth`. Did you mean to reference it inside a derived instead?
+https://svelte.dev/e/state_referenced_locally
+200 GET /
+12:17:57 PM [vite-plugin-svelte] src/routes/+page.svelte:1229:4 Visible, non-interactive element `<div>` with a click event must be accompanied by a keyboard event handler. Consider whether an interactive element such as `<button type="button">` or `<a>` might be more appropriate
+https://svelte.dev/e/a11y_click_events_have_key_events
+12:17:57 PM [vite-plugin-svelte] src/routes/+page.svelte:1229:4 noninteractive element cannot have nonnegative tabIndex value
+https://svelte.dev/e/a11y_no_noninteractive_tabindex
+12:17:57 PM [vite-plugin-svelte] src/routes/+page.svelte:1229:4 Non-interactive element `<div>` should not be assigned mouse or keyboard event listeners
+https://svelte.dev/e/a11y_no_noninteractive_element_interactions
+12:17:57 PM [vite-plugin-svelte] src/routes/+page.svelte:2063:2 Unused CSS selector ".curriculum-bar"
+https://svelte.dev/e/css_unused_selector
+12:17:57 PM [vite-plugin-svelte] src/routes/+page.svelte:2072:2 Unused CSS selector ".book-tabs"
+https://svelte.dev/e/css_unused_selector
+12:17:57 PM [vite-plugin-svelte] src/routes/+page.svelte:2078:2 Unused CSS selector ".book-tab"
+https://svelte.dev/e/css_unused_selector
+12:17:57 PM [vite-plugin-svelte] src/routes/+page.svelte:2094:2 Unused CSS selector ".book-tab:active"
+https://svelte.dev/e/css_unused_selector
+12:17:57 PM [vite-plugin-svelte] src/routes/+page.svelte:2099:2 Unused CSS selector ".book-tab.active"
+https://svelte.dev/e/css_unused_selector
+12:17:57 PM [vite-plugin-svelte] src/routes/+page.svelte:2104:2 Unused CSS selector ".top-icon-btn"
+https://svelte.dev/e/css_unused_selector
+12:17:57 PM [vite-plugin-svelte] src/routes/+page.svelte:2115:2 Unused CSS selector ".top-icon-btn.active"
+https://svelte.dev/e/css_unused_selector
+12:17:57 PM [vite-plugin-svelte] src/routes/+page.svelte:2120:2 Unused CSS selector ".provider-bar"
+https://svelte.dev/e/css_unused_selector
+12:17:57 PM [vite-plugin-svelte] src/routes/+page.svelte:2127:2 Unused CSS selector ".provider-badge"
+https://svelte.dev/e/css_unused_selector
+12:17:57 PM [vite-plugin-svelte] src/routes/+page.svelte:2136:2 Unused CSS selector ".provider-pill-scroll"
+https://svelte.dev/e/css_unused_selector
+12:17:57 PM [vite-plugin-svelte] src/routes/+page.svelte:2144:2 Unused CSS selector ".provider-pill"
+https://svelte.dev/e/css_unused_selector
+12:17:57 PM [vite-plugin-svelte] src/routes/+page.svelte:2161:2 Unused CSS selector ".provider-pill:active"
+https://svelte.dev/e/css_unused_selector
+12:17:57 PM [vite-plugin-svelte] src/routes/+page.svelte:2166:2 Unused CSS selector ".provider-pill.active"
+https://svelte.dev/e/css_unused_selector
+12:17:57 PM [vite-plugin-svelte] src/routes/+page.svelte:2175:2 Unused CSS selector ".provider-add-pill"
+https://svelte.dev/e/css_unused_selector
+12:17:57 PM [vite-plugin-svelte] src/routes/+page.svelte:2188:2 Unused CSS selector ".neo-header"
+https://svelte.dev/e/css_unused_selector
+12:17:57 PM [vite-plugin-svelte] src/routes/+page.svelte:2194:2 Unused CSS selector ".header-main-card"
+https://svelte.dev/e/css_unused_selector
+12:17:57 PM [vite-plugin-svelte] src/routes/+page.svelte:2204:2 Unused CSS selector ".header-left"
+https://svelte.dev/e/css_unused_selector
+12:17:57 PM [vite-plugin-svelte] src/routes/+page.svelte:2212:2 Unused CSS selector ".header-icon"
+https://svelte.dev/e/css_unused_selector
+12:17:57 PM [vite-plugin-svelte] src/routes/+page.svelte:2216:2 Unused CSS selector ".header-info"
+https://svelte.dev/e/css_unused_selector
+12:17:57 PM [vite-plugin-svelte] src/routes/+page.svelte:2220:2 Unused CSS selector ".meta-row"
+https://svelte.dev/e/css_unused_selector
+12:17:57 PM [vite-plugin-svelte] src/routes/+page.svelte:2228:2 Unused CSS selector ".book-label"
+https://svelte.dev/e/css_unused_selector
+12:17:57 PM [vite-plugin-svelte] src/routes/+page.svelte:2236:2 Unused CSS selector ".mode-badge"
+https://svelte.dev/e/css_unused_selector
+12:17:57 PM [vite-plugin-svelte] src/routes/+page.svelte:2245:2 Unused CSS selector ".mode-badge.chapters"
+https://svelte.dev/e/css_unused_selector
+12:17:57 PM [vite-plugin-svelte] src/routes/+page.svelte:2250:2 Unused CSS selector ".mode-badge.playlist"
+https://svelte.dev/e/css_unused_selector
+12:17:57 PM [vite-plugin-svelte] src/routes/+page.svelte:2255:2 Unused CSS selector ".mode-badge.singles"
+https://svelte.dev/e/css_unused_selector
+12:17:57 PM [vite-plugin-svelte] src/routes/+page.svelte:2260:2 Unused CSS selector ".title-row"
+https://svelte.dev/e/css_unused_selector
+12:17:57 PM [vite-plugin-svelte] src/routes/+page.svelte:2266:2 Unused CSS selector ".completion-btn"
+https://svelte.dev/e/css_unused_selector
+12:17:57 PM [vite-plugin-svelte] src/routes/+page.svelte:2283:2 Unused CSS selector ".completion-btn.completed"
+https://svelte.dev/e/css_unused_selector
+12:17:57 PM [vite-plugin-svelte] src/routes/+page.svelte:2288:2 Unused CSS selector ".dropdown-trigger-btn"
+https://svelte.dev/e/css_unused_selector
+12:17:57 PM [vite-plugin-svelte] src/routes/+page.svelte:2299:2 Unused CSS selector ".lesson-title"
+https://svelte.dev/e/css_unused_selector
+12:17:57 PM [vite-plugin-svelte] src/routes/+page.svelte:2307:2 Unused CSS selector ".dropdown-arrow"
+https://svelte.dev/e/css_unused_selector
+12:17:57 PM [vite-plugin-svelte] src/routes/+page.svelte:2312:2 Unused CSS selector ".dropdown-arrow.open"
+https://svelte.dev/e/css_unused_selector
+12:17:57 PM [vite-plugin-svelte] src/routes/+page.svelte:2316:2 Unused CSS selector ".lesson-nav-actions"
+https://svelte.dev/e/css_unused_selector
+12:17:57 PM [vite-plugin-svelte] src/routes/+page.svelte:2321:2 Unused CSS selector ".nav-btn"
+https://svelte.dev/e/css_unused_selector
+12:17:57 PM [vite-plugin-svelte] src/routes/+page.svelte:2332:2 Unused CSS selector ".nav-btn:active:not(:disabled)"
+https://svelte.dev/e/css_unused_selector
+12:17:57 PM [vite-plugin-svelte] src/routes/+page.svelte:2337:2 Unused CSS selector ".nav-btn:disabled"
+https://svelte.dev/e/css_unused_selector
+12:17:57 PM [vite-plugin-svelte] src/routes/+page.svelte:2343:2 Unused CSS selector ".lesson-dropdown-panel"
+https://svelte.dev/e/css_unused_selector
+12:17:57 PM [vite-plugin-svelte] src/routes/+page.svelte:2357:2 Unused CSS selector ".search-bar-row"
+https://svelte.dev/e/css_unused_selector
+12:17:57 PM [vite-plugin-svelte] src/routes/+page.svelte:2364:2 Unused CSS selector ".dropdown-search-input"
+https://svelte.dev/e/css_unused_selector
+12:17:57 PM [vite-plugin-svelte] src/routes/+page.svelte:2374:2 Unused CSS selector ".lesson-count"
+https://svelte.dev/e/css_unused_selector
+12:17:57 PM [vite-plugin-svelte] src/routes/+page.svelte:2381:2 Unused CSS selector ".dropdown-list"
+https://svelte.dev/e/css_unused_selector
+12:17:57 PM [vite-plugin-svelte] src/routes/+page.svelte:2391:2 Unused CSS selector ".dropdown-item"
+https://svelte.dev/e/css_unused_selector
+12:17:57 PM [vite-plugin-svelte] src/routes/+page.svelte:2406:2 Unused CSS selector ".dropdown-item:hover"
+https://svelte.dev/e/css_unused_selector
+12:17:57 PM [vite-plugin-svelte] src/routes/+page.svelte:2410:2 Unused CSS selector ".dropdown-item.active"
+https://svelte.dev/e/css_unused_selector
+12:17:57 PM [vite-plugin-svelte] src/routes/+page.svelte:2414:2 Unused CSS selector ".item-status"
+https://svelte.dev/e/css_unused_selector
+12:17:57 PM [vite-plugin-svelte] src/routes/+page.svelte:2418:2 Unused CSS selector ".item-seq"
+https://svelte.dev/e/css_unused_selector
+12:17:57 PM [vite-plugin-svelte] src/routes/+page.svelte:2424:2 Unused CSS selector ".item-title"
+https://svelte.dev/e/css_unused_selector
+12:17:57 PM [vite-plugin-svelte] src/routes/+page.svelte:2429:2 Unused CSS selector ".item-timestamp"
+https://svelte.dev/e/css_unused_selector
+12:17:57 PM [vite-plugin-svelte] src/routes/+page.svelte:2435:2 Unused CSS selector ".no-matches"
+https://svelte.dev/e/css_unused_selector
+12:17:57 PM [vite-plugin-svelte] src/routes/+page.svelte:2443:2 Unused CSS selector ".player-card"
+https://svelte.dev/e/css_unused_selector
+12:17:57 PM [vite-plugin-svelte] src/routes/+page.svelte:2451:2 Unused CSS selector ".player-card.theater-mode"
+https://svelte.dev/e/css_unused_selector
+12:17:57 PM [vite-plugin-svelte] src/routes/+page.svelte:2509:2 Unused CSS selector ".player-stage-card:fullscreen .transport-bar"
+https://svelte.dev/e/css_unused_selector
+12:17:57 PM [vite-plugin-svelte] src/routes/+page.svelte:2510:2 Unused CSS selector ".player-stage-card:-webkit-full-screen .transport-bar"
+https://svelte.dev/e/css_unused_selector
+12:17:57 PM [vite-plugin-svelte] src/routes/+page.svelte:2511:2 Unused CSS selector ".player-stage-card.is-fullscreen .transport-bar"
+https://svelte.dev/e/css_unused_selector
+12:17:57 PM [vite-plugin-svelte] src/routes/+page.svelte:2543:2 Unused CSS selector ".tactile-disc.metronome-disc.is-active"
+https://svelte.dev/e/css_unused_selector
+12:17:57 PM [vite-plugin-svelte] src/routes/+page.svelte:2646:2 Unused CSS selector ".transport-bar"
+https://svelte.dev/e/css_unused_selector
+12:17:57 PM [vite-plugin-svelte] src/routes/+page.svelte:2656:2 Unused CSS selector ".transport-left"
+https://svelte.dev/e/css_unused_selector
+12:17:57 PM [vite-plugin-svelte] src/routes/+page.svelte:2656:19 Unused CSS selector ".transport-middle"
+https://svelte.dev/e/css_unused_selector
+12:17:57 PM [vite-plugin-svelte] src/routes/+page.svelte:2663:2 Unused CSS selector ".play-toggle-btn"
+https://svelte.dev/e/css_unused_selector
+12:17:57 PM [vite-plugin-svelte] src/routes/+page.svelte:2676:2 Unused CSS selector ".play-toggle-btn:hover"
+https://svelte.dev/e/css_unused_selector
+12:17:57 PM [vite-plugin-svelte] src/routes/+page.svelte:2681:2 Unused CSS selector ".play-toggle-btn:active"
+https://svelte.dev/e/css_unused_selector
+12:17:57 PM [vite-plugin-svelte] src/routes/+page.svelte:2686:2 Unused CSS selector ".play-toggle-btn.playing"
+https://svelte.dev/e/css_unused_selector
+12:17:57 PM [vite-plugin-svelte] src/routes/+page.svelte:2690:2 Unused CSS selector ".skip-btn"
+https://svelte.dev/e/css_unused_selector
+12:17:57 PM [vite-plugin-svelte] src/routes/+page.svelte:2702:2 Unused CSS selector ".skip-btn:hover"
+https://svelte.dev/e/css_unused_selector
+12:17:57 PM [vite-plugin-svelte] src/routes/+page.svelte:2707:2 Unused CSS selector ".skip-btn:active"
+https://svelte.dev/e/css_unused_selector
+12:17:57 PM [vite-plugin-svelte] src/routes/+page.svelte:2712:2 Unused CSS selector ".loop-toggle-btn"
+https://svelte.dev/e/css_unused_selector
+12:17:57 PM [vite-plugin-svelte] src/routes/+page.svelte:2724:2 Unused CSS selector ".loop-toggle-btn:hover"
+https://svelte.dev/e/css_unused_selector
+12:17:57 PM [vite-plugin-svelte] src/routes/+page.svelte:2729:2 Unused CSS selector ".loop-toggle-btn:active"
+https://svelte.dev/e/css_unused_selector
+12:17:57 PM [vite-plugin-svelte] src/routes/+page.svelte:2734:2 Unused CSS selector ".loop-toggle-btn.active"
+https://svelte.dev/e/css_unused_selector
+12:17:57 PM [vite-plugin-svelte] src/routes/+page.svelte:2739:2 Unused CSS selector ".transport-right"
+https://svelte.dev/e/css_unused_selector
+12:17:57 PM [vite-plugin-svelte] src/routes/+page.svelte:2746:2 Unused CSS selector ".utility-btn"
+https://svelte.dev/e/css_unused_selector
+12:17:57 PM [vite-plugin-svelte] src/routes/+page.svelte:2761:2 Unused CSS selector ".utility-btn:active"
+https://svelte.dev/e/css_unused_selector
+12:17:57 PM [vite-plugin-svelte] src/routes/+page.svelte:2766:2 Unused CSS selector ".utility-btn.active"
+https://svelte.dev/e/css_unused_selector
+12:17:57 PM [vite-plugin-svelte] src/routes/+page.svelte:2771:2 Unused CSS selector ".utility-btn.muted"
+https://svelte.dev/e/css_unused_selector
+12:17:57 PM [vite-plugin-svelte] src/routes/+page.svelte:2777:2 Unused CSS selector ".restart-btn"
+https://svelte.dev/e/css_unused_selector
+12:17:57 PM [vite-plugin-svelte] src/routes/+page.svelte:2784:2 Unused CSS selector ".audio-studio-grid"
+https://svelte.dev/e/css_unused_selector
+12:17:57 PM [vite-plugin-svelte] src/routes/+page.svelte:2792:4 Unused CSS selector ".audio-studio-grid"
+https://svelte.dev/e/css_unused_selector
+12:17:57 PM [vite-plugin-svelte] src/routes/+page.svelte:2797:2 Unused CSS selector ".studio-card"
+https://svelte.dev/e/css_unused_selector
+12:17:57 PM [vite-plugin-svelte] src/routes/+page.svelte:2804:2 Unused CSS selector ".student-card"
+https://svelte.dev/e/css_unused_selector
+12:17:57 PM [vite-plugin-svelte] src/routes/+page.svelte:2808:2 Unused CSS selector ".teacher-card"
+https://svelte.dev/e/css_unused_selector
+12:17:57 PM [vite-plugin-svelte] src/routes/+page.svelte:2812:2 Unused CSS selector ".studio-header"
+https://svelte.dev/e/css_unused_selector
+12:17:57 PM [vite-plugin-svelte] src/routes/+page.svelte:2818:2 Unused CSS selector ".title-wrap"
+https://svelte.dev/e/css_unused_selector
+12:17:57 PM [vite-plugin-svelte] src/routes/+page.svelte:2824:2 Unused CSS selector ".studio-icon"
+https://svelte.dev/e/css_unused_selector
+12:17:57 PM [vite-plugin-svelte] src/routes/+page.svelte:2828:2 Unused CSS selector ".studio-card h3"
+https://svelte.dev/e/css_unused_selector
+12:17:57 PM [vite-plugin-svelte] src/routes/+page.svelte:2834:2 Unused CSS selector ".trash-btn"
+https://svelte.dev/e/css_unused_selector
+12:17:57 PM [vite-plugin-svelte] src/routes/+page.svelte:2843:2 Unused CSS selector ".audio-player"
+https://svelte.dev/e/css_unused_selector
+12:17:57 PM [vite-plugin-svelte] src/routes/+page.svelte:2848:2 Unused CSS selector ".take-meta"
+https://svelte.dev/e/css_unused_selector
+12:17:57 PM [vite-plugin-svelte] src/routes/+page.svelte:2854:2 Unused CSS selector ".empty-state"
+https://svelte.dev/e/css_unused_selector
+12:17:57 PM [vite-plugin-svelte] src/routes/+page.svelte:2861:2 Unused CSS selector ".record-btn"
+https://svelte.dev/e/css_unused_selector
+12:17:57 PM [vite-plugin-svelte] src/routes/+page.svelte:2874:2 Unused CSS selector ".record-btn:active"
+https://svelte.dev/e/css_unused_selector
+12:17:57 PM [vite-plugin-svelte] src/routes/+page.svelte:2879:2 Unused CSS selector ".record-btn.student"
+https://svelte.dev/e/css_unused_selector
+12:17:57 PM [vite-plugin-svelte] src/routes/+page.svelte:2884:2 Unused CSS selector ".record-btn.teacher"
+https://svelte.dev/e/css_unused_selector
+12:17:57 PM [vite-plugin-svelte] src/routes/+page.svelte:2889:2 Unused CSS selector ".record-btn.recording"
+https://svelte.dev/e/css_unused_selector
+12:17:57 PM [vite-plugin-svelte] src/routes/+page.svelte:2895:2 Unused CSS selector ".vu-wrapper"
+https://svelte.dev/e/css_unused_selector
+12:17:57 PM [vite-plugin-svelte] src/routes/+page.svelte:2902:2 Unused CSS selector ".vu-fill"
+https://svelte.dev/e/css_unused_selector
+12:17:57 PM [vite-plugin-svelte] src/routes/+page.svelte:2907:2 Unused CSS selector ".vu-fill.student"
+https://svelte.dev/e/css_unused_selector
+12:17:57 PM [vite-plugin-svelte] src/routes/+page.svelte:2911:2 Unused CSS selector ".vu-fill.teacher"
+https://svelte.dev/e/css_unused_selector
+12:17:57 PM [vite-plugin-svelte] src/routes/+page.svelte:2916:2 Unused CSS selector ".checkpoints-card"
+https://svelte.dev/e/css_unused_selector
+12:17:57 PM [vite-plugin-svelte] src/routes/+page.svelte:2922:2 Unused CSS selector ".checkpoints-top"
+https://svelte.dev/e/css_unused_selector
+12:17:57 PM [vite-plugin-svelte] src/routes/+page.svelte:2929:2 Unused CSS selector ".title-group"
+https://svelte.dev/e/css_unused_selector
+12:17:57 PM [vite-plugin-svelte] src/routes/+page.svelte:2935:2 Unused CSS selector ".checkpoints-icon"
+https://svelte.dev/e/css_unused_selector
+12:17:57 PM [vite-plugin-svelte] src/routes/+page.svelte:2939:2 Unused CSS selector ".edit-checkpoints-btn"
+https://svelte.dev/e/css_unused_selector
+12:17:57 PM [vite-plugin-svelte] src/routes/+page.svelte:2950:2 Unused CSS selector ".checkpoints-checklist"
+https://svelte.dev/e/css_unused_selector
+12:17:57 PM [vite-plugin-svelte] src/routes/+page.svelte:2959:2 Unused CSS selector ".checkpoint-item"
+https://svelte.dev/e/css_unused_selector
+12:17:57 PM [vite-plugin-svelte] src/routes/+page.svelte:2974:2 Unused CSS selector ".checkpoint-item:active"
+https://svelte.dev/e/css_unused_selector
+12:17:57 PM [vite-plugin-svelte] src/routes/+page.svelte:2979:2 Unused CSS selector ".checkpoint-item.done"
+https://svelte.dev/e/css_unused_selector
+12:17:57 PM [vite-plugin-svelte] src/routes/+page.svelte:2985:2 Unused CSS selector ".check-box"
+https://svelte.dev/e/css_unused_selector
+12:17:57 PM [vite-plugin-svelte] src/routes/+page.svelte:2989:2 Unused CSS selector ".check-text"
+https://svelte.dev/e/css_unused_selector
+12:17:57 PM [vite-plugin-svelte] src/routes/+page.svelte:2994:2 Unused CSS selector ".edit-instructions"
+https://svelte.dev/e/css_unused_selector
+12:17:57 PM [vite-plugin-svelte] src/routes/+page.svelte:3010:2 Unused CSS selector ".edit-btn-row"
+https://svelte.dev/e/css_unused_selector
+12:17:57 PM [vite-plugin-svelte] src/routes/+page.svelte:3018:2 Unused CSS selector ".neo-footer"
+https://svelte.dev/e/css_unused_selector
+12:17:57 PM [vite-plugin-svelte] src/routes/+page.svelte:3024:2 Unused CSS selector ".footer-settings-btn"
+https://svelte.dev/e/css_unused_selector
+12:17:57 PM [vite-plugin-svelte] src/routes/+page.svelte:3035:2 Unused CSS selector ".footer-settings-btn:active"
+https://svelte.dev/e/css_unused_selector
+12:17:57 PM [vite-plugin-svelte] src/routes/+page.svelte:3293:2 Unused CSS selector ".section-collapse-header"
+https://svelte.dev/e/css_unused_selector
+12:17:57 PM [vite-plugin-svelte] src/routes/+page.svelte:3309:2 Unused CSS selector ".section-collapse-header:active"
+https://svelte.dev/e/css_unused_selector
+12:17:57 PM [vite-plugin-svelte] src/routes/+page.svelte:3314:2 Unused CSS selector ".collapse-title-row"
+https://svelte.dev/e/css_unused_selector
+12:17:57 PM [vite-plugin-svelte] src/routes/+page.svelte:3323:2 Unused CSS selector ".collapse-chevron"
+https://svelte.dev/e/css_unused_selector
+12:17:57 PM [vite-plugin-svelte] src/routes/+page.svelte:3329:2 Unused CSS selector ".collapse-summary-badge"
+https://svelte.dev/e/css_unused_selector
+12:17:57 PM [vite-plugin-svelte] src/routes/+page.svelte:3343:2 Unused CSS selector ".collapse-summary-badge.badge-success"
+https://svelte.dev/e/css_unused_selector
+12:17:57 PM [vite-plugin-svelte] src/routes/+page.svelte:3350:2 Unused CSS selector ".count-in-quick-btn"
+https://svelte.dev/e/css_unused_selector
+12:17:57 PM [vite-plugin-svelte] src/routes/+page.svelte:3363:2 Unused CSS selector ".count-in-quick-btn:hover"
+https://svelte.dev/e/css_unused_selector
+12:17:57 PM [vite-plugin-svelte] src/routes/+page.svelte:3368:2 Unused CSS selector ".count-in-quick-btn:active"
+https://svelte.dev/e/css_unused_selector
+12:17:57 PM [vite-plugin-svelte] src/routes/+page.svelte:3373:2 Unused CSS selector ".practice-lab-trigger-btn"
+https://svelte.dev/e/css_unused_selector
+12:17:57 PM [vite-plugin-svelte] src/routes/+page.svelte:3389:2 Unused CSS selector ".practice-lab-trigger-btn:hover"
+https://svelte.dev/e/css_unused_selector
+12:17:57 PM [vite-plugin-svelte] src/routes/+page.svelte:3394:2 Unused CSS selector ".practice-lab-trigger-btn:active"
+https://svelte.dev/e/css_unused_selector
+12:17:57 PM [vite-plugin-svelte] src/routes/+page.svelte:3399:2 Unused CSS selector ".record-btn-row"
+https://svelte.dev/e/css_unused_selector
+12:17:57 PM [vite-plugin-svelte] src/routes/+page.svelte:3406:2 Unused CSS selector ".record-btn-row .record-btn"
+https://svelte.dev/e/css_unused_selector
+12:17:57 PM [vite-plugin-svelte] src/routes/+page.svelte:3411:2 Unused CSS selector ".count-in-record-btn"
+https://svelte.dev/e/css_unused_selector
+12:17:57 PM [vite-plugin-svelte] src/routes/+page.svelte:3767:2 Unused CSS selector ".kids-top-header"
+https://svelte.dev/e/css_unused_selector
+12:17:57 PM [vite-plugin-svelte] src/routes/+page.svelte:3783:2 Unused CSS selector ".kids-brand-btn"
+https://svelte.dev/e/css_unused_selector
+12:17:57 PM [vite-plugin-svelte] src/routes/+page.svelte:3794:2 Unused CSS selector ".brand-piano-icon"
+https://svelte.dev/e/css_unused_selector
+12:17:57 PM [vite-plugin-svelte] src/routes/+page.svelte:3798:2 Unused CSS selector ".brand-text-col"
+https://svelte.dev/e/css_unused_selector
+12:17:57 PM [vite-plugin-svelte] src/routes/+page.svelte:3804:2 Unused CSS selector ".brand-title"
+https://svelte.dev/e/css_unused_selector
+12:17:57 PM [vite-plugin-svelte] src/routes/+page.svelte:3810:2 Unused CSS selector ".kids-pill-badge"
+https://svelte.dev/e/css_unused_selector
+12:17:57 PM [vite-plugin-svelte] src/routes/+page.svelte:3821:2 Unused CSS selector ".active-profile-chip"
+https://svelte.dev/e/css_unused_selector
+12:17:57 PM [vite-plugin-svelte] src/routes/+page.svelte:3834:2 Unused CSS selector ".active-profile-chip:active"
+https://svelte.dev/e/css_unused_selector
+12:17:57 PM [vite-plugin-svelte] src/routes/+page.svelte:3839:2 Unused CSS selector ".avatar-bubble"
+https://svelte.dev/e/css_unused_selector
+12:17:57 PM [vite-plugin-svelte] src/routes/+page.svelte:3850:2 Unused CSS selector ".profile-info-col"
+https://svelte.dev/e/css_unused_selector
+12:17:57 PM [vite-plugin-svelte] src/routes/+page.svelte:3856:2 Unused CSS selector ".profile-name"
+https://svelte.dev/e/css_unused_selector
+12:17:57 PM [vite-plugin-svelte] src/routes/+page.svelte:3864:2 Unused CSS selector ".kids-breadcrumbs-bar"
+https://svelte.dev/e/css_unused_selector
+12:17:57 PM [vite-plugin-svelte] src/routes/+page.svelte:3877:2 Unused CSS selector ".crumb-chip"
+https://svelte.dev/e/css_unused_selector
+12:17:57 PM [vite-plugin-svelte] src/routes/+page.svelte:3893:2 Unused CSS selector ".crumb-chip:active"
+https://svelte.dev/e/css_unused_selector
+12:17:57 PM [vite-plugin-svelte] src/routes/+page.svelte:3898:2 Unused CSS selector ".crumb-chip.current"
+https://svelte.dev/e/css_unused_selector
+12:17:57 PM [vite-plugin-svelte] src/routes/+page.svelte:3903:2 Unused CSS selector ".crumb-avatar"
+https://svelte.dev/e/css_unused_selector
+12:17:57 PM [vite-plugin-svelte] src/routes/+page.svelte:3914:2 Unused CSS selector ".crumb-icon"
+https://svelte.dev/e/css_unused_selector
+12:17:57 PM [vite-plugin-svelte] src/routes/+page.svelte:3918:2 Unused CSS selector ".crumb-text"
+https://svelte.dev/e/css_unused_selector
+12:17:57 PM [vite-plugin-svelte] src/routes/+page.svelte:3925:2 Unused CSS selector ".crumb-arrow"
+https://svelte.dev/e/css_unused_selector
+12:17:57 PM [vite-plugin-svelte] src/routes/+page.svelte:4125:2 Unused CSS selector ".screen-step"
+https://svelte.dev/e/css_unused_selector
+12:17:57 PM [vite-plugin-svelte] src/routes/+page.svelte:4138:2 Unused CSS selector ".step-nav-bar"
+https://svelte.dev/e/css_unused_selector
+12:17:57 PM [vite-plugin-svelte] src/routes/+page.svelte:4145:2 Unused CSS selector ".step-back-btn"
+https://svelte.dev/e/css_unused_selector
+12:17:57 PM [vite-plugin-svelte] src/routes/+page.svelte:4157:2 Unused CSS selector ".step-back-btn:active"
+https://svelte.dev/e/css_unused_selector
+12:17:57 PM [vite-plugin-svelte] src/routes/+page.svelte:4162:2 Unused CSS selector ".step-counter-pill"
+https://svelte.dev/e/css_unused_selector
+12:17:57 PM [vite-plugin-svelte] src/routes/+page.svelte:4172:2 Unused CSS selector ".step-hero-header"
+https://svelte.dev/e/css_unused_selector
+12:17:57 PM [vite-plugin-svelte] src/routes/+page.svelte:4177:2 Unused CSS selector ".step-emoji-hero"
+https://svelte.dev/e/css_unused_selector
+12:17:57 PM [vite-plugin-svelte] src/routes/+page.svelte:4183:2 Unused CSS selector ".step-main-title"
+https://svelte.dev/e/css_unused_selector
+12:17:57 PM [vite-plugin-svelte] src/routes/+page.svelte:4190:2 Unused CSS selector ".step-sub-instruction"
+https://svelte.dev/e/css_unused_selector
+12:17:57 PM [vite-plugin-svelte] src/routes/+page.svelte:4198:2 Unused CSS selector ".profiles-full-grid"
+https://svelte.dev/e/css_unused_selector
+12:17:57 PM [vite-plugin-svelte] src/routes/+page.svelte:4204:2 Unused CSS selector ".profile-jumbo-card"
+https://svelte.dev/e/css_unused_selector
+12:17:57 PM [vite-plugin-svelte] src/routes/+page.svelte:4217:2 Unused CSS selector ".profile-jumbo-card:active"
+https://svelte.dev/e/css_unused_selector
+12:17:57 PM [vite-plugin-svelte] src/routes/+page.svelte:4222:2 Unused CSS selector ".profile-jumbo-card.selected-kid"
+https://svelte.dev/e/css_unused_selector
+12:17:57 PM [vite-plugin-svelte] src/routes/+page.svelte:4228:2 Unused CSS selector ".jumbo-bubble-circle"
+https://svelte.dev/e/css_unused_selector
+12:17:57 PM [vite-plugin-svelte] src/routes/+page.svelte:4240:2 Unused CSS selector ".jumbo-avatar-emoji"
+https://svelte.dev/e/css_unused_selector
+12:17:57 PM [vite-plugin-svelte] src/routes/+page.svelte:4244:2 Unused CSS selector ".jumbo-crown-badge"
+https://svelte.dev/e/css_unused_selector
+12:17:57 PM [vite-plugin-svelte] src/routes/+page.svelte:4252:2 Unused CSS selector ".jumbo-kid-name"
+https://svelte.dev/e/css_unused_selector
+12:17:57 PM [vite-plugin-svelte] src/routes/+page.svelte:4259:2 Unused CSS selector ".jumbo-active-pill"
+https://svelte.dev/e/css_unused_selector
+12:17:57 PM [vite-plugin-svelte] src/routes/+page.svelte:4269:2 Unused CSS selector ".jumbo-tap-pill"
+https://svelte.dev/e/css_unused_selector
+12:17:57 PM [vite-plugin-svelte] src/routes/+page.svelte:4279:2 Unused CSS selector ".add-kid-jumbo-card"
+https://svelte.dev/e/css_unused_selector
+12:17:57 PM [vite-plugin-svelte] src/routes/+page.svelte:4293:2 Unused CSS selector ".add-jumbo-circle"
+https://svelte.dev/e/css_unused_selector
+12:17:57 PM [vite-plugin-svelte] src/routes/+page.svelte:4306:2 Unused CSS selector ".books-full-grid"
+https://svelte.dev/e/css_unused_selector
+12:17:57 PM [vite-plugin-svelte] src/routes/+page.svelte:4312:2 Unused CSS selector ".book-jumbo-card"
+https://svelte.dev/e/css_unused_selector
+12:17:57 PM [vite-plugin-svelte] src/routes/+page.svelte:4323:2 Unused CSS selector ".book-jumbo-card:active"
+https://svelte.dev/e/css_unused_selector
+12:17:57 PM [vite-plugin-svelte] src/routes/+page.svelte:4328:2 Unused CSS selector ".book-jumbo-card.selected-book"
+https://svelte.dev/e/css_unused_selector
+12:17:57 PM [vite-plugin-svelte] src/routes/+page.svelte:4334:2 Unused CSS selector ".book-jumbo-cover"
+https://svelte.dev/e/css_unused_selector
+12:17:57 PM [vite-plugin-svelte] src/routes/+page.svelte:4351:2 Unused CSS selector ".book-icon-hero"
+https://svelte.dev/e/css_unused_selector
+12:17:57 PM [vite-plugin-svelte] src/routes/+page.svelte:4355:2 Unused CSS selector ".book-pub-badge"
+https://svelte.dev/e/css_unused_selector
+12:17:57 PM [vite-plugin-svelte] src/routes/+page.svelte:4363:2 Unused CSS selector ".book-jumbo-body"
+https://svelte.dev/e/css_unused_selector
+12:17:57 PM [vite-plugin-svelte] src/routes/+page.svelte:4371:2 Unused CSS selector ".book-jumbo-title"
+https://svelte.dev/e/css_unused_selector
+12:17:57 PM [vite-plugin-svelte] src/routes/+page.svelte:4378:2 Unused CSS selector ".book-pieces-badge"
+https://svelte.dev/e/css_unused_selector
+12:17:57 PM [vite-plugin-svelte] src/routes/+page.svelte:4384:2 Unused CSS selector ".book-selected-pill"
+https://svelte.dev/e/css_unused_selector
+12:17:57 PM [vite-plugin-svelte] src/routes/+page.svelte:4396:2 Unused CSS selector ".book-tap-pill"
+https://svelte.dev/e/css_unused_selector
+12:17:57 PM [vite-plugin-svelte] src/routes/+page.svelte:4409:2 Unused CSS selector ".teachers-full-grid"
+https://svelte.dev/e/css_unused_selector
+12:17:57 PM [vite-plugin-svelte] src/routes/+page.svelte:4415:2 Unused CSS selector ".teacher-jumbo-card"
+https://svelte.dev/e/css_unused_selector
+12:17:57 PM [vite-plugin-svelte] src/routes/+page.svelte:4427:2 Unused CSS selector ".teacher-jumbo-card:active"
+https://svelte.dev/e/css_unused_selector
+12:17:57 PM [vite-plugin-svelte] src/routes/+page.svelte:4432:2 Unused CSS selector ".teacher-jumbo-card.pip-pick-highlight"
+https://svelte.dev/e/css_unused_selector
+12:17:57 PM [vite-plugin-svelte] src/routes/+page.svelte:4437:2 Unused CSS selector ".pip-pick-banner"
+https://svelte.dev/e/css_unused_selector
+12:17:57 PM [vite-plugin-svelte] src/routes/+page.svelte:4450:2 Unused CSS selector ".teacher-avatar-col"
+https://svelte.dev/e/css_unused_selector
+12:17:57 PM [vite-plugin-svelte] src/routes/+page.svelte:4463:2 Unused CSS selector ".teacher-jumbo-content"
+https://svelte.dev/e/css_unused_selector
+12:17:57 PM [vite-plugin-svelte] src/routes/+page.svelte:4470:2 Unused CSS selector ".teacher-title-row"
+https://svelte.dev/e/css_unused_selector
+12:17:57 PM [vite-plugin-svelte] src/routes/+page.svelte:4478:2 Unused CSS selector ".teacher-jumbo-name"
+https://svelte.dev/e/css_unused_selector
+12:17:57 PM [vite-plugin-svelte] src/routes/+page.svelte:4485:2 Unused CSS selector ".teacher-jumbo-bio"
+https://svelte.dev/e/css_unused_selector
+12:17:57 PM [vite-plugin-svelte] src/routes/+page.svelte:4493:2 Unused CSS selector ".teacher-footer-row"
+https://svelte.dev/e/css_unused_selector
+12:17:57 PM [vite-plugin-svelte] src/routes/+page.svelte:4502:2 Unused CSS selector ".teacher-handle"
+https://svelte.dev/e/css_unused_selector
+12:17:57 PM [vite-plugin-svelte] src/routes/+page.svelte:4508:2 Unused CSS selector ".teacher-lessons-count"
+https://svelte.dev/e/css_unused_selector
+12:17:57 PM [vite-plugin-svelte] src/routes/+page.svelte:4518:2 Unused CSS selector ".teacher-select-pill"
+https://svelte.dev/e/css_unused_selector
+12:17:57 PM [vite-plugin-svelte] src/routes/+page.svelte:4528:2 Unused CSS selector ".add-custom-channel-row"
+https://svelte.dev/e/css_unused_selector
+12:17:57 PM [vite-plugin-svelte] src/routes/+page.svelte:4534:2 Unused CSS selector ".add-channel-full-btn"
+https://svelte.dev/e/css_unused_selector
+12:17:57 PM [vite-plugin-svelte] src/routes/+page.svelte:4544:2 Unused CSS selector ".continue-lesson-card"
+https://svelte.dev/e/css_unused_selector
+12:17:57 PM [vite-plugin-svelte] src/routes/+page.svelte:4555:2 Unused CSS selector ".continue-badge"
+https://svelte.dev/e/css_unused_selector
+12:17:57 PM [vite-plugin-svelte] src/routes/+page.svelte:4564:2 Unused CSS selector ".continue-content-row"
+https://svelte.dev/e/css_unused_selector
+12:17:57 PM [vite-plugin-svelte] src/routes/+page.svelte:4571:2 Unused CSS selector ".continue-num"
+https://svelte.dev/e/css_unused_selector
+12:17:57 PM [vite-plugin-svelte] src/routes/+page.svelte:4580:2 Unused CSS selector ".continue-text-col"
+https://svelte.dev/e/css_unused_selector
+12:17:57 PM [vite-plugin-svelte] src/routes/+page.svelte:4585:2 Unused CSS selector ".continue-text-col h3"
+https://svelte.dev/e/css_unused_selector
+12:17:57 PM [vite-plugin-svelte] src/routes/+page.svelte:4591:2 Unused CSS selector ".continue-text-col span"
+https://svelte.dev/e/css_unused_selector
+12:17:57 PM [vite-plugin-svelte] src/routes/+page.svelte:4597:2 Unused CSS selector ".continue-play-now-btn"
+https://svelte.dev/e/css_unused_selector
+12:17:57 PM [vite-plugin-svelte] src/routes/+page.svelte:4607:2 Unused CSS selector ".lesson-search-bar-row"
+https://svelte.dev/e/css_unused_selector
+12:17:57 PM [vite-plugin-svelte] src/routes/+page.svelte:4616:2 Unused CSS selector ".lesson-search-input"
+https://svelte.dev/e/css_unused_selector
+12:17:57 PM [vite-plugin-svelte] src/routes/+page.svelte:4626:2 Unused CSS selector ".lesson-count-badge"
+https://svelte.dev/e/css_unused_selector
+12:17:57 PM [vite-plugin-svelte] src/routes/+page.svelte:4637:2 Unused CSS selector ".lessons-full-grid"
+https://svelte.dev/e/css_unused_selector
+12:17:57 PM [vite-plugin-svelte] src/routes/+page.svelte:4643:2 Unused CSS selector ".song-step-card"
+https://svelte.dev/e/css_unused_selector
+12:17:57 PM [vite-plugin-svelte] src/routes/+page.svelte:4657:2 Unused CSS selector ".song-star"
+https://svelte.dev/e/css_unused_selector
+12:17:57 PM [vite-plugin-svelte] src/routes/+page.svelte:4661:2 Unused CSS selector ".song-play-btn"
+https://svelte.dev/e/css_unused_selector
+12:17:57 PM [vite-plugin-svelte] src/routes/+page.svelte:4738:2 Unused CSS selector ".player-book-label"
+https://svelte.dev/e/css_unused_selector
+12:17:57 PM [vite-plugin-svelte] src/routes/+page.svelte:4804:2 Unused CSS selector ".player-top-actions"
+https://svelte.dev/e/css_unused_selector
+12:17:57 PM [vite-plugin-svelte] src/routes/+page.svelte:4837:2 Unused CSS selector ".capsule-metronome-btn"
+https://svelte.dev/e/css_unused_selector
+12:17:57 PM [vite-plugin-svelte] src/routes/+page.svelte:4849:2 Unused CSS selector ".capsule-metronome-btn.active"
+https://svelte.dev/e/css_unused_selector
+12:17:57 PM [vite-plugin-svelte] src/routes/+page.svelte:5094:2 Unused CSS selector ".screen-studio"
+https://svelte.dev/e/css_unused_selector
+12:17:57 PM [vite-plugin-svelte] src/routes/+page.svelte:5100:2 Unused CSS selector ".studio-top-bar"
+https://svelte.dev/e/css_unused_selector
+12:17:57 PM [vite-plugin-svelte] src/routes/+page.svelte:5110:2 Unused CSS selector ".studio-top-tag"
+https://svelte.dev/e/css_unused_selector
+12:17:57 PM [vite-plugin-svelte] src/routes/+page.svelte:5118:2 Unused CSS selector ".studio-top-bar h2"
+https://svelte.dev/e/css_unused_selector
+12:17:57 PM [vite-plugin-svelte] src/routes/+page.svelte:5124:2 Unused CSS selector ".back-to-player-btn"
+https://svelte.dev/e/css_unused_selector
+12:17:57 PM [vite-plugin-svelte] src/routes/+page.svelte:5137:2 Unused CSS selector ".screen-goals"
+https://svelte.dev/e/css_unused_selector
+12:17:57 PM [vite-plugin-svelte] src/routes/+page.svelte:5143:2 Unused CSS selector ".goals-hero-card"
+https://svelte.dev/e/css_unused_selector
+12:17:57 PM [vite-plugin-svelte] src/routes/+page.svelte:5156:2 Unused CSS selector ".hero-left"
+https://svelte.dev/e/css_unused_selector
+12:17:57 PM [vite-plugin-svelte] src/routes/+page.svelte:5162:2 Unused CSS selector ".hero-icon"
+https://svelte.dev/e/css_unused_selector
+12:17:57 PM [vite-plugin-svelte] src/routes/+page.svelte:5166:2 Unused CSS selector ".hero-tag"
+https://svelte.dev/e/css_unused_selector
+12:17:57 PM [vite-plugin-svelte] src/routes/+page.svelte:5172:2 Unused CSS selector ".goals-hero-card h2"
+https://svelte.dev/e/css_unused_selector
+12:17:57 PM [vite-plugin-svelte] src/routes/+page.svelte:5178:2 Unused CSS selector ".stars-badge"
+https://svelte.dev/e/css_unused_selector
+12:17:57 PM [vite-plugin-svelte] src/routes/+page.svelte:5187:2 Unused CSS selector ".mastered-badge"
+https://svelte.dev/e/css_unused_selector
+12:17:57 PM [vite-plugin-svelte] src/routes/+page.svelte:5197:2 Unused CSS selector ".hero-right"
+https://svelte.dev/e/css_unused_selector
+12:17:57 PM [vite-plugin-svelte] src/routes/+page.svelte:5203:2 Unused CSS selector ".goals-checklist-grid"
+https://svelte.dev/e/css_unused_selector
+12:17:57 PM [vite-plugin-svelte] src/routes/+page.svelte:5209:2 Unused CSS selector ".goal-card"
+https://svelte.dev/e/css_unused_selector
+12:17:57 PM [vite-plugin-svelte] src/routes/+page.svelte:5223:2 Unused CSS selector ".goal-card:active"
+https://svelte.dev/e/css_unused_selector
+12:17:57 PM [vite-plugin-svelte] src/routes/+page.svelte:5228:2 Unused CSS selector ".goal-card.done"
+https://svelte.dev/e/css_unused_selector
+12:17:57 PM [vite-plugin-svelte] src/routes/+page.svelte:5233:2 Unused CSS selector ".goal-star-bubble"
+https://svelte.dev/e/css_unused_selector
+12:17:57 PM [vite-plugin-svelte] src/routes/+page.svelte:5247:2 Unused CSS selector ".goal-star-bubble.earned"
+https://svelte.dev/e/css_unused_selector
+12:17:57 PM [vite-plugin-svelte] src/routes/+page.svelte:5251:2 Unused CSS selector ".goal-content"
+https://svelte.dev/e/css_unused_selector
+12:17:57 PM [vite-plugin-svelte] src/routes/+page.svelte:5256:2 Unused CSS selector ".goal-number"
+https://svelte.dev/e/css_unused_selector
+12:17:57 PM [vite-plugin-svelte] src/routes/+page.svelte:5262:2 Unused CSS selector ".goal-text"
+https://svelte.dev/e/css_unused_selector
+12:17:57 PM [vite-plugin-svelte] src/routes/+page.svelte:5269:2 Unused CSS selector ".goal-check-pill"
+https://svelte.dev/e/css_unused_selector
+12:17:57 PM [vite-plugin-svelte] src/routes/+page.svelte:5279:2 Unused CSS selector ".goal-check-pill.done"
+https://svelte.dev/e/css_unused_selector
+12:17:57 PM [vite-plugin-svelte] src/routes/+page.svelte:5284:2 Unused CSS selector ".goals-edit-card"
+https://svelte.dev/e/css_unused_selector
+12:17:57 PM [vite-plugin-svelte] src/routes/+page.svelte:5303:2 Unused CSS selector ".kids-bottom-dock"
+https://svelte.dev/e/css_unused_selector
+12:17:57 PM [vite-plugin-svelte] src/routes/+page.svelte:5319:2 Unused CSS selector ".dock-btn"
+https://svelte.dev/e/css_unused_selector
+12:17:57 PM [vite-plugin-svelte] src/routes/+page.svelte:5333:2 Unused CSS selector ".dock-btn:active"
+https://svelte.dev/e/css_unused_selector
+12:17:57 PM [vite-plugin-svelte] src/routes/+page.svelte:5337:2 Unused CSS selector ".dock-btn.active"
+https://svelte.dev/e/css_unused_selector
+12:17:57 PM [vite-plugin-svelte] src/routes/+page.svelte:5343:2 Unused CSS selector ".dock-icon"
+https://svelte.dev/e/css_unused_selector
+12:17:57 PM [vite-plugin-svelte] src/routes/+page.svelte:5347:2 Unused CSS selector ".dock-label"
+https://svelte.dev/e/css_unused_selector
+12:17:57 PM [vite-plugin-svelte] src/routes/+page.svelte:5353:2 Unused CSS selector ".dock-pill-indicator"
+https://svelte.dev/e/css_unused_selector
+12:17:57 PM [vite-plugin-svelte] src/routes/+page.svelte:5364:2 Unused CSS selector ".dock-badge-success"
+https://svelte.dev/e/css_unused_selector
+12:17:57 PM [vite-plugin-svelte] src/routes/+page.svelte:5381:2 Unused CSS selector ".dock-badge-stars"
+https://svelte.dev/e/css_unused_selector
+12:17:57 PM [vite-plugin-svelte] src/lib/components/screens/LibraryScreen.svelte:230:2 Visible, non-interactive element `<div>` with a click event must be accompanied by a keyboard event handler. Consider whether an interactive element such as `<button type="button">` or `<a>` might be more appropriate
+https://svelte.dev/e/a11y_click_events_have_key_events
+12:17:57 PM [vite-plugin-svelte] src/lib/components/screens/LibraryScreen.svelte:230:2 `<div>` with a click handler must have an ARIA role
+https://svelte.dev/e/a11y_no_static_element_interactions
+12:17:57 PM [vite-plugin-svelte] src/lib/components/screens/LibraryScreen.svelte:231:4 Visible, non-interactive element `<div>` with a click event must be accompanied by a keyboard event handler. Consider whether an interactive element such as `<button type="button">` or `<a>` might be more appropriate
+https://svelte.dev/e/a11y_click_events_have_key_events
+12:17:57 PM [vite-plugin-svelte] src/lib/components/screens/LibraryScreen.svelte:231:4 `<div>` with a click handler must have an ARIA role
+https://svelte.dev/e/a11y_no_static_element_interactions
+12:17:57 PM [vite-plugin-svelte] src/lib/components/screens/ProfileScreen.svelte:99:2 Visible, non-interactive element `<div>` with a click event must be accompanied by a keyboard event handler. Consider whether an interactive element such as `<button type="button">` or `<a>` might be more appropriate
+https://svelte.dev/e/a11y_click_events_have_key_events
+12:17:57 PM [vite-plugin-svelte] src/lib/components/screens/ProfileScreen.svelte:99:2 `<div>` with a click handler must have an ARIA role
+https://svelte.dev/e/a11y_no_static_element_interactions
+12:17:57 PM [vite-plugin-svelte] src/lib/components/screens/ProfileScreen.svelte:100:4 Visible, non-interactive element `<div>` with a click event must be accompanied by a keyboard event handler. Consider whether an interactive element such as `<button type="button">` or `<a>` might be more appropriate
+https://svelte.dev/e/a11y_click_events_have_key_events
+12:17:57 PM [vite-plugin-svelte] src/lib/components/screens/ProfileScreen.svelte:100:4 `<div>` with a click handler must have an ARIA role
+https://svelte.dev/e/a11y_no_static_element_interactions
+12:17:57 PM [vite-plugin-svelte] src/lib/components/screens/SettingsScreen.svelte:24:30 This reference only captures the initial value of `teacherAuth`. Did you mean to reference it inside a derived instead?
+https://svelte.dev/e/state_referenced_locally
+12:17:57 PM [vite-plugin-svelte] src/lib/components/journey/JourneyMapScreen.svelte:147:8 Visible, non-interactive element `<div>` with a click event must be accompanied by a keyboard event handler. Consider whether an interactive element such as `<button type="button">` or `<a>` might be more appropriate
+https://svelte.dev/e/a11y_click_events_have_key_events
+12:17:57 PM [vite-plugin-svelte] src/lib/components/journey/JourneyMapScreen.svelte:147:8 `<div>` with a click handler must have an ARIA role
+https://svelte.dev/e/a11y_no_static_element_interactions
+200 GET /
+200 GET /
