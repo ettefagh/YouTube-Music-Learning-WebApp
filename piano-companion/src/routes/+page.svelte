@@ -297,7 +297,12 @@
 
   function handleFullscreenChange() {
     if (typeof document !== 'undefined') {
-      isFullscreen = !!document.fullscreenElement;
+      // If native fullscreen exits, we clear the state.
+      // If it enters, we ensure state is true.
+      // But we shouldn't force false if there's no native fullscreen but we manually toggled it.
+      if (document.fullscreenElement) {
+        isFullscreen = true;
+      }
     }
   }
 
@@ -521,17 +526,24 @@
 
   function toggleFullscreen() {
     if (!playerCardElement) return;
-    if (!document.fullscreenElement) {
+
+    // We try native fullscreen first, but always toggle the state variable
+    // to allow our CSS "fake fullscreen" to kick in for mobile browsers (like iOS Safari).
+    isFullscreen = !isFullscreen;
+
+    if (isFullscreen) {
       if (playerCardElement.requestFullscreen) {
         playerCardElement.requestFullscreen().catch(err => console.warn('Fullscreen error:', err));
       } else if ((playerCardElement as any).webkitRequestFullscreen) {
         (playerCardElement as any).webkitRequestFullscreen();
       }
     } else {
-      if (document.exitFullscreen) {
-        document.exitFullscreen().catch(err => console.warn('Exit fullscreen error:', err));
-      } else if ((document as any).webkitExitFullscreen) {
-        (document as any).webkitExitFullscreen();
+      if (document.fullscreenElement) {
+        if (document.exitFullscreen) {
+          document.exitFullscreen().catch(err => console.warn('Exit fullscreen error:', err));
+        } else if ((document as any).webkitExitFullscreen) {
+          (document as any).webkitExitFullscreen();
+        }
       }
     }
   }
@@ -1248,40 +1260,7 @@
               </button>
             {/each}
           </div>
-
-          <!-- Top Actions (Piece Prev/Next & Metronome) -->
-          <div class="player-top-actions">
-            <button
-              class="token-disc-btn prev-btn"
-              disabled={!hasPrevLesson}
-              onclick={prevLesson}
-              title="Previous piece"
-            >
-              ⏮
-            </button>
-            <button
-              class="token-disc-btn next-btn"
-              disabled={!hasNextLesson}
-              onclick={nextLesson}
-              title="Next piece"
-            >
-              ⏭
-            </button>
-            <button
-              class="capsule-metronome-btn {showMetronome ? 'active' : ''}"
-              onclick={() => showMetronome = !showMetronome}
-              title="Toggle metronome"
-            >
-              ⏱️ Metronome
-            </button>
-          </div>
         </div>
-
-        {#if showMetronome}
-          <div class="player-metronome-wrap">
-            <Metronome />
-          </div>
-        {/if}
 
         <!-- Stage Window: Single Viewport with Scrubber and Tactile Command Island -->
         <section
@@ -1314,7 +1293,16 @@
               ></div>
             {/key}
 
-            <!-- Integrated Border-Free Scrubber -->
+            <!-- Integrated Border-Free Scrubber with Prev/Next -->
+            <div class="scrubber-row-wrapper">
+              <button
+                class="token-disc-btn prev-btn scrubber-side-btn"
+                disabled={!hasPrevLesson}
+                onclick={prevLesson}
+                title="Previous piece"
+              >
+                ⏮
+              </button>
             <div
               class="scrubber-track"
               role="slider"
@@ -1386,7 +1374,22 @@
                 <span class="time-duration">{formatTime(videoDuration)}</span>
               </div>
             </div>
+              <button
+                class="token-disc-btn next-btn scrubber-side-btn"
+                disabled={!hasNextLesson}
+                onclick={nextLesson}
+                title="Next piece"
+              >
+                ⏭
+              </button>
+            </div>
           </div>
+
+          {#if showMetronome}
+            <div class="player-metronome-wrap">
+              <Metronome />
+            </div>
+          {/if}
 
           <!-- Tactile Command Island -->
           <div class="tactile-command-island">
@@ -2516,12 +2519,31 @@
     background: #111;
   }
 
-  .scrubber-track {
+  .scrubber-row-wrapper {
+    display: flex;
+    align-items: center;
     background: #ffffff;
-    padding: 10px 16px 6px 16px;
     border-bottom: 3px solid #000;
+    padding: 6px 12px;
+    gap: 12px;
+  }
+
+  .scrubber-side-btn {
+    flex-shrink: 0;
+  }
+
+  .scrubber-track {
+    flex-grow: 1;
+    background: #ffffff;
+    padding: 4px 4px 0 4px;
     cursor: pointer;
     user-select: none;
+  }
+
+  .tactile-disc.metronome-disc.is-active {
+    background: var(--retro-gold, #FEE75C);
+    transform: translateY(2px);
+    box-shadow: 1px 1px 0 var(--border-dark, #0F0E17);
   }
 
   .scrubber-bar-bg {
