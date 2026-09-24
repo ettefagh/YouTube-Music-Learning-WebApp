@@ -179,7 +179,9 @@
   }
 
   .back-btn {
-    background: #ffffff;
+    background: var(--card-bg, #ffffff);
+    color: var(--text-main, #121212);
+    border: 2px solid var(--border-dark, #000);
     font-size: 0.9rem;
     font-weight: 900;
     padding: 8px 16px;
@@ -188,8 +190,9 @@
   }
 
   .lock-btn {
-    background: #F5F5F5;
-    border: 2px solid #000;
+    background: var(--card-bg-subtle, #F5F5F5);
+    color: var(--text-main, #121212);
+    border: 2px solid var(--border-dark, #000);
     border-radius: 10px;
     padding: 6px 12px;
     font-weight: 800;
@@ -199,11 +202,18 @@
 
   .station-tag {
     background: #FFF9C4;
+    color: #0F0E17;
     border: 2px solid #000;
     border-radius: 12px;
     padding: 4px 12px;
     font-size: 0.78rem;
     font-weight: 900;
+  }
+
+  :global(html.dark) .station-tag {
+    background: #2D2713;
+    color: #FFDE59;
+    border-color: #FFA94D;
   }
 
   .settings-hero {
@@ -221,14 +231,14 @@
     margin: 0 0 6px 0;
     font-size: 2rem;
     font-weight: 900;
-    color: #121212;
+    color: var(--text-heading, #121212);
   }
 
   .hero-subtitle {
     margin: 0;
     font-size: 1rem;
     font-weight: 700;
-    color: #555;
+    color: var(--text-muted, #555);
   }
 
   /* Gated Card */
@@ -238,7 +248,10 @@
     align-items: center;
     text-align: center;
     padding: 40px 24px;
-    background: #ffffff;
+    background: var(--card-bg, #ffffff);
+    color: var(--text-main, #121212);
+    border: 3px solid var(--border-dark, #000);
+    box-shadow: 4px 4px 0 var(--border-dark, #000);
     border-radius: 20px;
     gap: 12px;
   }
@@ -251,11 +264,12 @@
     margin: 0;
     font-size: 1.5rem;
     font-weight: 900;
+    color: var(--text-heading, #121212);
   }
 
   .gated-lock-card p {
     margin: 0;
-    color: #666;
+    color: var(--text-muted, #666);
     font-size: 1rem;
     max-width: 440px;
   }
@@ -263,11 +277,14 @@
   .unlock-btn {
     margin-top: 10px;
     background: #FFD54F;
+    color: #0F0E17;
+    border: 2.5px solid #000;
     font-size: 1rem;
     font-weight: 900;
     padding: 12px 24px;
     border-radius: 12px;
     cursor: pointer;
+    box-shadow: 3px 3px 0 #000;
   }
 
   /* Settings Sections Grid */
@@ -279,7 +296,10 @@
 
   .settings-card {
     padding: 20px;
-    background: #ffffff;
+    background: var(--card-bg, #ffffff);
+    color: var(--text-main, #121212);
+    border: 3px solid var(--border-dark, #000);
+    box-shadow: 4px 4px 0 var(--border-dark, #000);
     border-radius: 18px;
     display: flex;
     flex-direction: column;
@@ -300,12 +320,12 @@
     margin: 0;
     font-size: 1.25rem;
     font-weight: 900;
-    color: #121212;
+    color: var(--text-heading, #121212);
   }
 
   .card-header span {
     font-size: 0.8rem;
-    color: #555;
+    color: var(--text-muted, #555);
     font-weight: 700;
   }
 
@@ -318,12 +338,23 @@
   .desc {
     margin: 0;
     font-size: 0.9rem;
-    color: #444;
+    color: var(--text-main, #444);
     line-height: 1.4;
+  }
+
+  .desc code {
+    background: var(--card-bg-subtle, #f0f0f0);
+    color: var(--retro-pink, #FF3366);
+    padding: 2px 5px;
+    border-radius: 4px;
+    border: 1px solid var(--border-dark, #ccc);
   }
 
   .primary-loud {
     background: #FFCA28;
+    color: #0F0E17;
+    border: 2.5px solid #000;
+    box-shadow: 2px 2px 0 #000;
     align-self: flex-start;
   }
 
@@ -332,9 +363,10 @@
     justify-content: space-between;
     align-items: center;
     padding: 10px 14px;
-    background: #FAFAFA;
-    border: 1.5px solid #000;
+    background: var(--surface-secondary, #FAFAFA);
+    border: 1.5px solid var(--border-dark, #000);
     border-radius: 12px;
+    color: var(--text-main, #121212);
   }
 
   .setting-text {
@@ -345,11 +377,12 @@
 
   .setting-text strong {
     font-size: 0.95rem;
+    color: var(--text-heading, #121212);
   }
 
   .setting-text small {
     font-size: 0.78rem;
-    color: #666;
+    color: var(--text-muted, #666);
   }
 
   .status-pill {
@@ -360,6 +393,12 @@
     font-size: 0.78rem;
     font-weight: 900;
     padding: 3px 8px;
+  }
+
+  :global(html.dark) .status-pill {
+    background: #132D1B;
+    border-color: #00FFA3;
+    color: #00FFA3;
   }
 
   .data-btn-row {
@@ -377,7 +416,10 @@
   }
 
   .action-btn.secondary {
-    background: #ffffff;
+    background: var(--card-bg-subtle, #ffffff);
+    color: var(--text-main, #121212);
+    border: 2px solid var(--border-dark, #000);
+    box-shadow: 2px 2px 0 var(--border-dark, #000);
   }
 
   .import-label {
@@ -394,5 +436,12 @@
     font-weight: 900;
     padding: 10px 16px;
     cursor: pointer;
+    box-shadow: 2px 2px 0 #000;
+  }
+
+  :global(html.dark) .danger-btn {
+    background: #381216;
+    border-color: #FF5252;
+    color: #FF8A80;
   }
 </style>

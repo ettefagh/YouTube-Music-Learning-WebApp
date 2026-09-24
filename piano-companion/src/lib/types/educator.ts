@@ -47,6 +47,42 @@ export const KNOWN_EDUCATORS: Record<string, EducatorChannelInfo> = {
     bannerColor: '#D32F2F',
     description: 'Method specialist providing clear visual cues, bookmarked chapter guides, and finger number tips.',
     channelHandle: '@GavinBradyPiano'
+  },
+  'Felicitas Falke (Singles)': {
+    name: 'Felicitas Falke (Singles)',
+    educatorName: 'Felicitas Falke',
+    avatarEmoji: '👩‍🏫',
+    avatarBgColor: '#FCE7F3',
+    bannerColor: '#BE185D',
+    description: 'Pianist & teacher specializing in 4-hand duet teacher accompaniments (Mitspiel-Version), multi-tempo practice, and gentle pedagogical tips.',
+    channelHandle: '@felicitasfalke'
+  },
+  'Maryna Tochyltseva (Singles)': {
+    name: 'Maryna Tochyltseva (Singles)',
+    educatorName: 'Maryna Tochyltseva',
+    avatarEmoji: '🎹',
+    avatarBgColor: '#E0E7FF',
+    bannerColor: '#4338CA',
+    description: 'Clear, step-by-step tutorial demonstrations for individual pieces with dedicated left- and right-hand practice guidance.',
+    channelHandle: '@MarynaTochyltseva'
+  },
+  'Valentin Bedrich (Singles)': {
+    name: 'Valentin Bedrich (Singles)',
+    educatorName: 'Valentin Bedrich',
+    avatarEmoji: '🎯',
+    avatarBgColor: '#FEF3C7',
+    bannerColor: '#D97706',
+    description: 'Dynamic practice coach behind "Üben mit Valentin", breaking down difficult rhythm spots, coordination, and piece preparation.',
+    channelHandle: '@ValentinBedrich'
+  },
+  'JessPiano (Singles)': {
+    name: 'JessPiano (Singles)',
+    educatorName: 'JessPiano',
+    avatarEmoji: '✨',
+    avatarBgColor: '#EDE9FE',
+    bannerColor: '#7C3AED',
+    description: 'Overhead Synthesia & illuminated visualizer tutorials helping visual learners see falling notes and key hand positions.',
+    channelHandle: '@JessPiano'
   }
 };
 

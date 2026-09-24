@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { onMount } from 'svelte';
+  import { onMount, onDestroy } from 'svelte';
 
   let {
     isReady = false,
@@ -12,6 +12,13 @@
   let minTimeElapsed = $state(false);
   let isExiting = $state(false);
   let statusTextIndex = $state(0);
+  let showSkipHint = $state(false);
+
+  let textInterval: any = null;
+  let minTimer: any = null;
+  let fallbackTimer: any = null;
+  let skipTimer: any = null;
+  let exitTimer: any = null;
 
   const statusMessages = [
     'Warming up the piano keys... 🎹',
@@ -24,22 +31,36 @@
 
   onMount(() => {
     // Cycle playful kid status messages
-    const textInterval = setInterval(() => {
+    textInterval = setInterval(() => {
       if (statusTextIndex < statusMessages.length - 1) {
         statusTextIndex++;
       }
-    }, 600);
+    }, 500);
 
-    // Ensure splash displays for at least 1.8s for a joyful kid experience
-    const minTimer = setTimeout(() => {
+    // Show subtle tap to skip after 1.2s
+    skipTimer = setTimeout(() => {
+      showSkipHint = true;
+    }, 1200);
+
+    // Minimum display time for a joyful kid experience (1.8s)
+    minTimer = setTimeout(() => {
       minTimeElapsed = true;
       checkCompletion();
     }, 1800);
 
-    return () => {
-      clearInterval(textInterval);
-      clearTimeout(minTimer);
-    };
+    // Fallback safety timeout (3.5s): never let slow storage lock the user
+    fallbackTimer = setTimeout(() => {
+      minTimeElapsed = true;
+      forceComplete();
+    }, 3500);
+  });
+
+  onDestroy(() => {
+    if (textInterval) clearInterval(textInterval);
+    if (minTimer) clearTimeout(minTimer);
+    if (fallbackTimer) clearTimeout(fallbackTimer);
+    if (skipTimer) clearTimeout(skipTimer);
+    if (exitTimer) clearTimeout(exitTimer);
   });
 
   $effect(() => {
@@ -51,14 +72,34 @@
   function checkCompletion() {
     if (isReady && minTimeElapsed && !isExiting) {
       isExiting = true;
-      setTimeout(() => {
+      exitTimer = setTimeout(() => {
         onComplete();
-      }, 450); // wait for exit animation
+      }, 450);
+    }
+  }
+
+  function forceComplete() {
+    if (!isExiting) {
+      isExiting = true;
+      exitTimer = setTimeout(() => {
+        onComplete();
+      }, 300);
+    }
+  }
+
+  function handleUserSkip() {
+    if (showSkipHint && !isExiting) {
+      forceComplete();
     }
   }
 </script>
 
 <div class="app-splash-overlay {isExiting ? 'splash-exit' : ''}">
+  {#if showSkipHint}
+    <button class="splash-skip-btn" onclick={forceComplete} aria-label="Skip intro splash">
+      Tap to Start ➔
+    </button>
+  {/if}
   <!-- Floating musical particles -->
   <div class="floating-notes-container">
     <span class="float-note note-1">♪</span>
@@ -170,7 +211,7 @@
     left: 0;
     width: 100vw;
     height: 100vh;
-    background: #FFFDE7;
+    background: var(--canvas-bg, #FFFDE7);
     z-index: 9999;
     display: flex;
     flex-direction: column;
@@ -184,6 +225,28 @@
     opacity: 0;
     transform: scale(1.06);
     pointer-events: none;
+  }
+
+  .splash-skip-btn {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    background: var(--card-bg, #ffffff);
+    color: var(--text-main, #121212);
+    border: 2px solid var(--border-dark, #000000);
+    border-radius: 9999px;
+    padding: 6px 14px;
+    font-size: 0.85rem;
+    font-weight: 800;
+    cursor: pointer;
+    box-shadow: 2px 2px 0 var(--border-dark, #000000);
+    z-index: 10001;
+    transition: transform 0.12s ease;
+  }
+
+  .splash-skip-btn:active {
+    transform: translate(1px, 1px);
+    box-shadow: 1px 1px 0 var(--border-dark, #000000);
   }
 
   /* Floating Kids Notes & Sparkles */
@@ -316,7 +379,7 @@
     margin: 0;
     font-size: 2rem;
     font-weight: 900;
-    color: #121212;
+    color: var(--text-heading, #121212);
     letter-spacing: -0.02em;
   }
 
@@ -336,7 +399,7 @@
     margin: 4px 0 10px 0;
     font-size: 1.05rem;
     font-weight: 800;
-    color: #444;
+    color: var(--text-muted, #444);
     min-height: 28px;
   }
 
@@ -344,12 +407,12 @@
   .candy-loader-track {
     width: 260px;
     height: 18px;
-    background: #ffffff;
-    border: 3px solid #000000;
+    background: var(--card-bg, #ffffff);
+    border: 3px solid var(--border-dark, #000000);
     border-radius: 20px;
     overflow: hidden;
     position: relative;
-    box-shadow: 3px 3px 0 #000000;
+    box-shadow: 3px 3px 0 var(--border-dark, #000000);
   }
 
   .candy-loader-bar {

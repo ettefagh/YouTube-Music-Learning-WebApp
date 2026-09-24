@@ -87,11 +87,17 @@
 <style>
   .chapter-timeline-card {
     background: #FFF8E1;
-    border: 3px solid #000;
+    border: 3px solid var(--border-dark, #000);
     border-radius: 12px;
-    box-shadow: 4px 4px 0 #000;
+    box-shadow: 4px 4px 0 var(--border-dark, #000);
     padding: 10px 14px;
     margin-bottom: 16px;
+  }
+
+  :global(html.dark) .chapter-timeline-card {
+    background: #231F15;
+    border-color: #FFA94D;
+    box-shadow: 4px 4px 0 #000;
   }
 
   .timeline-header {
@@ -123,13 +129,14 @@
 
   .active-title {
     font-size: 0.9rem;
-    color: #121212;
+    font-weight: 700;
+    color: var(--text-heading, #121212);
   }
 
   .time-range {
     font-size: 0.8rem;
     font-weight: 700;
-    color: #666;
+    color: var(--text-muted, #666);
   }
 
   .header-right {
@@ -140,8 +147,9 @@
   .chapter-counter {
     font-size: 0.8rem;
     font-weight: 900;
-    background: #fff;
-    border: 2px solid #000;
+    background: var(--card-bg, #fff);
+    color: var(--text-main, #000);
+    border: 2px solid var(--border-dark, #000);
     border-radius: 6px;
     padding: 2px 8px;
   }
@@ -155,8 +163,8 @@
   .timeline-ribbon {
     display: flex;
     height: 28px;
-    background: #ffffff;
-    border: 2px solid #000;
+    background: var(--card-bg-subtle, #ffffff);
+    border: 2px solid var(--border-dark, #000);
     border-radius: 6px;
     overflow: hidden;
     position: relative;
@@ -166,8 +174,9 @@
   .chapter-segment {
     height: 100%;
     border: none;
-    border-right: 1px solid #000;
+    border-right: 1px solid var(--border-dark, #000);
     background: #FFFDE7;
+    color: #121212;
     cursor: pointer;
     padding: 0;
     position: relative;
@@ -178,8 +187,17 @@
     flex-shrink: 0;
   }
 
+  :global(html.dark) .chapter-segment {
+    background: #2E2A1C;
+    color: #FFDE59;
+  }
+
   .chapter-segment:hover {
     background: #FFE082;
+  }
+
+  :global(html.dark) .chapter-segment:hover {
+    background: #4D401D;
   }
 
   .chapter-segment.active {
@@ -193,6 +211,12 @@
 
   .chapter-segment.completed:not(.active) {
     background: #C8E6C9;
+    color: #1B5E20;
+  }
+
+  :global(html.dark) .chapter-segment.completed:not(.active) {
+    background: #1B3824;
+    color: #00FFA3;
   }
 
   .segment-num {

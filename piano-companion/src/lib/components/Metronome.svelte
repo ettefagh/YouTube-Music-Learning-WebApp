@@ -253,16 +253,23 @@
   .title {
     font-weight: 800;
     font-size: 1rem;
-    color: #000;
+    color: var(--text-heading, #000);
   }
 
   .tempo-tag {
     font-size: 0.8rem;
     font-weight: 700;
     background: #FFE082;
+    color: #0F0E17;
     border: 2px solid #000;
     border-radius: 6px;
     padding: 2px 8px;
+  }
+
+  :global(html.dark) .tempo-tag {
+    background: #3B2E15;
+    color: #FFDE59;
+    border-color: #FFA94D;
   }
 
   .right-group {
@@ -299,14 +306,14 @@
   }
 
   .toggle-expand-btn {
-    background: none;
-    border: 2px solid #000;
+    border: 2px solid var(--border-dark, #000);
     border-radius: 6px;
     font-size: 0.75rem;
     font-weight: 700;
     padding: 4px 8px;
     cursor: pointer;
-    background: #fff;
+    background: var(--card-bg-subtle, #fff);
+    color: var(--text-main, #000);
   }
 
   .beat-indicators {
@@ -319,9 +326,10 @@
   .beat-dot {
     width: 32px;
     height: 32px;
-    border: 2px solid #000;
+    border: 2px solid var(--border-dark, #000);
     border-radius: 50%;
-    background: #FFF;
+    background: var(--card-bg-subtle, #FFF);
+    color: var(--text-main, #121212);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -357,14 +365,15 @@
   }
 
   .step-btn {
-    border: 2px solid #000;
-    background: #fff;
+    border: 2px solid var(--border-dark, #000);
+    background: var(--card-bg-subtle, #fff);
+    color: var(--text-main, #121212);
     border-radius: 6px;
     font-weight: 800;
     font-size: 0.85rem;
     padding: 6px 10px;
     cursor: pointer;
-    box-shadow: 1px 1px 0 #000;
+    box-shadow: 1px 1px 0 var(--border-dark, #000);
   }
 
   .step-btn:active {
@@ -375,6 +384,7 @@
   .tap-btn {
     border: 2px solid #000;
     background: #E1BEE7;
+    color: #0F0E17;
     border-radius: 8px;
     font-weight: 800;
     font-size: 0.85rem;
@@ -382,6 +392,12 @@
     cursor: pointer;
     box-shadow: 2px 2px 0 #000;
     margin-left: 6px;
+  }
+
+  :global(html.dark) .tap-btn {
+    background: #3B2154;
+    color: #C084FC;
+    border-color: #C084FC;
   }
 
   .tap-btn:active {
@@ -397,13 +413,13 @@
   .bpm-number {
     font-size: 1.8rem;
     font-weight: 900;
-    color: #000;
+    color: var(--text-heading, #000);
   }
 
   .bpm-unit {
     font-size: 0.75rem;
     font-weight: 700;
-    color: #666;
+    color: var(--text-muted, #666);
     margin-left: 2px;
   }
 
@@ -417,7 +433,7 @@
   .expanded-controls {
     margin-top: 12px;
     padding-top: 12px;
-    border-top: 2px dashed #000;
+    border-top: 2px dashed var(--border-dark, #000);
     display: flex;
     flex-direction: column;
     gap: 8px;
@@ -434,7 +450,7 @@
     font-size: 0.8rem;
     font-weight: 700;
     min-width: 110px;
-    color: #333;
+    color: var(--text-muted, #333);
   }
 
   .preset-buttons {
@@ -444,8 +460,9 @@
   }
 
   .preset-btn {
-    border: 2px solid #000;
-    background: #fff;
+    border: 2px solid var(--border-dark, #000);
+    background: var(--card-bg-subtle, #fff);
+    color: var(--text-main, #121212);
     border-radius: 6px;
     font-size: 0.8rem;
     font-weight: 700;
@@ -455,6 +472,7 @@
 
   .preset-btn.active {
     background: #FFD54F;
+    color: #0F0E17;
   }
 
   @keyframes pulse {

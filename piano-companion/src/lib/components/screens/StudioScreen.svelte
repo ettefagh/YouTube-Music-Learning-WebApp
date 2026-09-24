@@ -275,7 +275,8 @@
     text-align: center;
     padding: 36px 20px;
     gap: 12px;
-    background: #ffffff;
+    background: var(--card-bg, #ffffff);
+    color: var(--text-main, #121212);
     border-radius: 18px;
   }
 
@@ -290,9 +291,16 @@
     align-items: center;
     padding: 14px 18px;
     background: #FFF9C4;
+    color: #121212;
     border-radius: 16px;
     gap: 12px;
     flex-wrap: wrap;
+  }
+
+  :global(.dark) .song-target-strip {
+    background: #2B2618;
+    color: #FFFFFE;
+    border-color: #FFA94D;
   }
 
   .target-badge {
@@ -302,11 +310,15 @@
     letter-spacing: 0.04em;
   }
 
+  :global(.dark) .target-badge {
+    color: #FFA94D;
+  }
+
   .target-song-title {
     margin: 0;
     font-size: 1.35rem;
     font-weight: 900;
-    color: #121212;
+    color: var(--text-main, #121212);
   }
 
   .switch-to-player-btn {
@@ -319,10 +331,16 @@
     cursor: pointer;
   }
 
+  :global(.dark) .switch-to-player-btn {
+    background: #00FFA3;
+    color: #0F0E17;
+  }
+
   /* Trophy Room */
   .trophy-room-card {
     padding: 20px;
-    background: #ffffff;
+    background: var(--card-bg, #ffffff);
+    color: var(--text-main, #121212);
     border-radius: 18px;
     display: flex;
     flex-direction: column;
@@ -351,17 +369,18 @@
     margin: 0;
     font-size: 1.2rem;
     font-weight: 900;
-    color: #121212;
+    color: var(--text-main, #121212);
   }
 
   .room-subtitle {
     font-size: 0.8rem;
-    color: #555;
+    color: var(--text-muted, #555);
     font-weight: 700;
   }
 
   .stars-counter-badge {
     background: #FFF9C4;
+    color: #121212;
     border: 2px solid #000;
     border-radius: 12px;
     padding: 6px 14px;
@@ -373,10 +392,22 @@
     gap: 6px;
   }
 
+  :global(.dark) .stars-counter-badge {
+    background: #2B2618;
+    color: #FFDE59;
+    border-color: #FFA94D;
+  }
+
   .stars-counter-badge.mastered {
     background: #C8E6C9;
     border-color: #2E7D32;
     color: #2E7D32;
+  }
+
+  :global(.dark) .stars-counter-badge.mastered {
+    background: #15291E;
+    border-color: #00FFA3;
+    color: #00FFA3;
   }
 
   .sparkle-tag {
@@ -394,7 +425,8 @@
     display: flex;
     align-items: center;
     gap: 12px;
-    background: #FAFAFA;
+    background: var(--card-bg-subtle, #FAFAFA);
+    color: var(--text-main, #121212);
     border: 2px solid #000;
     border-radius: 14px;
     padding: 12px 16px;
@@ -402,6 +434,11 @@
     text-align: left;
     box-shadow: 2.5px 2.5px 0 #000;
     transition: transform 0.12s ease, box-shadow 0.12s ease, background-color 0.15s ease;
+  }
+
+  :global(.dark) .checkpoint-item {
+    background: #242238;
+    color: #FFFFFE;
   }
 
   .checkpoint-item:hover {
@@ -418,6 +455,12 @@
     background: #E8F5E9;
     border-color: #2E7D32;
     box-shadow: 3.5px 3.5px 0 #2E7D32;
+  }
+
+  :global(.dark) .checkpoint-item.checked {
+    background: #15291E;
+    border-color: #00FFA3;
+    box-shadow: 3.5px 3.5px 0 #00FFA3;
   }
 
   .checkpoint-item.checked:hover {
@@ -519,7 +562,8 @@
   /* Audio Booth */
   .audio-booth-card {
     padding: 20px;
-    background: #ffffff;
+    background: var(--card-bg, #ffffff);
+    color: var(--text-main, #121212);
     border-radius: 18px;
     display: flex;
     flex-direction: column;
@@ -539,7 +583,7 @@
     display: flex;
     flex-direction: column;
     gap: 10px;
-    background: #FAFAFA;
+    background: var(--card-bg-subtle, #FAFAFA);
     box-shadow: 3px 3px 0 #000;
   }
 
@@ -548,9 +592,19 @@
     background: #FFFDE7;
   }
 
+  :global(.dark) .booth-track-card.student-booth {
+    background: #2B2618;
+    border-color: #FFA94D;
+  }
+
   .booth-track-card.teacher-booth {
     border-color: #000;
     background: #EDE7F6;
+  }
+
+  :global(.dark) .booth-track-card.teacher-booth {
+    background: #261638;
+    border-color: #C084FC;
   }
 
   .track-card-header {
@@ -569,16 +623,34 @@
 
   .track-badge.student {
     background: #FFF9C4;
+    color: #5D4037;
+  }
+
+  :global(.dark) .track-badge.student {
+    background: #3B2E15;
+    color: #FFDE59;
+    border-color: #FFA94D;
   }
 
   .track-badge.teacher {
     background: #D1C4E9;
+    color: #311B92;
+  }
+
+  :global(.dark) .track-badge.teacher {
+    background: #2E1B4E;
+    color: #C084FC;
+    border-color: #C084FC;
   }
 
   .recorded-tag {
     font-size: 0.72rem;
     font-weight: 800;
     color: #2E7D32;
+  }
+
+  :global(.dark) .recorded-tag {
+    color: #00FFA3;
   }
 
   .track-action-area {

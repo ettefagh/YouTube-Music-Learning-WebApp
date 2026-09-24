@@ -27,8 +27,8 @@
         const states: Record<string, string> = {
             completed: 'bg-gradient-to-br from-[#FEE75C] to-[#FBBF24] border-4 border-emerald-400',
             current: 'bg-gradient-to-br from-pink-500 to-cyan-400 border-4 border-white animate-pulse-border shadow-[0_0_20px_rgba(236,72,153,0.6)]',
-            upcoming: 'bg-[#F5F3FF] border-4 border-[#C4B5FD] text-slate-400',
-            locked: 'bg-slate-200 border-4 border-slate-300 text-slate-400 backdrop-blur-sm'
+            upcoming: 'bg-[#F5F3FF] dark:bg-[#1E1B4B] border-4 border-[#C4B5FD] dark:border-indigo-600 text-slate-400 dark:text-slate-200',
+            locked: 'bg-slate-200 dark:bg-slate-800/80 border-4 border-slate-300 dark:border-slate-700 text-slate-400 dark:text-slate-500 backdrop-blur-sm'
         };
         return `${base} ${states[node.status] || ''} ${isActive ? 'scale-110' : 'hover:scale-105'}`;
     });
@@ -63,9 +63,9 @@
     <!-- Mascot Pip (Only on current node) -->
     {#if node.status === 'current'}
         <div class="absolute -top-16 z-20 animate-bob flex flex-col items-center">
-            <div class="bg-white text-slate-800 text-xs font-bold py-1 px-3 rounded-2xl shadow-md mb-2 relative">
+            <div class="bg-white dark:bg-slate-800 text-slate-800 dark:text-white text-xs font-bold py-1 px-3 rounded-2xl shadow-md mb-2 relative">
                 Play me!
-                <div class="absolute -bottom-1 left-1/2 w-2 h-2 bg-white transform -translate-x-1/2 rotate-45"></div>
+                <div class="absolute -bottom-1 left-1/2 w-2 h-2 bg-white dark:bg-slate-800 transform -translate-x-1/2 rotate-45"></div>
             </div>
             <!-- Mock Mascot Image -->
             <div class="w-12 h-12 bg-yellow-300 rounded-full border-2 border-slate-800 flex items-center justify-center text-xl shadow-lg">
@@ -89,7 +89,7 @@
         {:else if node.status === 'completed'}
             <span class="text-3xl">⭐</span>
         {:else}
-            <span class="font-bold text-xl {node.status === 'current' ? 'text-white' : 'text-slate-600'}">
+            <span class="font-bold text-xl {node.status === 'current' ? 'text-white' : 'text-slate-600 dark:text-slate-200'}">
                 {node.sequenceIndex + 1}
             </span>
         {/if}
@@ -97,11 +97,11 @@
 
     <!-- Title Label -->
     <div class="mt-3 text-center w-32">
-        <span class="text-sm font-bold text-slate-800 block leading-tight drop-shadow-sm truncate">
+        <span class="text-sm font-bold text-slate-800 dark:text-slate-100 block leading-tight drop-shadow-sm truncate">
             {node.title}
         </span>
         {#if node.status === 'completed' && node.teacherTakes && node.teacherTakes.length > 0}
-            <span class="text-xs text-emerald-600 font-semibold bg-emerald-50 px-2 py-0.5 rounded-full mt-1 inline-block">
+            <span class="text-xs text-emerald-600 dark:text-emerald-300 font-semibold bg-emerald-50 dark:bg-emerald-950/60 px-2 py-0.5 rounded-full mt-1 inline-block">
                 {node.teacherTakes.length} takes
             </span>
         {/if}

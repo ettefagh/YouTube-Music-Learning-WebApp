@@ -37,6 +37,19 @@
 
   let showBookPickerModal = $state<boolean>(false);
   let lessonSearch = $state<string>('');
+  let showAllProviders = $state<boolean>(false);
+
+  let visibleProviders = $derived.by(() => {
+    if (showAllProviders || providers.length <= 3) return providers;
+    const selectedIdx = providers.indexOf(selectedProvider);
+    if (selectedIdx < 3) {
+      return providers.slice(0, 3);
+    } else {
+      return [providers[0], providers[1], selectedProvider];
+    }
+  });
+
+  let hiddenProviderCount = $derived(Math.max(0, providers.length - 3));
 
   let viewMode = $state<'journey' | 'list'>(typeof window !== 'undefined' ? (localStorage.getItem('journey_view_mode') as 'journey' | 'list') || 'journey' : 'journey');
 
@@ -136,7 +149,7 @@
     </div>
 
     <div class="teacher-pills-row">
-      {#each providers as provider}
+      {#each visibleProviders as provider}
         {@const pLessons = allLessons.filter((l: LocalLesson) => l.providerName === provider && l.bookId === selectedBookId)}
         {@const ed = getEducatorInfo(provider)}
         {@const isPipPick = provider.includes('Anikó Drabon')}
@@ -161,6 +174,25 @@
           {/if}
         </button>
       {/each}
+
+      {#if providers.length > 3}
+        <button
+          class="teacher-pill-btn expand-pill-btn"
+          onclick={() => showAllProviders = !showAllProviders}
+          title={showAllProviders ? 'Show fewer teachers' : `Show ${hiddenProviderCount} more teachers`}
+          aria-expanded={showAllProviders}
+        >
+          <div class="pill-avatar plus-avatar">
+            <span>{showAllProviders ? '▲' : '➕'}</span>
+          </div>
+          <div class="pill-meta">
+            <div class="pill-name-row">
+              <span class="pill-name">{showAllProviders ? 'Show Less' : `+${hiddenProviderCount} More`}</span>
+            </div>
+            <span class="pill-count">{showAllProviders ? 'Collapse list' : 'View other teachers'}</span>
+          </div>
+        </button>
+      {/if}
     </div>
   </section>
 
@@ -347,32 +379,99 @@
     letter-spacing: 0.05em;
   }
 
+  .book-active-shelf {
+    background: var(--card-bg, #ffffff);
+    color: var(--text-main, #121212);
+    border-radius: 18px;
+    padding: 16px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+
+  .shelf-left {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+
+  .book-3d-cover {
+    width: 62px;
+    height: 80px;
+    background: #FF5722;
+    border: 2.5px solid #000;
+    border-radius: 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 3px 3px 0 #000;
+    color: #fff;
+    flex-shrink: 0;
+  }
+
+  .cover-icon {
+    font-size: 1.8rem;
+  }
+
+  .cover-publisher {
+    font-size: 0.55rem;
+    font-weight: 900;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+  }
+
+  .shelf-info {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+  }
+
+  .shelf-eyebrow {
+    font-size: 0.68rem;
+    font-weight: 900;
+    color: #FF5722;
+    letter-spacing: 0.04em;
+  }
+
   .shelf-title {
     margin: 0;
     font-size: 1.4rem;
     font-weight: 900;
-    color: #121212;
+    color: var(--text-main, #121212);
   }
 
   .shelf-pieces-count {
     font-size: 0.85rem;
     font-weight: 700;
-    color: #555;
+    color: var(--text-muted, #555);
   }
 
   .change-book-btn {
-    background: #ffffff;
+    background: var(--tint-yellow, #FFF8E1);
+    color: var(--text-main, #121212);
+    border: 2px solid #000;
     font-size: 0.9rem;
     font-weight: 900;
     padding: 10px 16px;
     border-radius: 12px;
     cursor: pointer;
+    box-shadow: 2px 2px 0 #000;
+  }
+
+  :global(.dark) .change-book-btn {
+    background: #2B2618;
+    color: #FFDE59;
+    border-color: #FFA94D;
   }
 
   /* Teacher Pills */
   .teacher-selector-section {
     padding: 16px 18px;
-    background: #ffffff;
+    background: var(--card-bg, #ffffff);
+    color: var(--text-main, #121212);
     border-radius: 16px;
     display: flex;
     flex-direction: column;
@@ -399,17 +498,24 @@
     margin: 0;
     font-size: 1.15rem;
     font-weight: 900;
-    color: #121212;
+    color: var(--text-main, #121212);
   }
 
   .add-channel-chip {
-    background: #F5F5F5;
+    background: var(--card-bg-subtle, #F5F5F5);
+    color: var(--text-main, #121212);
     border: 1.5px solid #000;
     border-radius: 8px;
     font-weight: 800;
     font-size: 0.75rem;
     padding: 4px 10px;
     cursor: pointer;
+  }
+
+  :global(.dark) .add-channel-chip {
+    background: #242238;
+    border-color: #A7A9BE;
+    color: #FFFFFE;
   }
 
   .teacher-pills-row {
@@ -422,7 +528,8 @@
     display: flex;
     align-items: center;
     gap: 10px;
-    background: #FAFAFA;
+    background: var(--card-bg-subtle, #FAFAFA);
+    color: var(--text-main, #121212);
     border: 2px solid #000;
     border-radius: 14px;
     padding: 9px 13px;
@@ -446,6 +553,44 @@
     background: #E8F5E9;
     border-color: #2E7D32;
     box-shadow: 3.5px 3.5px 0 #2E7D32;
+  }
+
+  :global(.dark) .teacher-pill-btn.selected {
+    background: #15291E;
+    border-color: #00FFA3;
+    box-shadow: 3.5px 3.5px 0 #00FFA3;
+  }
+
+  .teacher-pill-btn.expand-pill-btn {
+    background: #FFFDE7;
+    border-style: dashed;
+    border-color: #F57F17;
+  }
+
+  :global(.dark) .teacher-pill-btn.expand-pill-btn {
+    background: #2B2618;
+    border-style: dashed;
+    border-color: #FFA94D;
+  }
+
+  .teacher-pill-btn.expand-pill-btn:hover {
+    background: #FFF9C4;
+  }
+
+  :global(.dark) .teacher-pill-btn.expand-pill-btn:hover {
+    background: #3B2E15;
+  }
+
+  .plus-avatar {
+    background-color: #FFE082 !important;
+    color: #121212;
+    font-size: 1.1rem;
+    font-weight: 900;
+  }
+
+  :global(.dark) .plus-avatar {
+    background-color: #3B2E15 !important;
+    color: #FFDE59;
   }
 
   .pill-avatar {
@@ -477,11 +622,12 @@
   .pill-name {
     font-size: 0.9rem;
     font-weight: 900;
-    color: #121212;
+    color: var(--text-main, #121212);
   }
 
   .pip-star-badge {
     background: #FFD54F;
+    color: #0F0E17;
     border: 1px solid #000;
     border-radius: 6px;
     font-size: 0.65rem;
@@ -491,7 +637,7 @@
 
   .pill-count {
     font-size: 0.72rem;
-    color: #666;
+    color: var(--text-muted, #666);
     font-weight: 700;
   }
 
@@ -499,6 +645,10 @@
     font-weight: 900;
     color: #2E7D32;
     font-size: 1.1rem;
+  }
+
+  :global(.dark) .pill-check {
+    color: #00FFA3;
   }
 
   /* Quick Resume Box */
@@ -510,12 +660,22 @@
     box-shadow: 3px 3px 0 #2E7D32;
   }
 
+  :global(.dark) .quick-resume-box {
+    background: #15291E;
+    border-color: #00FFA3;
+    box-shadow: 3px 3px 0 #00FFA3;
+  }
+
   .resume-badge-tag {
     font-size: 0.68rem;
     font-weight: 900;
     color: #2E7D32;
     margin-bottom: 4px;
     letter-spacing: 0.04em;
+  }
+
+  :global(.dark) .resume-badge-tag {
+    color: #00FFA3;
   }
 
   .resume-content-row {
@@ -528,9 +688,15 @@
     font-size: 1.3rem;
     font-weight: 900;
     background: #C8E6C9;
+    color: #121212;
     border: 2px solid #000;
     border-radius: 8px;
     padding: 4px 8px;
+  }
+
+  :global(.dark) .resume-num {
+    background: #1F3F2E;
+    color: #00FFA3;
   }
 
   .resume-text {
@@ -541,13 +707,13 @@
     margin: 0;
     font-size: 1.05rem;
     font-weight: 900;
-    color: #121212;
+    color: var(--text-main, #121212);
   }
 
   .resume-text span {
     font-size: 0.75rem;
     font-weight: 700;
-    color: #444;
+    color: var(--text-muted, #444);
   }
 
   .resume-play-btn {
@@ -560,10 +726,16 @@
     cursor: pointer;
   }
 
+  :global(.dark) .resume-play-btn {
+    background: #00FFA3;
+    color: #0F0E17;
+  }
+
   /* Songs List */
   .songs-list-section {
     padding: 16px 18px;
-    background: #ffffff;
+    background: var(--card-bg, #ffffff);
+    color: var(--text-main, #121212);
     border-radius: 16px;
     display: flex;
     flex-direction: column;
@@ -584,12 +756,13 @@
     border: 2px solid #000;
     border-radius: 12px;
     padding: 6px 12px;
-    background: #FAFAFA;
+    background: var(--card-bg-subtle, #FAFAFA);
+    color: var(--text-main, #121212);
   }
 
   .search-icon {
     font-size: 1rem;
-    color: #666;
+    color: var(--text-muted, #666);
   }
 
   .song-search-input {
@@ -599,6 +772,7 @@
     font-size: 0.95rem;
     font-weight: 700;
     width: 100%;
+    color: var(--text-main, #121212);
   }
 
   .clear-search-btn {
@@ -607,7 +781,7 @@
     cursor: pointer;
     font-weight: 900;
     font-size: 0.9rem;
-    color: #888;
+    color: var(--text-muted, #888);
   }
 
   .song-count-pill {
@@ -621,6 +795,12 @@
     white-space: nowrap;
   }
 
+  :global(.dark) .song-count-pill {
+    background: #15291E;
+    color: #00FFA3;
+    border-color: #00FFA3;
+  }
+
   .songs-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
@@ -631,7 +811,8 @@
     display: flex;
     align-items: center;
     gap: 12px;
-    background: #ffffff;
+    background: var(--card-bg-subtle, #ffffff);
+    color: var(--text-main, #121212);
     border: 2px solid #000;
     border-radius: 14px;
     padding: 12px 16px;
@@ -644,6 +825,7 @@
   .song-grid-card:hover {
     transform: translateY(-2px);
     box-shadow: 3.5px 3.5px 0 #000;
+    background: var(--card-bg-elevated, #FAFAFA);
   }
 
   .song-grid-card:active {
@@ -657,14 +839,27 @@
     box-shadow: 3.5px 3.5px 0 #E65100;
   }
 
+  :global(.dark) .song-grid-card.current {
+    background: #2B2618;
+    border-color: #FFDE59;
+    box-shadow: 3.5px 3.5px 0 #FFDE59;
+  }
+
   .song-card-num {
     font-size: 0.95rem;
     font-weight: 900;
-    background: #EEEEEE;
+    background: var(--tint-purple, #EEEEEE);
+    color: var(--text-main, #121212);
     border: 1.5px solid #000;
     border-radius: 7px;
     padding: 4px 7px;
     flex-shrink: 0;
+  }
+
+  :global(.dark) .song-card-num {
+    background: #261638;
+    color: #C084FC;
+    border-color: #7C3AED;
   }
 
   .song-card-content {
@@ -676,7 +871,7 @@
     margin: 0;
     font-size: 0.95rem;
     font-weight: 900;
-    color: #121212;
+    color: var(--text-main, #121212);
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -685,7 +880,7 @@
   .song-card-chapter {
     font-size: 0.72rem;
     font-weight: 700;
-    color: #666;
+    color: var(--text-muted, #666);
   }
 
   .song-card-action {
@@ -711,6 +906,11 @@
     transition: transform 0.12s ease;
   }
 
+  :global(.dark) .song-play-tag {
+    background: #00FFA3;
+    color: #0F0E17;
+  }
+
   .song-grid-card:hover .song-play-tag {
     transform: scale(1.04);
   }
@@ -722,7 +922,7 @@
     left: 0;
     width: 100vw;
     height: 100vh;
-    background: rgba(0, 0, 0, 0.5);
+    background: rgba(0, 0, 0, 0.65);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -731,7 +931,8 @@
   }
 
   .book-picker-sheet {
-    background: #ffffff;
+    background: var(--card-bg, #ffffff);
+    color: var(--text-main, #121212);
     max-width: 580px;
     width: 100%;
     max-height: 80vh;
@@ -759,16 +960,23 @@
     margin: 0;
     font-size: 1.3rem;
     font-weight: 900;
+    color: var(--text-main, #121212);
   }
 
   .modal-close-btn {
-    background: #EEEEEE;
+    background: var(--card-bg-subtle, #EEEEEE);
+    color: var(--text-main, #121212);
     border: 2px solid #000;
     border-radius: 8px;
     width: 32px;
     height: 32px;
     font-weight: 900;
     cursor: pointer;
+  }
+
+  :global(.dark) .modal-close-btn {
+    background: #242238;
+    color: #FFFFFE;
   }
 
   .bookshelf-grid {
@@ -781,7 +989,8 @@
     display: flex;
     align-items: center;
     gap: 14px;
-    background: #FFF8E1;
+    background: var(--card-bg-subtle, #FFF8E1);
+    color: var(--text-main, #121212);
     border: 2.5px solid #000;
     border-radius: 14px;
     padding: 12px;
@@ -790,10 +999,21 @@
     box-shadow: 2px 2px 0 #000;
   }
 
+  :global(.dark) .shelf-book-card {
+    background: #242238;
+    color: #FFFFFE;
+  }
+
   .shelf-book-card.active-book {
     border-color: #E65100;
     box-shadow: 3px 3px 0 #E65100;
     background: #FFF59D;
+  }
+
+  :global(.dark) .shelf-book-card.active-book {
+    background: #2B2618;
+    border-color: #FFDE59;
+    box-shadow: 3px 3px 0 #FFDE59;
   }
 
   .shelf-book-cover {
@@ -828,11 +1048,16 @@
     margin: 0 0 2px 0;
     font-size: 1.1rem;
     font-weight: 900;
+    color: var(--text-main, #121212);
+  }
+
+  :global(.dark) .shelf-book-details h4 {
+    color: #FFFFFE;
   }
 
   .shelf-lessons-avail {
     font-size: 0.78rem;
-    color: #555;
+    color: var(--text-muted, #555);
     font-weight: 700;
   }
 

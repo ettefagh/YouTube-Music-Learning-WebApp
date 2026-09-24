@@ -64,6 +64,18 @@
   let selectedProvider = $state<string>('');
   let defaultProvider = $state<string>('');
 
+  let showAllPlayerProviders = $state<boolean>(false);
+  let visiblePlayerProviders = $derived.by(() => {
+    if (showAllPlayerProviders || providers.length <= 3) return providers;
+    const selectedIdx = providers.indexOf(selectedProvider);
+    if (selectedIdx < 3) {
+      return providers.slice(0, 3);
+    } else {
+      return [providers[0], providers[1], selectedProvider];
+    }
+  });
+  let hiddenPlayerProviderCount = $derived(Math.max(0, providers.length - 3));
+
   let allLessons = $state<LocalLesson[]>([]);
   let lessons = $state<LocalLesson[]>([]);
   let currentLesson = $state<LocalLesson | null>(null);
@@ -158,6 +170,7 @@
 
   // --- Modals & Settings ---
   let showOnboarding = $state<boolean>(false);
+  let needsOnboarding = $state<boolean>(false);
   let showSettingsModal = $state<boolean>(false);
   let showAddProviderModal = $state<boolean>(false);
   let showTeacherGate = $state<boolean>(false);
@@ -188,9 +201,7 @@
   // --- Lifecycle ---
   onMount(async () => {
     const onboardingComplete = localStorage.getItem('onboardingComplete');
-    if (!onboardingComplete) {
-      showOnboarding = true;
-    }
+    needsOnboarding = !onboardingComplete;
 
     const savedDefault = localStorage.getItem('defaultProvider');
     if (savedDefault === 'Piano Companion (Chapters)' || savedDefault === 'Piano') {
@@ -208,7 +219,13 @@
     const savedTheme = localStorage.getItem('themeColor');
     if (savedTheme) {
       currentThemeColor = savedTheme;
-      document.body.style.backgroundColor = savedTheme;
+      if (savedTheme === '#0F0E17' || savedTheme === '#121212' || savedTheme === '#1A1829') {
+        document.documentElement.classList.add('dark');
+        document.body.style.backgroundColor = 'var(--canvas-bg)';
+      } else {
+        document.documentElement.classList.remove('dark');
+        document.body.style.backgroundColor = savedTheme;
+      }
     }
 
     const savedCollapsed = localStorage.getItem('collapsedSections');
@@ -338,19 +355,21 @@
   function switchTeacherPreservingPiece(newProvider: string) {
     if (newProvider === selectedProvider) return;
     const oldLesson = currentLesson;
-    const oldDuration = videoDuration || (oldLesson?.endTime && oldLesson?.startTime ? oldLesson.endTime - oldLesson.startTime : 1);
+    const oldPieceDuration = (oldLesson?.endTime && oldLesson?.startTime && oldLesson.endTime > oldLesson.startTime)
+      ? (oldLesson.endTime - oldLesson.startTime)
+      : (videoDuration > 0 ? videoDuration : 1);
     const oldStart = oldLesson?.startTime ?? 0;
     const oldElapsed = Math.max(0, videoCurrentTime - oldStart);
-    const progressRatio = oldDuration > 0 ? Math.min(1, Math.max(0, oldElapsed / oldDuration)) : 0;
+    const progressRatio = oldPieceDuration > 0 ? Math.min(1, Math.max(0, oldElapsed / oldPieceDuration)) : 0;
     const wasPlaying = isVideoPlaying;
 
     let relLoopA: number | null = null;
     let relLoopB: number | null = null;
     if (customLoopA !== null) {
-      relLoopA = (customLoopA - oldStart) / oldDuration;
+      relLoopA = (customLoopA - oldStart) / oldPieceDuration;
     }
     if (customLoopB !== null) {
-      relLoopB = (customLoopB - oldStart) / oldDuration;
+      relLoopB = (customLoopB - oldStart) / oldPieceDuration;
     }
 
     selectedProvider = newProvider;
@@ -363,17 +382,19 @@
 
     if (matchedLesson) {
       selectLesson(matchedLesson);
-      const newDuration = matchedLesson.endTime && matchedLesson.startTime ? (matchedLesson.endTime - matchedLesson.startTime) : (matchedLesson.endTime ?? 0);
+      const newPieceDuration = (matchedLesson.endTime && matchedLesson.startTime && matchedLesson.endTime > matchedLesson.startTime)
+        ? (matchedLesson.endTime - matchedLesson.startTime)
+        : (matchedLesson.endTime ?? 0);
       const newStart = matchedLesson.startTime ?? 0;
       
-      const targetTime = newStart + (progressRatio * (newDuration > 0 ? newDuration : 0));
+      const targetTime = newStart + (progressRatio * (newPieceDuration > 0 ? newPieceDuration : 0));
       videoSeekTarget = targetTime;
 
-      if (relLoopA !== null && newDuration > 0) {
-        customLoopA = Math.round(newStart + (relLoopA * newDuration));
+      if (relLoopA !== null && newPieceDuration > 0) {
+        customLoopA = Math.round(newStart + (relLoopA * newPieceDuration));
       }
-      if (relLoopB !== null && newDuration > 0) {
-        customLoopB = Math.round(newStart + (relLoopB * newDuration));
+      if (relLoopB !== null && newPieceDuration > 0) {
+        customLoopB = Math.round(newStart + (relLoopB * newPieceDuration));
       }
 
       if (wasPlaying) {
@@ -393,6 +414,14 @@
     completedCheckpoints = {};
     mascotState = 'idle';
     mascotMessage = `Let's practice "${lesson.title}"!`;
+
+    // Immediately sync playback scrub position to the new lesson's start
+    videoCurrentTime = lesson.startTime ?? 0;
+    if (lesson.endTime && lesson.startTime && lesson.endTime > lesson.startTime) {
+      videoDuration = lesson.endTime;
+    } else {
+      videoDuration = 0;
+    }
 
     // Revoke previous URLs to free memory
     if (studentAudioUrl) URL.revokeObjectURL(studentAudioUrl);
@@ -934,7 +963,13 @@
   function applyTheme(color: string) {
     currentThemeColor = color;
     localStorage.setItem('themeColor', color);
-    document.body.style.backgroundColor = color;
+    if (color === '#0F0E17' || color === '#121212' || color === '#1A1829') {
+      document.documentElement.classList.add('dark');
+      document.body.style.backgroundColor = 'var(--canvas-bg)';
+    } else {
+      document.documentElement.classList.remove('dark');
+      document.body.style.backgroundColor = color;
+    }
   }
 
   async function forceUpdateApp() {
@@ -1106,21 +1141,30 @@
     const m = Math.floor(seconds / 60);
     const s = Math.floor(seconds % 60);
     return `${m}:${s.toString().padStart(2, '0')}`;
-}
+  }
+
+  function handleInitiationComplete() {
+    showInitialSplash = false;
+    if (needsOnboarding) {
+      showOnboarding = true;
+    }
+  }
+
+  function handleOnboardingComplete() {
+    localStorage.setItem('onboardingComplete', 'true');
+    showOnboarding = false;
+    needsOnboarding = false;
+  }
 </script>
 
 <div class="cockpit-container">
   {#if showInitialSplash}
     <AppSplashScreen
       isReady={isAppReady}
-      onComplete={() => {
-        showInitialSplash = false;
-      }}
+      onComplete={handleInitiationComplete}
     />
-  {/if}
-
-  {#if showOnboarding}
-    <OnboardingModal onComplete={() => { localStorage.setItem('onboardingComplete', 'true'); showOnboarding = false; }} />
+  {:else if showOnboarding}
+    <OnboardingModal onComplete={handleOnboardingComplete} />
   {/if}
 
   {#if activeScreen !== 'splash' && activeScreen !== 'profile' && activeScreen !== 'settings'}
@@ -1232,8 +1276,9 @@
 
           <!-- In-Player Teacher Switcher: 1-tap switch preserving piece -->
           <div class="in-player-teacher-strip" role="tablist" aria-label="Switch instructor">
-            {#each providers as pName}
+            {#each visiblePlayerProviders as pName}
               {@const isCurrentTeacher = pName === selectedProvider}
+              {@const edu = getEducatorInfo(pName)}
               <button
                 class="teacher-pill {isCurrentTeacher ? 'active' : ''}"
                 onclick={() => switchTeacherPreservingPiece(pName)}
@@ -1242,11 +1287,22 @@
                 aria-selected={isCurrentTeacher}
               >
                 <span class="teacher-token-avatar">
-                  {pName.includes('Anikó') ? '👩‍🏫' : pName.includes('Gavin') ? '👨‍🏫' : pName.includes('Vika') ? '🎹' : '🎬'}
+                  {edu.avatarEmoji}
                 </span>
-                <span class="teacher-pill-name">{pName.split(' ')[0]}</span>
+                <span class="teacher-pill-name">{edu.educatorName.split(' ')[0]}</span>
               </button>
             {/each}
+            {#if providers.length > 3}
+              <button
+                class="teacher-pill expand-player-pill"
+                onclick={() => showAllPlayerProviders = !showAllPlayerProviders}
+                title={showAllPlayerProviders ? 'Show fewer instructors' : `Show ${hiddenPlayerProviderCount} more instructors`}
+                aria-expanded={showAllPlayerProviders}
+              >
+                <span class="teacher-token-avatar plus-token">{showAllPlayerProviders ? '▲' : '➕'}</span>
+                <span class="teacher-pill-name">{showAllPlayerProviders ? 'Less' : `+${hiddenPlayerProviderCount}`}</span>
+              </button>
+            {/if}
           </div>
 
           <!-- Top Actions (Piece Prev/Next & Metronome) -->
@@ -1291,28 +1347,26 @@
 
           <!-- Video Stage Frame -->
           <div class="player-box">
-            {#key currentLesson.youtubeVideoId}
-              <div
-                use:youtubeLooper={{
-                  videoId: () => currentLesson?.youtubeVideoId ?? '',
-                  startTime: () => customLoopA ?? currentLesson?.startTime ?? 0,
-                  endTime: () => customLoopB ?? (currentLesson?.endTime && currentLesson.endTime > 0 ? currentLesson.endTime : videoDuration),
-                  customLoopStart: () => customLoopA,
-                  customLoopEnd: () => customLoopB,
-                  playbackRate: () => playbackRate,
-                  isLooping: () => isLooping,
-                  onReady: (controller) => {
-                    playerController = controller;
-                  },
-                  onPlayerStateChange: handlePlayerStateChange,
-                  onSegmentComplete: handleSegmentComplete,
-                  onTimeUpdate: handleTimeUpdate,
-                  seekTarget: () => videoSeekTarget,
-                  _trigger: [playbackRate, isLooping, currentLesson?.youtubeVideoId, videoSeekTarget, customLoopA, customLoopB, autoAdvance]
-                }}
-                class="yt-frame"
-              ></div>
-            {/key}
+            <div
+              use:youtubeLooper={{
+                videoId: () => currentLesson?.youtubeVideoId ?? '',
+                startTime: () => customLoopA ?? currentLesson?.startTime ?? 0,
+                endTime: () => customLoopB ?? (currentLesson?.endTime && currentLesson.endTime > 0 ? currentLesson.endTime : videoDuration),
+                customLoopStart: () => customLoopA,
+                customLoopEnd: () => customLoopB,
+                playbackRate: () => playbackRate,
+                isLooping: () => isLooping,
+                onReady: (controller) => {
+                  playerController = controller;
+                },
+                onPlayerStateChange: handlePlayerStateChange,
+                onSegmentComplete: handleSegmentComplete,
+                onTimeUpdate: handleTimeUpdate,
+                seekTarget: () => videoSeekTarget,
+                _trigger: [playbackRate, isLooping, currentLesson?.youtubeVideoId, videoSeekTarget, customLoopA, customLoopB, autoAdvance]
+              }}
+              class="yt-frame"
+            ></div>
 
             <!-- Integrated Border-Free Scrubber -->
             <div
@@ -1978,13 +2032,14 @@
             <button class="color-dot" style="background: #E3F2FD" aria-label="Sky Blue" onclick={() => applyTheme('#E3F2FD')}></button>
             <button class="color-dot" style="background: #FCE4EC" aria-label="Pastel Pink" onclick={() => applyTheme('#FCE4EC')}></button>
             <button class="color-dot" style="background: #FFF9C4" aria-label="Warm Butter" onclick={() => applyTheme('#FFF9C4')}></button>
+            <button class="color-dot" style="background: #0F0E17; border-color: #00FFA3;" aria-label="Dark Midnight" onclick={() => applyTheme('#0F0E17')}></button>
           </div>
         </div>
 
         <div class="form-group">
-          <span class="form-label">PWA Version & Updates:</span>
+          <span class="form-label">PWA Version & Updates (v0.1.0):</span>
           <button class="action-btn outline-btn" onclick={forceUpdateApp}>
-            🔄 Check for Updates / Refresh App
+            🔄 Check for Updates / Refresh App (v0.1.0)
           </button>
         </div>
 
@@ -2045,14 +2100,15 @@
 
   /* Neo-brutalist Base Cards */
   .neo-card {
-    background: #ffffff;
-    border: 3px solid #000000;
+    background: var(--card-bg, #ffffff);
+    color: var(--text-main, #121212);
+    border: 3px solid var(--border-dark, #000000);
     border-radius: 12px;
-    box-shadow: 4px 4px 0px #000000;
+    box-shadow: 4px 4px 0px var(--border-dark, #000000);
   }
 
   .neo-border {
-    border: 2px solid #000000;
+    border: 2px solid var(--border-dark, #000000);
     border-radius: 8px;
   }
 
@@ -2473,6 +2529,13 @@
     z-index: 999999 !important;
   }
 
+  .player-box {
+    position: relative;
+    width: 100%;
+    background: #000000;
+    overflow: hidden;
+  }
+
   .player-stage-card:fullscreen .player-box,
   .player-stage-card:-webkit-full-screen .player-box,
   .player-stage-card.is-fullscreen .player-box {
@@ -2509,11 +2572,13 @@
     flex-shrink: 0;
   }
 
-  .yt-frame {
+  .yt-frame,
+  .player-box iframe {
     width: 100%;
     aspect-ratio: 16 / 9;
     border-bottom: 3px solid #000;
-    background: #111;
+    background: #000000;
+    display: block;
   }
 
   .scrubber-track {
@@ -3052,7 +3117,7 @@
     font-weight: 800;
     font-size: 0.85rem;
     margin-bottom: 6px;
-    color: #222;
+    color: var(--text-heading, #222);
   }
 
   .type-selector-pills {
@@ -3062,34 +3127,37 @@
   }
 
   .type-pill {
-    border: 2px solid #000;
+    border: 2px solid var(--border-dark, #000);
     border-radius: 16px;
-    background: #fff;
+    background: var(--card-bg-subtle, #fff);
+    color: var(--text-main, #121212);
     padding: 6px 12px;
     font-weight: 800;
     font-size: 0.8rem;
     cursor: pointer;
-    box-shadow: 2px 2px 0 #000;
+    box-shadow: 2px 2px 0 var(--border-dark, #000);
   }
 
   .type-pill.active {
     background: #FFCA28;
+    color: #0F0E17;
     border-width: 3px;
   }
 
-  .neo-input, .neo-select {
+  .neo-input, .neo-select, .neo-textarea {
     width: 100%;
-    border: 3px solid #000;
+    border: 3px solid var(--border-dark, #000);
     border-radius: 8px;
     padding: 10px;
     font-size: 0.95rem;
-    background: #fff;
+    background: var(--card-bg-subtle, #fff);
+    color: var(--text-main, #121212);
     box-sizing: border-box;
   }
 
   .field-hint {
     font-size: 0.8rem;
-    color: #666;
+    color: var(--text-muted, #666);
     margin: 4px 0 6px 0;
   }
 
@@ -3107,28 +3175,28 @@
   }
 
   .action-btn {
-    border: 3px solid #000;
+    border: 3px solid var(--border-dark, #000);
     border-radius: 8px;
     font-weight: 800;
     padding: 10px 16px;
     cursor: pointer;
     font-size: 0.9rem;
-    box-shadow: 2px 2px 0 #000;
+    box-shadow: 2px 2px 0 var(--border-dark, #000);
   }
 
   .action-btn:active {
     transform: translate(2px, 2px);
-    box-shadow: 0 0 0 #000;
+    box-shadow: 0 0 0 var(--border-dark, #000);
   }
 
   .action-btn.primary-btn {
     background: #FFCA28;
-    color: #000;
+    color: #0F0E17;
   }
 
   .action-btn.outline-btn {
-    background: #ffffff;
-    color: #000;
+    background: var(--card-bg, #ffffff);
+    color: var(--text-main, #000);
   }
 
   .theme-palette {
@@ -3139,10 +3207,10 @@
   .color-dot {
     width: 36px;
     height: 36px;
-    border: 3px solid #000;
+    border: 3px solid var(--border-dark, #000);
     border-radius: 50%;
     cursor: pointer;
-    box-shadow: 2px 2px 0 #000;
+    box-shadow: 2px 2px 0 var(--border-dark, #000);
   }
 
   @keyframes pulse {
@@ -3161,22 +3229,23 @@
 
   .add-channel-btn-mini {
     background: #E8F5E9;
-    border: 2px solid #000;
+    color: #2E7D32;
+    border: 2px solid var(--border-dark, #000);
     border-radius: 6px;
     font-weight: 800;
     font-size: 0.75rem;
     padding: 3px 8px;
     cursor: pointer;
-    box-shadow: 1px 1px 0 #000;
+    box-shadow: 1px 1px 0 var(--border-dark, #000);
   }
 
   .add-channel-btn-mini:active {
     transform: translate(1px, 1px);
-    box-shadow: 0 0 0 #000;
+    box-shadow: 0 0 0 var(--border-dark, #000);
   }
 
   .channels-manager-list {
-    background: #FAFAFA;
+    background: var(--surface-secondary, #FAFAFA);
     max-height: 180px;
     overflow-y: auto;
     border-radius: 8px;
@@ -3187,7 +3256,7 @@
     justify-content: space-between;
     align-items: center;
     padding: 8px 12px;
-    border-bottom: 1px solid #E0E0E0;
+    border-bottom: 1px solid var(--border-dark, #E0E0E0);
   }
 
   .channel-row-item:last-child {
@@ -3196,6 +3265,16 @@
 
   .channel-row-item.active-channel {
     background: #FFFDE7;
+  }
+
+  :global(html.dark) .channel-row-item.active-channel {
+    background: #2D2713;
+  }
+
+  :global(html.dark) .add-channel-btn-mini {
+    background: #132D1B;
+    border-color: #00FFA3;
+    color: #00FFA3;
   }
 
   .channel-item-left {
@@ -3214,7 +3293,7 @@
   .channel-title {
     font-size: 0.85rem;
     font-weight: 800;
-    color: #121212;
+    color: var(--text-heading, #121212);
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -3223,7 +3302,7 @@
   .channel-subtext {
     font-size: 0.7rem;
     font-weight: 700;
-    color: #666;
+    color: var(--text-muted, #666);
     text-transform: capitalize;
   }
 
@@ -3242,6 +3321,12 @@
     border: 1px solid #999;
   }
 
+  :global(html.dark) .builtin-badge {
+    background: #242238;
+    color: #A1A1AA;
+    border-color: #3F3B66;
+  }
+
   .delete-channel-btn {
     background: #FFEBEE;
     color: #D32F2F;
@@ -3251,7 +3336,13 @@
     font-size: 0.75rem;
     padding: 3px 8px;
     cursor: pointer;
-    box-shadow: 1px 1px 0 #000;
+    box-shadow: 1px 1px 0 var(--border-dark, #000);
+  }
+
+  :global(html.dark) .delete-channel-btn {
+    background: #381216;
+    border-color: #FF5252;
+    color: #FF8A80;
   }
 
   .delete-channel-btn:active {
@@ -3413,16 +3504,22 @@
 
   .count-in-card {
     background: #FFFDE7;
-    border: 4px solid #000;
+    border: 4px solid var(--border-dark, #000);
     border-radius: 24px;
     padding: 36px 40px;
     text-align: center;
-    box-shadow: 8px 8px 0 #000;
+    box-shadow: 8px 8px 0 var(--border-dark, #000);
     max-width: 380px;
     width: 88%;
     display: flex;
     flex-direction: column;
     align-items: center;
+  }
+
+  :global(html.dark) .count-in-card {
+    background: #231F15;
+    border-color: #FFA94D;
+    box-shadow: 8px 8px 0 #000;
   }
 
   .count-in-icon {
@@ -3445,15 +3542,24 @@
     margin-bottom: 20px;
   }
 
+  :global(html.dark) .count-in-label {
+    color: #FFFFFE;
+  }
+
   .count-in-cancel-btn {
     background: #ffffff;
-    border: 2px solid #000;
+    border: 2px solid var(--border-dark, #000);
     border-radius: 8px;
     font-weight: 800;
     padding: 8px 16px;
     cursor: pointer;
-    box-shadow: 2px 2px 0 #000;
+    box-shadow: 2px 2px 0 var(--border-dark, #000);
     font-size: 0.85rem;
+  }
+
+  :global(html.dark) .count-in-cancel-btn {
+    background: #2E2B4B;
+    color: #FFFFFE;
   }
 
   /* Practice Lab Modal */
@@ -3461,9 +3567,10 @@
     max-width: 640px !important;
     width: 94% !important;
     border-radius: 16px !important;
-    border: 4px solid #000 !important;
-    box-shadow: 6px 6px 0 #000 !important;
-    background: #FAF9F6 !important;
+    border: 4px solid var(--border-dark, #000) !important;
+    box-shadow: 6px 6px 0 var(--border-dark, #000) !important;
+    background: var(--card-bg, #FAF9F6) !important;
+    color: var(--text-main, #121212) !important;
     max-height: 88vh !important;
     display: flex !important;
     flex-direction: column !important;
@@ -3723,8 +3830,8 @@
 
   .modal-footer {
     padding: 12px 20px;
-    border-top: 2px solid #000;
-    background: #ffffff;
+    border-top: 2px solid var(--border-dark, #000);
+    background: var(--card-bg, #ffffff);
     display: flex;
     justify-content: flex-end;
   }
@@ -3732,13 +3839,90 @@
   .modal-primary-btn {
     background: #4CAF50;
     color: #ffffff;
-    border: 2px solid #000;
+    border: 2px solid var(--border-dark, #000);
     border-radius: 8px;
     font-weight: 900;
     font-size: 0.95rem;
     padding: 10px 20px;
     cursor: pointer;
-    box-shadow: 2px 2px 0 #000;
+    box-shadow: 2px 2px 0 var(--border-dark, #000);
+  }
+
+  :global(html.dark) .modal-header {
+    background: #2E2514;
+    border-bottom-color: var(--border-dark, #000);
+    color: #FFDE59;
+  }
+
+  :global(html.dark) .modal-close-btn {
+    background: var(--card-bg-subtle, #242238);
+    color: var(--text-main, #FFFFFE);
+    border-color: var(--border-dark, #000);
+  }
+
+  :global(html.dark) .lab-section {
+    background: var(--card-bg, #1E1C30);
+    border-color: var(--border-dark, #000);
+  }
+
+  :global(html.dark) .lab-section-label {
+    color: var(--text-heading, #FFFFFE);
+  }
+
+  :global(html.dark) .lab-speed-btn {
+    background: var(--card-bg-subtle, #242238);
+    color: var(--text-main, #FFFFFE);
+    border-color: var(--border-dark, #000);
+  }
+
+  :global(html.dark) .rate-desc {
+    color: var(--text-muted, #A1A1AA);
+  }
+
+  :global(html.dark) .loop-nudge-card {
+    background: var(--card-bg-subtle, #242238);
+    border-color: var(--border-dark, #000);
+  }
+
+  :global(html.dark) .nudge-btn {
+    background: var(--card-bg, #1E1C30);
+    color: var(--text-main, #FFFFFE);
+    border-color: var(--border-dark, #000);
+  }
+
+  :global(html.dark) .nudge-btn.set-btn {
+    background: #3B2154;
+    color: #C084FC;
+    border-color: #C084FC;
+  }
+
+  :global(html.dark) .lab-clear-loop-btn {
+    background: #381216;
+    border-color: #FF5252;
+    color: #FF8A80;
+  }
+
+  :global(html.dark) .lab-seek-btn {
+    background: var(--card-bg-subtle, #242238);
+    color: var(--text-main, #FFFFFE);
+    border-color: var(--border-dark, #000);
+  }
+
+  :global(html.dark) .lab-seek-btn.restart-accent {
+    background: #132D1B;
+    border-color: #00FFA3;
+    color: #00FFA3;
+  }
+
+  :global(html.dark) .lab-mode-btn {
+    background: var(--card-bg-subtle, #242238);
+    color: var(--text-main, #FFFFFE);
+    border-color: var(--border-dark, #000);
+  }
+
+  :global(html.dark) .modal-footer {
+    background: var(--card-bg, #1A1829);
+    border-top-color: var(--border-dark, #000);
   }
 
   /* ================= YouTube Kids Header ================= */
@@ -3748,14 +3932,20 @@
     align-items: center;
     padding: 10px 16px;
     background: #FFF9C4;
-    border: 3px solid #000;
+    border: 3px solid var(--border-dark, #000);
     border-radius: 16px;
-    box-shadow: 3px 3px 0 #000;
+    box-shadow: 3px 3px 0 var(--border-dark, #000);
     margin-bottom: 20px;
     margin-top: 10px;
     position: sticky;
     top: 10px;
     z-index: 100;
+  }
+
+  :global(html.dark) .kids-top-header {
+    background: #252115;
+    border-color: #FFA94D;
+    box-shadow: 3px 3px 0 #000;
   }
 
   .kids-brand-btn {
@@ -3782,7 +3972,7 @@
   .brand-title {
     font-size: 1.15rem;
     font-weight: 900;
-    color: #121212;
+    color: var(--text-heading, #121212);
   }
 
   .kids-pill-badge {
@@ -3800,18 +3990,18 @@
     display: flex;
     align-items: center;
     gap: 8px;
-    background: #ffffff;
-    border: 2px solid #000;
+    background: var(--card-bg, #ffffff);
+    border: 2px solid var(--border-dark, #000);
     border-radius: 24px;
     padding: 4px 12px 4px 6px;
     cursor: pointer;
-    box-shadow: 2px 2px 0 #000;
+    box-shadow: 2px 2px 0 var(--border-dark, #000);
     transition: transform 0.1s ease;
   }
 
   .active-profile-chip:active {
     transform: translate(1px, 1px);
-    box-shadow: 1px 1px 0 #000;
+    box-shadow: 1px 1px 0 var(--border-dark, #000);
   }
 
   .avatar-bubble {
@@ -3834,7 +4024,7 @@
   .profile-name {
     font-weight: 900;
     font-size: 0.85rem;
-    color: #121212;
+    color: var(--text-heading, #121212);
     line-height: 1.1;
   }
 
@@ -3844,7 +4034,8 @@
     align-items: center;
     gap: 8px;
     padding: 8px 14px;
-    background: #ffffff;
+    background: var(--card-bg, #ffffff);
+    border: 2px solid var(--border-dark, #000);
     border-radius: 12px;
     overflow-x: auto;
     white-space: nowrap;
@@ -3856,26 +4047,33 @@
     display: inline-flex;
     align-items: center;
     gap: 6px;
-    background: #F5F5F5;
-    border: 2px solid #000;
+    background: var(--card-bg-subtle, #F5F5F5);
+    color: var(--text-main, #121212);
+    border: 2px solid var(--border-dark, #000);
     border-radius: 8px;
     padding: 4px 10px;
     font-size: 0.82rem;
     font-weight: 800;
     cursor: pointer;
-    box-shadow: 1.5px 1.5px 0 #000;
+    box-shadow: 1.5px 1.5px 0 var(--border-dark, #000);
     transition: transform 0.1s ease, background 0.15s ease;
     flex-shrink: 0;
   }
 
   .crumb-chip:active {
     transform: translate(1px, 1px);
-    box-shadow: 0.5px 0.5px 0 #000;
+    box-shadow: 0.5px 0.5px 0 var(--border-dark, #000);
   }
 
   .crumb-chip.current {
     background: #FFF9C4;
     border-color: #E65100;
+  }
+
+  :global(html.dark) .crumb-chip.current {
+    background: #3B331A;
+    border-color: #FFA94D;
+    color: #FFDE59;
   }
 
   .crumb-avatar {
@@ -3894,7 +4092,7 @@
   }
 
   .crumb-text {
-    color: #121212;
+    color: var(--text-main, #121212);
     max-width: 140px;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -3903,7 +4101,7 @@
   .crumb-arrow {
     font-weight: 900;
     font-size: 1.1rem;
-    color: #888;
+    color: var(--text-muted, #888);
     user-select: none;
     flex-shrink: 0;
   }
@@ -3926,8 +4124,11 @@
     max-width: 640px;
     width: 100%;
     padding: 36px 24px;
-    background: #ffffff;
+    background: var(--card-bg, #ffffff);
+    color: var(--text-main, #121212);
+    border: 3px solid var(--border-dark, #000);
     border-radius: 24px;
+    box-shadow: 5px 5px 0 var(--border-dark, #000);
     gap: 16px;
   }
 
@@ -3958,7 +4159,7 @@
     margin: 0;
     font-size: 2.1rem;
     font-weight: 900;
-    color: #121212;
+    color: var(--text-heading, #121212);
     display: flex;
     align-items: center;
     gap: 8px;
@@ -3969,7 +4170,7 @@
   .splash-subtitle {
     margin: 0;
     font-size: 1rem;
-    color: #555;
+    color: var(--text-muted, #555);
     font-weight: 700;
     max-width: 480px;
   }
@@ -3986,6 +4187,12 @@
     gap: 12px;
     box-shadow: 4px 4px 0 #2E7D32;
     margin-top: 6px;
+  }
+
+  :global(html.dark) .resume-hero-box {
+    background: #132D1B;
+    border-color: #00FFA3;
+    box-shadow: 4px 4px 0 #000000;
   }
 
   .resume-eyebrow-row {
@@ -4013,6 +4220,10 @@
     font-weight: 900;
     color: #2E7D32;
     letter-spacing: 0.05em;
+  }
+
+  :global(html.dark) .resume-eyebrow {
+    color: #00FFA3;
   }
 
   .resume-main-row {
@@ -4044,13 +4255,13 @@
     margin: 0 0 2px 0;
     font-size: 1.2rem;
     font-weight: 900;
-    color: #121212;
+    color: var(--text-heading, #121212);
   }
 
   .resume-book-name {
     font-size: 0.8rem;
     font-weight: 700;
-    color: #444;
+    color: var(--text-muted, #444);
   }
 
   .resume-action-btn {
@@ -4068,6 +4279,13 @@
     width: 100%;
     margin-top: 4px;
     transition: transform 0.1s ease;
+  }
+
+  :global(html.dark) .resume-action-btn {
+    background: #00FFA3;
+    color: #0F0E17;
+    border: 2px solid #000;
+    box-shadow: 2px 2px 0 #000;
   }
 
   .resume-action-btn:active {
@@ -4757,6 +4975,32 @@
     background: var(--retro-pink, #FF3366);
     color: #ffffff;
     box-shadow: 2.5px 2.5px 0 var(--border-dark, #0F0E17);
+  }
+
+  .teacher-pill.expand-player-pill {
+    background: #FFFDE7;
+    border-style: dashed;
+    border-color: #F57F17;
+  }
+
+  .teacher-pill.expand-player-pill:hover {
+    background: #FFF9C4;
+  }
+
+  :global(html.dark) .teacher-pill.expand-player-pill {
+    background: #2D2713;
+    border-color: #FFA94D;
+    color: #FFDE59;
+  }
+
+  .plus-token {
+    background: #FFE082 !important;
+    font-weight: 900;
+  }
+
+  :global(html.dark) .teacher-pill.expand-player-pill .plus-token {
+    background: #45381A !important;
+    color: #FFDE59;
   }
 
   .teacher-token-avatar {

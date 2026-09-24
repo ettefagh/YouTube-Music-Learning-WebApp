@@ -38,6 +38,7 @@ declare global {
 
 export function youtubeLooper(node: HTMLElement, options: LooperOptions) {
   let player: any = null;
+  let isReady = false;
   let rafId: number | null = null;
   let lastSeekTarget: number | null = null;
   let lastStartTime: number | null = null;
@@ -139,15 +140,26 @@ export function youtubeLooper(node: HTMLElement, options: LooperOptions) {
       playerVars: playerVars,
       events: {
         onReady: () => {
+          isReady = true;
           player.setPlaybackRate(options.playbackRate());
-          if (options.startTime() > 0) {
-            if (player.cueVideoById && vId) {
+          const currentVId = options.videoId ? options.videoId() : vId;
+          const currentStart = options.startTime();
+
+          if (currentVId && currentVId !== vId) {
+            lastVideoId = currentVId;
+            lastStartTime = currentStart;
+            player.cueVideoById({
+              videoId: currentVId,
+              startSeconds: currentStart
+            });
+          } else if (currentStart > 0) {
+            if (player.cueVideoById && currentVId) {
               player.cueVideoById({
-                videoId: vId,
-                startSeconds: options.startTime()
+                videoId: currentVId,
+                startSeconds: currentStart
               });
             } else if (player.seekTo) {
-              player.seekTo(options.startTime(), false);
+              player.seekTo(currentStart, false);
               player.pauseVideo?.();
             }
           } else {
@@ -168,6 +180,17 @@ export function youtubeLooper(node: HTMLElement, options: LooperOptions) {
             else if (event.data === window.YT.PlayerState.CUED) stateName = 'cued';
           }
           options.onPlayerStateChange?.(stateName);
+
+          // Update duration and current time immediately upon state transitions
+          if (player && options.onTimeUpdate) {
+            try {
+              const dur = typeof player.getDuration === 'function' ? player.getDuration() : 0;
+              const cur = typeof player.getCurrentTime === 'function' ? player.getCurrentTime() : 0;
+              if (dur > 0) {
+                options.onTimeUpdate(cur, dur);
+              }
+            } catch {}
+          }
 
           if (window.YT && event.data === window.YT.PlayerState.PLAYING) {
             startLoopWatcher();
@@ -251,7 +274,7 @@ export function youtubeLooper(node: HTMLElement, options: LooperOptions) {
       options = newOptions;
 
       // Handle programmatic seek from parent UI
-      if (options.seekTarget && player && player.seekTo) {
+      if (options.seekTarget && player && isReady && player.seekTo) {
         const target = options.seekTarget();
         if (target !== null && target !== lastSeekTarget) {
           player.seekTo(target, true);
@@ -259,17 +282,27 @@ export function youtubeLooper(node: HTMLElement, options: LooperOptions) {
         }
       }
 
-      if (player && player.setPlaybackRate) {
+      if (player && isReady && player.setPlaybackRate) {
         player.setPlaybackRate(options.playbackRate());
       }
 
       const newVId = options.videoId ? options.videoId() : undefined;
       const newStart = options.startTime();
 
-      if (player && newVId) {
-        const currentVideoUrl = player.getVideoUrl ? player.getVideoUrl() : '';
-        if (newVId !== lastVideoId && (!currentVideoUrl || !currentVideoUrl.includes(newVId))) {
-          // Different video: cue new video unless user was already playing
+      if (newVId) {
+        if (!player || !isReady) {
+          lastVideoId = newVId;
+          lastStartTime = newStart;
+          return;
+        }
+
+        let currentVideoUrl = '';
+        try {
+          currentVideoUrl = player.getVideoUrl ? player.getVideoUrl() : '';
+        } catch {}
+
+        if (newVId !== lastVideoId || (currentVideoUrl && !currentVideoUrl.includes(newVId))) {
+          // Different video: cue or load new video smoothly in-place
           const wasPlaying = controller.isPlaying();
           lastVideoId = newVId;
           lastStartTime = newStart;
@@ -300,7 +333,17 @@ export function youtubeLooper(node: HTMLElement, options: LooperOptions) {
     destroy() {
       stopLoopWatcher();
       document.removeEventListener('visibilitychange', handleVisibilityChange);
-      if (player?.destroy) player.destroy();
+      if (player) {
+        try {
+          if (typeof player.destroy === 'function') {
+            player.destroy();
+          }
+        } catch (e) {
+          console.warn('[YouTube Player] Error during player destroy:', e);
+        }
+        player = null;
+      }
+      isReady = false;
     }
   };
 }

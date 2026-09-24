@@ -53,6 +53,11 @@
 
 <style>
   .mascot-card { display: flex; align-items: center; gap: 16px; padding: 12px 20px; background: #FFF9C4; border-radius: 20px; border: 3px solid #000; box-shadow: 4px 4px 0 #000; margin-bottom: 24px; }
+  :global(.dark) .mascot-card {
+    background: #2B2618;
+    border-color: #FFA94D;
+    box-shadow: 4px 4px 0 #000;
+  }
   .pip-svg {
     width: 60px;
     height: 60px;
@@ -66,8 +71,11 @@
   }
   .mascot-bubble p {
     margin: 0;
-    font-weight: 600;
+    font-weight: 700;
     color: #5D4037;
     font-size: 0.95rem;
+  }
+  :global(.dark) .mascot-bubble p {
+    color: #FFDE59;
   }
 </style>

@@ -92,7 +92,7 @@ export async function initDatabase() {
     await navigator.storage.persist();
   }
   const bookCount = await db.books.count();
-  if (bookCount < 2) {
+  if (bookCount < 3) {
     await db.books.bulkPut(SEED_BOOKS);
   }
 
@@ -102,10 +102,9 @@ export async function initDatabase() {
     await db.lessons.where('providerName').equals('Piano Companion (Chapters)').modify({ providerName: 'Gavin Brady (Chapters)' });
   }
 
-  // Since we added so many tracks, force seed injection if lesson count is low
+  // Idempotently ensure all newly added seed lessons are present in IndexedDB
   const lessonCount = await db.lessons.count();
-  if (lessonCount < 100) {
-    await db.lessons.clear();
+  if (lessonCount < SEED_LESSONS.length) {
     await db.lessons.bulkPut(SEED_LESSONS);
   }
 }

@@ -66,7 +66,7 @@
     left: 0;
     right: 0;
     height: 72px;
-    background: #ffffff;
+    background: var(--card-bg, #ffffff);
     border-top: 3.5px solid #000000;
     box-shadow: 0 -4px 0 rgba(0, 0, 0, 0.12);
     display: flex;
@@ -103,6 +103,11 @@
 
   .dock-btn:hover:not(.active) {
     transform: translateY(-2px);
+    background: rgba(0, 0, 0, 0.05);
+  }
+
+  :global(.dark) .dock-btn:hover:not(.active) {
+    background: rgba(255, 255, 255, 0.08);
   }
 
   .dock-btn:active {
@@ -113,6 +118,10 @@
     border: 2.5px solid #000000;
     box-shadow: 3px 3px 0 #000000;
     transform: translateY(-4px);
+  }
+
+  .dock-btn.active .dock-label {
+    color: #0F0E17 !important;
   }
 
   .dock-btn.active.dock-btn-library {
@@ -127,6 +136,18 @@
     background: #FFF9C4;
   }
 
+  :global(.dark) .dock-btn.active.dock-btn-library {
+    background: #FFDE59;
+  }
+
+  :global(.dark) .dock-btn.active.dock-btn-player {
+    background: #00FFA3;
+  }
+
+  :global(.dark) .dock-btn.active.dock-btn-studio {
+    background: #FFA94D;
+  }
+
   .dock-icon {
     font-size: 1.55rem;
     line-height: 1;
@@ -135,7 +156,7 @@
   .dock-label {
     font-size: 0.85rem;
     font-weight: 900;
-    color: #121212;
+    color: var(--text-main, #121212);
     letter-spacing: -0.01em;
   }
 

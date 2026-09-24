@@ -156,7 +156,9 @@
   }
 
   .back-btn {
-    background: #ffffff;
+    background: var(--card-bg, #ffffff);
+    color: var(--text-main, #121212);
+    border: 2px solid var(--border-dark, #000);
     font-size: 0.9rem;
     font-weight: 900;
     padding: 8px 16px;
@@ -166,11 +168,18 @@
 
   .station-tag {
     background: #FFF9C4;
+    color: #0F0E17;
     border: 2px solid #000;
     border-radius: 12px;
     padding: 4px 12px;
     font-size: 0.78rem;
     font-weight: 900;
+  }
+
+  :global(html.dark) .station-tag {
+    background: #2D2713;
+    color: #FFDE59;
+    border-color: #FFA94D;
   }
 
   .profile-hero-center {
@@ -188,14 +197,14 @@
     margin: 0 0 6px 0;
     font-size: 2rem;
     font-weight: 900;
-    color: #121212;
+    color: var(--text-heading, #121212);
   }
 
   .hero-subtitle {
     margin: 0;
     font-size: 1rem;
     font-weight: 700;
-    color: #555;
+    color: var(--text-muted, #555);
   }
 
   .profiles-cards-grid {
@@ -209,7 +218,10 @@
     flex-direction: column;
     align-items: center;
     padding: 24px 16px;
-    background: #ffffff;
+    background: var(--card-bg, #ffffff);
+    color: var(--text-main, #121212);
+    border: 3px solid var(--border-dark, #000);
+    box-shadow: 4px 4px 0 var(--border-dark, #000);
     border-radius: 20px;
     cursor: pointer;
     gap: 12px;
@@ -219,13 +231,19 @@
 
   .kid-jumbo-card:active {
     transform: translate(2px, 2px);
-    box-shadow: 2px 2px 0 #000;
+    box-shadow: 2px 2px 0 var(--border-dark, #000);
   }
 
   .kid-jumbo-card.active-kid {
     background: #FFF8E1;
     border-color: #E65100;
     box-shadow: 5px 5px 0 #E65100;
+  }
+
+  :global(html.dark) .kid-jumbo-card.active-kid {
+    background: #2A2312;
+    border-color: #FFA94D;
+    box-shadow: 5px 5px 0 #000;
   }
 
   .jumbo-bubble {
@@ -262,7 +280,7 @@
     margin: 0;
     font-size: 1.3rem;
     font-weight: 900;
-    color: #121212;
+    color: var(--text-heading, #121212);
   }
 
   .active-badge {
@@ -276,9 +294,9 @@
   }
 
   .tap-badge {
-    background: #FAFAFA;
-    color: #444;
-    border: 1.5px solid #000;
+    background: var(--surface-secondary, #FAFAFA);
+    color: var(--text-muted, #444);
+    border: 1.5px solid var(--border-dark, #000);
     border-radius: 10px;
     padding: 3px 10px;
     font-size: 0.75rem;
@@ -297,9 +315,18 @@
     box-sizing: border-box;
   }
 
+  :global(html.dark) .last-song-pill {
+    background: #132D1B;
+    border-color: #00FFA3;
+  }
+
   .last-tag {
     font-weight: 900;
     color: #2E7D32;
+  }
+
+  :global(html.dark) .last-tag {
+    color: #00FFA3;
   }
 
   .last-title {
@@ -310,30 +337,35 @@
     text-overflow: ellipsis;
   }
 
+  :global(html.dark) .last-title {
+    color: #FFFFFE;
+  }
+
   .add-kid-jumbo-card {
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
     padding: 24px 16px;
-    background: #FAFAFA;
-    border: 3px dashed #666;
+    background: var(--card-bg-subtle, #FAFAFA);
+    border: 3px dashed var(--border-dark, #666);
     border-radius: 20px;
     cursor: pointer;
     gap: 12px;
     text-align: center;
+    color: var(--text-main, #121212);
   }
 
   .add-plus-bubble {
     width: 88px;
     height: 88px;
     border-radius: 50%;
-    border: 3px dashed #666;
+    border: 3px dashed var(--border-dark, #666);
     display: flex;
     align-items: center;
     justify-content: center;
     font-size: 2.4rem;
-    background: #ffffff;
+    background: var(--card-bg, #ffffff);
   }
 
   /* Modal */
@@ -343,7 +375,7 @@
     left: 0;
     width: 100vw;
     height: 100vh;
-    background: rgba(0, 0, 0, 0.5);
+    background: rgba(0, 0, 0, 0.55);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -352,10 +384,13 @@
   }
 
   .add-modal-card {
-    background: #ffffff;
+    background: var(--card-bg, #ffffff);
+    color: var(--text-main, #121212);
     max-width: 480px;
     width: 100%;
     border-radius: 20px;
+    border: 3px solid var(--border-dark, #000);
+    box-shadow: 5px 5px 0 var(--border-dark, #000);
     padding: 24px;
     display: flex;
     flex-direction: column;
@@ -372,11 +407,13 @@
     margin: 0;
     font-size: 1.3rem;
     font-weight: 900;
+    color: var(--text-heading, #121212);
   }
 
   .close-btn {
-    background: #eee;
-    border: 2px solid #000;
+    background: var(--card-bg-subtle, #eee);
+    color: var(--text-main, #000);
+    border: 2px solid var(--border-dark, #000);
     border-radius: 8px;
     width: 32px;
     height: 32px;
@@ -394,10 +431,13 @@
   .form-group label, .avatar-label {
     font-size: 0.9rem;
     font-weight: 900;
+    color: var(--text-heading, #121212);
   }
 
   .name-input {
-    border: 2px solid #000;
+    border: 2px solid var(--border-dark, #000);
+    background: var(--card-bg-subtle, #ffffff);
+    color: var(--text-main, #121212);
     border-radius: 10px;
     padding: 10px;
     font-size: 1rem;
@@ -439,6 +479,9 @@
 
   .create-btn {
     background: #FFD54F;
+    color: #0F0E17;
+    border: 2.5px solid #000;
+    box-shadow: 2px 2px 0 #000;
     font-size: 1rem;
     font-weight: 900;
     padding: 12px 20px;

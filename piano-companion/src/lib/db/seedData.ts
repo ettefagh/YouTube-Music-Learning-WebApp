@@ -15,6 +15,13 @@ export const SEED_BOOKS: LocalBook[] = [
     "publisher": "Anikó Drabon / Mitras Music",
     "coverImageR2Url": "https://images.unsplash.com/photo-1552422535-c45813c61732?auto=format&fit=crop&w=400&q=80",
     "updatedAt": 1788117025732
+  },
+  {
+    "id": "tastenzauberei-3",
+    "title": "Tastenzauberei Band 3",
+    "publisher": "Anikó Drabon / Mitras Music",
+    "coverImageR2Url": "https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?auto=format&fit=crop&w=400&q=80",
+    "updatedAt": 1788898117477
   }
 ];
 
@@ -3078,5 +3085,1144 @@ export const SEED_LESSONS: LocalLesson[] = [
       "Follow the chapter timing accurately"
     ],
     "isCompleted": false
+  },
+  {
+    "id": "tz1-ff-01-glocken",
+    "bookId": "tastenzauberei-1",
+    "providerName": "Felicitas Falke (Singles)",
+    "title": "Glocken (vierhändig)",
+    "sequenceIndex": 1,
+    "youtubeVideoId": "CUvzy7Tu6TE",
+    "startTime": 0,
+    "endTime": 0,
+    "checkpoints": [
+      "Spiele im Fünftonraum um das eingestrichene C",
+      "Höre auf die vierhändige Lehrerbegleitung im Hintergrund",
+      "Achte auf ein ruhiges, gleichmäßiges Glockenläuten"
+    ],
+    "isCompleted": false,
+    "listType": "singles"
+  },
+  {
+    "id": "tz1-ff-26-alle-zusammen",
+    "bookId": "tastenzauberei-1",
+    "providerName": "Felicitas Falke (Singles)",
+    "title": "Alle zusammen",
+    "sequenceIndex": 26,
+    "youtubeVideoId": "gTTaiCd8fsQ",
+    "startTime": 0,
+    "endTime": 0,
+    "checkpoints": [
+      "Rechte Hand spielt C-D-E, linke Hand C-H-A",
+      "Singe den Merksatz: Dino sieht Hase, Elefant sieht Affe",
+      "Wiederholungszeichen am Taktende beachten"
+    ],
+    "isCompleted": false,
+    "listType": "singles"
+  },
+  {
+    "id": "tz1-ff-27-legato-staccato",
+    "bookId": "tastenzauberei-1",
+    "providerName": "Felicitas Falke (Singles)",
+    "title": "Legato – staccato",
+    "sequenceIndex": 27,
+    "youtubeVideoId": "5U0Qox_bxyU",
+    "startTime": 0,
+    "endTime": 0,
+    "checkpoints": [
+      "Unterscheide deutlich gebundene Bögen von kurzen Hüpftönen",
+      "Staccato mit federndem Handgelenk ausführen",
+      "Handgelenk stets elastisch und locker halten"
+    ],
+    "isCompleted": false,
+    "listType": "singles"
+  },
+  {
+    "id": "tz1-ff-30-fingersport",
+    "bookId": "tastenzauberei-1",
+    "providerName": "Felicitas Falke (Singles)",
+    "title": "Fingersport",
+    "sequenceIndex": 30,
+    "youtubeVideoId": "x2D-ksbn3nQ",
+    "startTime": 0,
+    "endTime": 0,
+    "checkpoints": [
+      "Jeden Finger einzeln und unabhängig anheben",
+      "Handrücken waagerecht über den Tasten halten",
+      "Mit langsamem Übetempo beginnen und gleichmäßig steigern"
+    ],
+    "isCompleted": false,
+    "listType": "singles"
+  },
+  {
+    "id": "tz1-ff-31-gradeaus",
+    "bookId": "tastenzauberei-1",
+    "providerName": "Felicitas Falke (Singles)",
+    "title": "Gradeaus (vierhändig)",
+    "sequenceIndex": 31,
+    "youtubeVideoId": "dspAd0VfAa8",
+    "startTime": 0,
+    "endTime": 0,
+    "checkpoints": [
+      "Kombiniere Primo-Melodie mit Secondo-Begleitung",
+      "Zähle den Grundschlag 1 - 2 - 3 - 4 laut mit",
+      "Sauberen Tastenanschlag ohne Rutschen beibehalten"
+    ],
+    "isCompleted": false,
+    "listType": "singles"
+  },
+  {
+    "id": "tz1-ff-41-tanzparty",
+    "bookId": "tastenzauberei-1",
+    "providerName": "Felicitas Falke (Singles)",
+    "title": "Tanzparty",
+    "sequenceIndex": 41,
+    "youtubeVideoId": "iceCAS0w_CM",
+    "startTime": 0,
+    "endTime": 0,
+    "checkpoints": [
+      "Schwungvollen Tanzrhythmus im Puls halten",
+      "Achte auf dynamische Kontraste zwischen forte und piano",
+      "Fingersatzwechsel vorab isoliert einüben"
+    ],
+    "isCompleted": false,
+    "listType": "singles"
+  },
+  {
+    "id": "tz1-ff-63-das-karussell",
+    "bookId": "tastenzauberei-1",
+    "providerName": "Felicitas Falke (Singles)",
+    "title": "Das Karussell",
+    "sequenceIndex": 63,
+    "youtubeVideoId": "DPyC2_Q1yhY",
+    "startTime": 0,
+    "endTime": 0,
+    "checkpoints": [
+      "Rechte Hand führt die Karussell-Melodie fließend",
+      "Linke Hand begleitet im gleichmäßigen Drehtakt",
+      "Optionales Haltepedal für schwebenden Klangklang nutzen"
+    ],
+    "isCompleted": false,
+    "listType": "singles"
+  },
+  {
+    "id": "tz2-ff-40-wiegenlied",
+    "bookId": "tastenzauberei-2",
+    "providerName": "Felicitas Falke (Singles)",
+    "title": "Wiegenlied",
+    "sequenceIndex": 40,
+    "youtubeVideoId": "33JUsR0QiFo",
+    "startTime": 0,
+    "endTime": 0,
+    "checkpoints": [
+      "Sicherer Einstieg in der neuen G-Lage",
+      "Zartes, wiegendes Dolce im Dreivierteltakt spielen",
+      "Linke Hand leise im Hintergrund begleiten lassen"
+    ],
+    "isCompleted": false,
+    "listType": "singles"
+  },
+  {
+    "id": "tz2-ff-58-sanfte-wellen",
+    "bookId": "tastenzauberei-2",
+    "providerName": "Felicitas Falke (Singles)",
+    "title": "Sanfte Wellen",
+    "sequenceIndex": 58,
+    "youtubeVideoId": "pGjCvz0xWvM",
+    "startTime": 0,
+    "endTime": 0,
+    "checkpoints": [
+      "Kantilene mit feiner Anschlagskultur ausarbeiten",
+      "Fließende Phrasierungsbögen über zwei Takte spannen",
+      "Begleitfiguren sanft wie sanfte Meereswellen wiegen"
+    ],
+    "isCompleted": false,
+    "listType": "singles"
+  },
+  {
+    "id": "tz1-mt-05-ein-gewitter-kommt",
+    "bookId": "tastenzauberei-1",
+    "providerName": "Maryna Tochyltseva (Singles)",
+    "title": "Ein Gewitter kommt",
+    "sequenceIndex": 5,
+    "youtubeVideoId": "58vV0evM04M",
+    "startTime": 0,
+    "endTime": 0,
+    "checkpoints": [
+      "Improvisation im festen Rhythmus umsetzen",
+      "Gewitter-Donner mit tiefen Tasten der linken Hand erzeugen",
+      "Dynamischen Aufbau von piano bis zum Fortissimo spüren"
+    ],
+    "isCompleted": false,
+    "listType": "singles"
+  },
+  {
+    "id": "tz1-mt-20-herr-c",
+    "bookId": "tastenzauberei-1",
+    "providerName": "Maryna Tochyltseva (Singles)",
+    "title": "Herr C...",
+    "sequenceIndex": 20,
+    "youtubeVideoId": "pYT5YfiEzkc",
+    "startTime": 0,
+    "endTime": 0,
+    "checkpoints": [
+      "Orientierung an den zwei schwarzen Tasten für das C1",
+      "Daumen der rechten Hand entspannt auf die C-Taste legen",
+      "Notenbild mit Violinschlüssel genau mitverfolgen"
+    ],
+    "isCompleted": false,
+    "listType": "singles"
+  },
+  {
+    "id": "tz1-mt-26-alle-zusammen",
+    "bookId": "tastenzauberei-1",
+    "providerName": "Maryna Tochyltseva (Singles)",
+    "title": "Alle zusammen",
+    "sequenceIndex": 26,
+    "youtubeVideoId": "Rn5nfD6wfPY",
+    "startTime": 0,
+    "endTime": 0,
+    "checkpoints": [
+      "Beide Hände gleichzeitig im Fünftonraum positionieren",
+      "Fließender Wechsel zwischen rechter und linker Hand",
+      "Ruhige Fingerbewegungen ohne Heben der Schultern"
+    ],
+    "isCompleted": false,
+    "listType": "singles"
+  },
+  {
+    "id": "tz1-mt-38-die-spieluhr",
+    "bookId": "tastenzauberei-1",
+    "providerName": "Maryna Tochyltseva (Singles)",
+    "title": "Die Spieluhr",
+    "sequenceIndex": 38,
+    "youtubeVideoId": "MVG3S_K37j4",
+    "startTime": 0,
+    "endTime": 0,
+    "checkpoints": [
+      "Zartes, mechanisches Ticken im Pianissimo gestalten",
+      "Gleichmäßige Sechzehntel- bzw. Achtelläufe üben",
+      "Hände am Ende behutsam ausklingen lassen"
+    ],
+    "isCompleted": false,
+    "listType": "singles"
+  },
+  {
+    "id": "tz2-mt-01-wettrennen",
+    "bookId": "tastenzauberei-2",
+    "providerName": "Maryna Tochyltseva (Singles)",
+    "title": "Neuer Start, Wettrennen",
+    "sequenceIndex": 1,
+    "youtubeVideoId": "Yqu5jz1FB_g",
+    "startTime": 0,
+    "endTime": 0,
+    "checkpoints": [
+      "Wiederholung des Noten-Alphabets auf der Tastatur",
+      "Spritziges Tempo mit präzisem Tastenanschlag spielen",
+      "Vorbereitung auf schnelle Tonfolgen"
+    ],
+    "isCompleted": false,
+    "listType": "singles"
+  },
+  {
+    "id": "tz2-mt-03-auf-der-wippe",
+    "bookId": "tastenzauberei-2",
+    "providerName": "Maryna Tochyltseva (Singles)",
+    "title": "Auf der Wippe",
+    "sequenceIndex": 3,
+    "youtubeVideoId": "Hm7USuSELZY",
+    "startTime": 0,
+    "endTime": 0,
+    "checkpoints": [
+      "Hin- und Herbewegung im mezzoforte (mf) darstellen",
+      "Auf harmonischen Ausgleich beider Hände achten",
+      "Bewusste Tonhöhenunterschiede hören"
+    ],
+    "isCompleted": false,
+    "listType": "singles"
+  },
+  {
+    "id": "tz2-mt-53-indianertanz",
+    "bookId": "tastenzauberei-2",
+    "providerName": "Maryna Tochyltseva (Singles)",
+    "title": "Indianertanz (W. Gillock)",
+    "sequenceIndex": 53,
+    "youtubeVideoId": "PeoUy20dWHA",
+    "startTime": 0,
+    "endTime": 0,
+    "checkpoints": [
+      "Rhythmische Trommelschläge der linken Hand betonen",
+      "Crescendo und Diminuendo dramatisch ausführen",
+      "Fingersatzwechsel im zügigen Marschtempo kontrollieren"
+    ],
+    "isCompleted": false,
+    "listType": "singles"
+  },
+  {
+    "id": "tz1-vb-38-die-spieluhr",
+    "bookId": "tastenzauberei-1",
+    "providerName": "Valentin Bedrich (Singles)",
+    "title": "Die Spieluhr",
+    "sequenceIndex": 38,
+    "youtubeVideoId": "GjUrgwJqeuk",
+    "startTime": 0,
+    "endTime": 0,
+    "checkpoints": [
+      "Valentin-Methode: Zuerst langsam Takt für Takt isolieren",
+      "Rhythmus mit lauter Stimme mitsprechen",
+      "Fingerkuppen aufstellen wie kleine Hämmerchen"
+    ],
+    "isCompleted": false,
+    "listType": "singles"
+  },
+  {
+    "id": "tz1-jp-64-die-lokomotive",
+    "bookId": "tastenzauberei-1",
+    "providerName": "JessPiano (Singles)",
+    "title": "Die Lokomotive",
+    "sequenceIndex": 64,
+    "youtubeVideoId": "xItcuzQhs8w",
+    "startTime": 0,
+    "endTime": 0,
+    "checkpoints": [
+      "Folge den bunten herabfallenden Synthesia-Balken",
+      "Achte auf das Intervall der Sexte zwischen den Händen",
+      "Beschleunige das Tempo wie eine anfahrende Dampflok"
+    ],
+    "isCompleted": false,
+    "listType": "singles"
+  },
+  {
+    "id": "tz3-gb-01",
+    "bookId": "tastenzauberei-3",
+    "providerName": "Gavin Brady (Chapters)",
+    "title": "Licht und Schatten",
+    "sequenceIndex": 1,
+    "youtubeVideoId": "FguuYvtOfFk",
+    "startTime": 0,
+    "endTime": 54,
+    "checkpoints": [
+      "Schwerpunkt: Wiederholung der Notennamen, Klavierduo",
+      "Auf die genaue Ausführung der Artikulationsbögen achten",
+      "Gavin Bradys Handhaltung und Dynamik als Vorbild nehmen"
+    ],
+    "isCompleted": false,
+    "listType": "chapters"
+  },
+  {
+    "id": "tz3-gb-02",
+    "bookId": "tastenzauberei-3",
+    "providerName": "Gavin Brady (Chapters)",
+    "title": "Wilde Jagd",
+    "sequenceIndex": 2,
+    "youtubeVideoId": "FguuYvtOfFk",
+    "startTime": 54,
+    "endTime": 130,
+    "checkpoints": [
+      "Schwerpunkt: Sekundschritte, Spiel im schnellem Tempo",
+      "Auf die genaue Ausführung der Artikulationsbögen achten",
+      "Gavin Bradys Handhaltung und Dynamik als Vorbild nehmen"
+    ],
+    "isCompleted": false,
+    "listType": "chapters"
+  },
+  {
+    "id": "tz3-gb-03",
+    "bookId": "tastenzauberei-3",
+    "providerName": "Gavin Brady (Chapters)",
+    "title": "Drachensteigen",
+    "sequenceIndex": 3,
+    "youtubeVideoId": "FguuYvtOfFk",
+    "startTime": 130,
+    "endTime": 202,
+    "checkpoints": [
+      "Schwerpunkt: Sekund- und Terzschritte",
+      "Auf die genaue Ausführung der Artikulationsbögen achten",
+      "Gavin Bradys Handhaltung und Dynamik als Vorbild nehmen"
+    ],
+    "isCompleted": false,
+    "listType": "chapters"
+  },
+  {
+    "id": "tz3-gb-04",
+    "bookId": "tastenzauberei-3",
+    "providerName": "Gavin Brady (Chapters)",
+    "title": "Aus der Zauberflöte (W. A. Mozart)",
+    "sequenceIndex": 4,
+    "youtubeVideoId": "FguuYvtOfFk",
+    "startTime": 202,
+    "endTime": 246,
+    "checkpoints": [
+      "Schwerpunkt: Terzen, Klavierduo",
+      "Auf die genaue Ausführung der Artikulationsbögen achten",
+      "Gavin Bradys Handhaltung und Dynamik als Vorbild nehmen"
+    ],
+    "isCompleted": false,
+    "listType": "chapters"
+  },
+  {
+    "id": "tz3-gb-05",
+    "bookId": "tastenzauberei-3",
+    "providerName": "Gavin Brady (Chapters)",
+    "title": "Zerflossene Melodie",
+    "sequenceIndex": 5,
+    "youtubeVideoId": "FguuYvtOfFk",
+    "startTime": 246,
+    "endTime": 309,
+    "checkpoints": [
+      "Schwerpunkt: Quint- und Sextschritte, Arpeggio",
+      "Auf die genaue Ausführung der Artikulationsbögen achten",
+      "Gavin Bradys Handhaltung und Dynamik als Vorbild nehmen"
+    ],
+    "isCompleted": false,
+    "listType": "chapters"
+  },
+  {
+    "id": "tz3-gb-06",
+    "bookId": "tastenzauberei-3",
+    "providerName": "Gavin Brady (Chapters)",
+    "title": "Tanz der Intervalle",
+    "sequenceIndex": 6,
+    "youtubeVideoId": "FguuYvtOfFk",
+    "startTime": 309,
+    "endTime": 356,
+    "checkpoints": [
+      "Schwerpunkt: Von Sekunde bis Sexte",
+      "Auf die genaue Ausführung der Artikulationsbögen achten",
+      "Gavin Bradys Handhaltung und Dynamik als Vorbild nehmen"
+    ],
+    "isCompleted": false,
+    "listType": "chapters"
+  },
+  {
+    "id": "tz3-gb-07",
+    "bookId": "tastenzauberei-3",
+    "providerName": "Gavin Brady (Chapters)",
+    "title": "Singende Oktaven, Übersicht",
+    "sequenceIndex": 7,
+    "youtubeVideoId": "FguuYvtOfFk",
+    "startTime": 356,
+    "endTime": 417,
+    "checkpoints": [
+      "Schwerpunkt: Die Oktavbereiche",
+      "Auf die genaue Ausführung der Artikulationsbögen achten",
+      "Gavin Bradys Handhaltung und Dynamik als Vorbild nehmen"
+    ],
+    "isCompleted": false,
+    "listType": "chapters"
+  },
+  {
+    "id": "tz3-gb-08",
+    "bookId": "tastenzauberei-3",
+    "providerName": "Gavin Brady (Chapters)",
+    "title": "Hauptdreiklänge",
+    "sequenceIndex": 8,
+    "youtubeVideoId": "FguuYvtOfFk",
+    "startTime": 417,
+    "endTime": 458,
+    "checkpoints": [
+      "Schwerpunkt: Hauptdreiklänge",
+      "Auf die genaue Ausführung der Artikulationsbögen achten",
+      "Gavin Bradys Handhaltung und Dynamik als Vorbild nehmen"
+    ],
+    "isCompleted": false,
+    "listType": "chapters"
+  },
+  {
+    "id": "tz3-gb-09",
+    "bookId": "tastenzauberei-3",
+    "providerName": "Gavin Brady (Chapters)",
+    "title": "Dreiklang-Dance",
+    "sequenceIndex": 9,
+    "youtubeVideoId": "FguuYvtOfFk",
+    "startTime": 458,
+    "endTime": 513,
+    "checkpoints": [
+      "Schwerpunkt: Umkehrungen des Dreiklanges",
+      "Auf die genaue Ausführung der Artikulationsbögen achten",
+      "Gavin Bradys Handhaltung und Dynamik als Vorbild nehmen"
+    ],
+    "isCompleted": false,
+    "listType": "chapters"
+  },
+  {
+    "id": "tz3-gb-10",
+    "bookId": "tastenzauberei-3",
+    "providerName": "Gavin Brady (Chapters)",
+    "title": "Deutscher Tanz (J. Haydn)",
+    "sequenceIndex": 10,
+    "youtubeVideoId": "FguuYvtOfFk",
+    "startTime": 513,
+    "endTime": 585,
+    "checkpoints": [
+      "Schwerpunkt: Der Septakkord",
+      "Auf die genaue Ausführung der Artikulationsbögen achten",
+      "Gavin Bradys Handhaltung und Dynamik als Vorbild nehmen"
+    ],
+    "isCompleted": false,
+    "listType": "chapters"
+  },
+  {
+    "id": "tz3-gb-11",
+    "bookId": "tastenzauberei-3",
+    "providerName": "Gavin Brady (Chapters)",
+    "title": "Greensleeves",
+    "sequenceIndex": 11,
+    "youtubeVideoId": "FguuYvtOfFk",
+    "startTime": 585,
+    "endTime": 642,
+    "checkpoints": [
+      "Schwerpunkt: Dreiklänge erkennen",
+      "Auf die genaue Ausführung der Artikulationsbögen achten",
+      "Gavin Bradys Handhaltung und Dynamik als Vorbild nehmen"
+    ],
+    "isCompleted": false,
+    "listType": "chapters"
+  },
+  {
+    "id": "tz3-gb-12",
+    "bookId": "tastenzauberei-3",
+    "providerName": "Gavin Brady (Chapters)",
+    "title": "Etüde (C. Czerny)",
+    "sequenceIndex": 12,
+    "youtubeVideoId": "FguuYvtOfFk",
+    "startTime": 642,
+    "endTime": 704,
+    "checkpoints": [
+      "Schwerpunkt: Dreiklänge erkennen",
+      "Auf die genaue Ausführung der Artikulationsbögen achten",
+      "Gavin Bradys Handhaltung und Dynamik als Vorbild nehmen"
+    ],
+    "isCompleted": false,
+    "listType": "chapters"
+  },
+  {
+    "id": "tz3-gb-13",
+    "bookId": "tastenzauberei-3",
+    "providerName": "Gavin Brady (Chapters)",
+    "title": "Thema mit Variation (C. Gurlitt)",
+    "sequenceIndex": 13,
+    "youtubeVideoId": "FguuYvtOfFk",
+    "startTime": 704,
+    "endTime": 772,
+    "checkpoints": [
+      "Schwerpunkt: Dreiklänge erkennen, Triole",
+      "Auf die genaue Ausführung der Artikulationsbögen achten",
+      "Gavin Bradys Handhaltung und Dynamik als Vorbild nehmen"
+    ],
+    "isCompleted": false,
+    "listType": "chapters"
+  },
+  {
+    "id": "tz3-gb-14",
+    "bookId": "tastenzauberei-3",
+    "providerName": "Gavin Brady (Chapters)",
+    "title": "Gurlitt - Rock it!",
+    "sequenceIndex": 14,
+    "youtubeVideoId": "FguuYvtOfFk",
+    "startTime": 772,
+    "endTime": 849,
+    "checkpoints": [
+      "Schwerpunkt: Stilistik & Spieltechnik",
+      "Auf die genaue Ausführung der Artikulationsbögen achten",
+      "Gavin Bradys Handhaltung und Dynamik als Vorbild nehmen"
+    ],
+    "isCompleted": false,
+    "listType": "chapters"
+  },
+  {
+    "id": "tz3-gb-15",
+    "bookId": "tastenzauberei-3",
+    "providerName": "Gavin Brady (Chapters)",
+    "title": "Menuett (J. Krieger)",
+    "sequenceIndex": 15,
+    "youtubeVideoId": "FguuYvtOfFk",
+    "startTime": 849,
+    "endTime": 892,
+    "checkpoints": [
+      "Schwerpunkt: Polyphones Spiel",
+      "Auf die genaue Ausführung der Artikulationsbögen achten",
+      "Gavin Bradys Handhaltung und Dynamik als Vorbild nehmen"
+    ],
+    "isCompleted": false,
+    "listType": "chapters"
+  },
+  {
+    "id": "tz3-gb-16",
+    "bookId": "tastenzauberei-3",
+    "providerName": "Gavin Brady (Chapters)",
+    "title": "Waschmittel-Werbung",
+    "sequenceIndex": 16,
+    "youtubeVideoId": "FguuYvtOfFk",
+    "startTime": 892,
+    "endTime": 973,
+    "checkpoints": [
+      "Schwerpunkt: C-Dur",
+      "Auf die genaue Ausführung der Artikulationsbögen achten",
+      "Gavin Bradys Handhaltung und Dynamik als Vorbild nehmen"
+    ],
+    "isCompleted": false,
+    "listType": "chapters"
+  },
+  {
+    "id": "tz3-gb-17",
+    "bookId": "tastenzauberei-3",
+    "providerName": "Gavin Brady (Chapters)",
+    "title": "Für Elise (L. v. Beethoven)",
+    "sequenceIndex": 17,
+    "youtubeVideoId": "FguuYvtOfFk",
+    "startTime": 973,
+    "endTime": 1058,
+    "checkpoints": [
+      "Schwerpunkt: a-Moll",
+      "Auf die genaue Ausführung der Artikulationsbögen achten",
+      "Gavin Bradys Handhaltung und Dynamik als Vorbild nehmen"
+    ],
+    "isCompleted": false,
+    "listType": "chapters"
+  },
+  {
+    "id": "tz3-gb-18",
+    "bookId": "tastenzauberei-3",
+    "providerName": "Gavin Brady (Chapters)",
+    "title": "Die Wut über den... (L. v. Beethoven)",
+    "sequenceIndex": 18,
+    "youtubeVideoId": "FguuYvtOfFk",
+    "startTime": 1058,
+    "endTime": 1095,
+    "checkpoints": [
+      "Schwerpunkt: G-Dur",
+      "Auf die genaue Ausführung der Artikulationsbögen achten",
+      "Gavin Bradys Handhaltung und Dynamik als Vorbild nehmen"
+    ],
+    "isCompleted": false,
+    "listType": "chapters"
+  },
+  {
+    "id": "tz3-gb-19",
+    "bookId": "tastenzauberei-3",
+    "providerName": "Gavin Brady (Chapters)",
+    "title": "Auf dem Boot",
+    "sequenceIndex": 19,
+    "youtubeVideoId": "FguuYvtOfFk",
+    "startTime": 1095,
+    "endTime": 1145,
+    "checkpoints": [
+      "Schwerpunkt: e-Moll",
+      "Auf die genaue Ausführung der Artikulationsbögen achten",
+      "Gavin Bradys Handhaltung und Dynamik als Vorbild nehmen"
+    ],
+    "isCompleted": false,
+    "listType": "chapters"
+  },
+  {
+    "id": "tz3-gb-20",
+    "bookId": "tastenzauberei-3",
+    "providerName": "Gavin Brady (Chapters)",
+    "title": "Musette aus dem Notenbüchlein für A. M. Bach",
+    "sequenceIndex": 20,
+    "youtubeVideoId": "FguuYvtOfFk",
+    "startTime": 1145,
+    "endTime": 1197,
+    "checkpoints": [
+      "Schwerpunkt: D-Dur",
+      "Auf die genaue Ausführung der Artikulationsbögen achten",
+      "Gavin Bradys Handhaltung und Dynamik als Vorbild nehmen"
+    ],
+    "isCompleted": false,
+    "listType": "chapters"
+  },
+  {
+    "id": "tz3-gb-21",
+    "bookId": "tastenzauberei-3",
+    "providerName": "Gavin Brady (Chapters)",
+    "title": "Regenbogen",
+    "sequenceIndex": 21,
+    "youtubeVideoId": "FguuYvtOfFk",
+    "startTime": 1197,
+    "endTime": 1260,
+    "checkpoints": [
+      "Schwerpunkt: F-Dur",
+      "Auf die genaue Ausführung der Artikulationsbögen achten",
+      "Gavin Bradys Handhaltung und Dynamik als Vorbild nehmen"
+    ],
+    "isCompleted": false,
+    "listType": "chapters"
+  },
+  {
+    "id": "tz3-gb-22",
+    "bookId": "tastenzauberei-3",
+    "providerName": "Gavin Brady (Chapters)",
+    "title": "Nächtliche Reise (C. Gurlitt)",
+    "sequenceIndex": 22,
+    "youtubeVideoId": "FguuYvtOfFk",
+    "startTime": 1260,
+    "endTime": 1330,
+    "checkpoints": [
+      "Schwerpunkt: d-Moll",
+      "Auf die genaue Ausführung der Artikulationsbögen achten",
+      "Gavin Bradys Handhaltung und Dynamik als Vorbild nehmen"
+    ],
+    "isCompleted": false,
+    "listType": "chapters"
+  },
+  {
+    "id": "tz3-gb-23",
+    "bookId": "tastenzauberei-3",
+    "providerName": "Gavin Brady (Chapters)",
+    "title": "Die Blasmusik zieht vorbei",
+    "sequenceIndex": 23,
+    "youtubeVideoId": "FguuYvtOfFk",
+    "startTime": 1330,
+    "endTime": 1385,
+    "checkpoints": [
+      "Schwerpunkt: Synkope",
+      "Auf die genaue Ausführung der Artikulationsbögen achten",
+      "Gavin Bradys Handhaltung und Dynamik als Vorbild nehmen"
+    ],
+    "isCompleted": false,
+    "listType": "chapters"
+  },
+  {
+    "id": "tz3-gb-24",
+    "bookId": "tastenzauberei-3",
+    "providerName": "Gavin Brady (Chapters)",
+    "title": "Menuett (L. Mozart)",
+    "sequenceIndex": 24,
+    "youtubeVideoId": "FguuYvtOfFk",
+    "startTime": 1385,
+    "endTime": 1437,
+    "checkpoints": [
+      "Schwerpunkt: Artikulation",
+      "Auf die genaue Ausführung der Artikulationsbögen achten",
+      "Gavin Bradys Handhaltung und Dynamik als Vorbild nehmen"
+    ],
+    "isCompleted": false,
+    "listType": "chapters"
+  },
+  {
+    "id": "tz3-gb-25",
+    "bookId": "tastenzauberei-3",
+    "providerName": "Gavin Brady (Chapters)",
+    "title": "Zwei Gavottes (Telemann, Witthauer)",
+    "sequenceIndex": 25,
+    "youtubeVideoId": "FguuYvtOfFk",
+    "startTime": 1437,
+    "endTime": 1475,
+    "checkpoints": [
+      "Schwerpunkt: Alla breve",
+      "Auf die genaue Ausführung der Artikulationsbögen achten",
+      "Gavin Bradys Handhaltung und Dynamik als Vorbild nehmen"
+    ],
+    "isCompleted": false,
+    "listType": "chapters"
+  },
+  {
+    "id": "tz3-gb-26",
+    "bookId": "tastenzauberei-3",
+    "providerName": "Gavin Brady (Chapters)",
+    "title": "Zwei Gavottes (Telemann, Witthauer)",
+    "sequenceIndex": 26,
+    "youtubeVideoId": "FguuYvtOfFk",
+    "startTime": 1475,
+    "endTime": 1510,
+    "checkpoints": [
+      "Schwerpunkt: Alla breve",
+      "Auf die genaue Ausführung der Artikulationsbögen achten",
+      "Gavin Bradys Handhaltung und Dynamik als Vorbild nehmen"
+    ],
+    "isCompleted": false,
+    "listType": "chapters"
+  },
+  {
+    "id": "tz3-gb-27",
+    "bookId": "tastenzauberei-3",
+    "providerName": "Gavin Brady (Chapters)",
+    "title": "The Entertainer (S. Joplin)",
+    "sequenceIndex": 27,
+    "youtubeVideoId": "FguuYvtOfFk",
+    "startTime": 1510,
+    "endTime": 1558,
+    "checkpoints": [
+      "Schwerpunkt: Ragtime",
+      "Auf die genaue Ausführung der Artikulationsbögen achten",
+      "Gavin Bradys Handhaltung und Dynamik als Vorbild nehmen"
+    ],
+    "isCompleted": false,
+    "listType": "chapters"
+  },
+  {
+    "id": "tz3-gb-28",
+    "bookId": "tastenzauberei-3",
+    "providerName": "Gavin Brady (Chapters)",
+    "title": "Samba-Etüde",
+    "sequenceIndex": 28,
+    "youtubeVideoId": "FguuYvtOfFk",
+    "startTime": 1558,
+    "endTime": 1613,
+    "checkpoints": [
+      "Schwerpunkt: Klavierduo",
+      "Auf die genaue Ausführung der Artikulationsbögen achten",
+      "Gavin Bradys Handhaltung und Dynamik als Vorbild nehmen"
+    ],
+    "isCompleted": false,
+    "listType": "chapters"
+  },
+  {
+    "id": "tz3-gb-29",
+    "bookId": "tastenzauberei-3",
+    "providerName": "Gavin Brady (Chapters)",
+    "title": "Rock 'n' Roll",
+    "sequenceIndex": 29,
+    "youtubeVideoId": "FguuYvtOfFk",
+    "startTime": 1613,
+    "endTime": 1660,
+    "checkpoints": [
+      "Schwerpunkt: Hauptdreiklänge",
+      "Auf die genaue Ausführung der Artikulationsbögen achten",
+      "Gavin Bradys Handhaltung und Dynamik als Vorbild nehmen"
+    ],
+    "isCompleted": false,
+    "listType": "chapters"
+  },
+  {
+    "id": "tz3-gb-30",
+    "bookId": "tastenzauberei-3",
+    "providerName": "Gavin Brady (Chapters)",
+    "title": "Rock 'n' Roll",
+    "sequenceIndex": 30,
+    "youtubeVideoId": "FguuYvtOfFk",
+    "startTime": 1660,
+    "endTime": 1709,
+    "checkpoints": [
+      "Schwerpunkt: Hauptdreiklänge",
+      "Auf die genaue Ausführung der Artikulationsbögen achten",
+      "Gavin Bradys Handhaltung und Dynamik als Vorbild nehmen"
+    ],
+    "isCompleted": false,
+    "listType": "chapters"
+  },
+  {
+    "id": "tz3-gb-31",
+    "bookId": "tastenzauberei-3",
+    "providerName": "Gavin Brady (Chapters)",
+    "title": "Burleske (L. Mozart)",
+    "sequenceIndex": 31,
+    "youtubeVideoId": "FguuYvtOfFk",
+    "startTime": 1709,
+    "endTime": 1740,
+    "checkpoints": [
+      "Schwerpunkt: Oktavsprünge",
+      "Auf die genaue Ausführung der Artikulationsbögen achten",
+      "Gavin Bradys Handhaltung und Dynamik als Vorbild nehmen"
+    ],
+    "isCompleted": false,
+    "listType": "chapters"
+  },
+  {
+    "id": "tz3-gb-32",
+    "bookId": "tastenzauberei-3",
+    "providerName": "Gavin Brady (Chapters)",
+    "title": "Bourrèe",
+    "sequenceIndex": 32,
+    "youtubeVideoId": "FguuYvtOfFk",
+    "startTime": 1740,
+    "endTime": 1796,
+    "checkpoints": [
+      "Schwerpunkt: Stilistik & Spieltechnik",
+      "Auf die genaue Ausführung der Artikulationsbögen achten",
+      "Gavin Bradys Handhaltung und Dynamik als Vorbild nehmen"
+    ],
+    "isCompleted": false,
+    "listType": "chapters"
+  },
+  {
+    "id": "tz3-gb-33",
+    "bookId": "tastenzauberei-3",
+    "providerName": "Gavin Brady (Chapters)",
+    "title": "Bewegter Walzer",
+    "sequenceIndex": 33,
+    "youtubeVideoId": "FguuYvtOfFk",
+    "startTime": 1796,
+    "endTime": 1854,
+    "checkpoints": [
+      "Schwerpunkt: Walzer",
+      "Auf die genaue Ausführung der Artikulationsbögen achten",
+      "Gavin Bradys Handhaltung und Dynamik als Vorbild nehmen"
+    ],
+    "isCompleted": false,
+    "listType": "chapters"
+  },
+  {
+    "id": "tz3-gb-34",
+    "bookId": "tastenzauberei-3",
+    "providerName": "Gavin Brady (Chapters)",
+    "title": "Tarantella in Blue",
+    "sequenceIndex": 34,
+    "youtubeVideoId": "FguuYvtOfFk",
+    "startTime": 1854,
+    "endTime": 1896,
+    "checkpoints": [
+      "Schwerpunkt: Prestissimo",
+      "Auf die genaue Ausführung der Artikulationsbögen achten",
+      "Gavin Bradys Handhaltung und Dynamik als Vorbild nehmen"
+    ],
+    "isCompleted": false,
+    "listType": "chapters"
+  },
+  {
+    "id": "tz3-gb-35",
+    "bookId": "tastenzauberei-3",
+    "providerName": "Gavin Brady (Chapters)",
+    "title": "Zwei Choräle (J. S. Bach)",
+    "sequenceIndex": 35,
+    "youtubeVideoId": "FguuYvtOfFk",
+    "startTime": 1896,
+    "endTime": 1941,
+    "checkpoints": [
+      "Schwerpunkt: Atembogen",
+      "Auf die genaue Ausführung der Artikulationsbögen achten",
+      "Gavin Bradys Handhaltung und Dynamik als Vorbild nehmen"
+    ],
+    "isCompleted": false,
+    "listType": "chapters"
+  },
+  {
+    "id": "tz3-gb-36",
+    "bookId": "tastenzauberei-3",
+    "providerName": "Gavin Brady (Chapters)",
+    "title": "Zwei Choräle (J. S. Bach)",
+    "sequenceIndex": 36,
+    "youtubeVideoId": "FguuYvtOfFk",
+    "startTime": 1941,
+    "endTime": 1993,
+    "checkpoints": [
+      "Schwerpunkt: Atembogen",
+      "Auf die genaue Ausführung der Artikulationsbögen achten",
+      "Gavin Bradys Handhaltung und Dynamik als Vorbild nehmen"
+    ],
+    "isCompleted": false,
+    "listType": "chapters"
+  },
+  {
+    "id": "tz3-gb-37",
+    "bookId": "tastenzauberei-3",
+    "providerName": "Gavin Brady (Chapters)",
+    "title": "Zwei ungarische Sprungtänze",
+    "sequenceIndex": 37,
+    "youtubeVideoId": "FguuYvtOfFk",
+    "startTime": 1993,
+    "endTime": 2034,
+    "checkpoints": [
+      "Schwerpunkt: Accelerando, Body-Percussion",
+      "Auf die genaue Ausführung der Artikulationsbögen achten",
+      "Gavin Bradys Handhaltung und Dynamik als Vorbild nehmen"
+    ],
+    "isCompleted": false,
+    "listType": "chapters"
+  },
+  {
+    "id": "tz3-gb-38",
+    "bookId": "tastenzauberei-3",
+    "providerName": "Gavin Brady (Chapters)",
+    "title": "Zwei ungarische Sprungtänze",
+    "sequenceIndex": 38,
+    "youtubeVideoId": "FguuYvtOfFk",
+    "startTime": 2034,
+    "endTime": 2085,
+    "checkpoints": [
+      "Schwerpunkt: Accelerando, Body-Percussion",
+      "Auf die genaue Ausführung der Artikulationsbögen achten",
+      "Gavin Bradys Handhaltung und Dynamik als Vorbild nehmen"
+    ],
+    "isCompleted": false,
+    "listType": "chapters"
+  },
+  {
+    "id": "tz3-gb-39",
+    "bookId": "tastenzauberei-3",
+    "providerName": "Gavin Brady (Chapters)",
+    "title": "Abschied",
+    "sequenceIndex": 39,
+    "youtubeVideoId": "FguuYvtOfFk",
+    "startTime": 2085,
+    "endTime": 2128,
+    "checkpoints": [
+      "Schwerpunkt: Polyphones Spiel",
+      "Auf die genaue Ausführung der Artikulationsbögen achten",
+      "Gavin Bradys Handhaltung und Dynamik als Vorbild nehmen"
+    ],
+    "isCompleted": false,
+    "listType": "chapters"
+  },
+  {
+    "id": "tz3-gb-40",
+    "bookId": "tastenzauberei-3",
+    "providerName": "Gavin Brady (Chapters)",
+    "title": "Die Polizei kommt",
+    "sequenceIndex": 40,
+    "youtubeVideoId": "FguuYvtOfFk",
+    "startTime": 2128,
+    "endTime": 2175,
+    "checkpoints": [
+      "Schwerpunkt: Klavierduo",
+      "Auf die genaue Ausführung der Artikulationsbögen achten",
+      "Gavin Bradys Handhaltung und Dynamik als Vorbild nehmen"
+    ],
+    "isCompleted": false,
+    "listType": "chapters"
+  },
+  {
+    "id": "tz3-gb-41",
+    "bookId": "tastenzauberei-3",
+    "providerName": "Gavin Brady (Chapters)",
+    "title": "Ungarisch (A. Diabelli)",
+    "sequenceIndex": 41,
+    "youtubeVideoId": "FguuYvtOfFk",
+    "startTime": 2175,
+    "endTime": 2232,
+    "checkpoints": [
+      "Schwerpunkt: Vorschlagsnoten",
+      "Auf die genaue Ausführung der Artikulationsbögen achten",
+      "Gavin Bradys Handhaltung und Dynamik als Vorbild nehmen"
+    ],
+    "isCompleted": false,
+    "listType": "chapters"
+  },
+  {
+    "id": "tz3-gb-42",
+    "bookId": "tastenzauberei-3",
+    "providerName": "Gavin Brady (Chapters)",
+    "title": "Zwergentanz",
+    "sequenceIndex": 42,
+    "youtubeVideoId": "FguuYvtOfFk",
+    "startTime": 2232,
+    "endTime": 2284,
+    "checkpoints": [
+      "Schwerpunkt: Dissonanz",
+      "Auf die genaue Ausführung der Artikulationsbögen achten",
+      "Gavin Bradys Handhaltung und Dynamik als Vorbild nehmen"
+    ],
+    "isCompleted": false,
+    "listType": "chapters"
+  },
+  {
+    "id": "tz3-gb-43",
+    "bookId": "tastenzauberei-3",
+    "providerName": "Gavin Brady (Chapters)",
+    "title": "Menuett (J. Krieger)",
+    "sequenceIndex": 43,
+    "youtubeVideoId": "FguuYvtOfFk",
+    "startTime": 2284,
+    "endTime": 2375,
+    "checkpoints": [
+      "Schwerpunkt: Polyphones Spiel",
+      "Auf die genaue Ausführung der Artikulationsbögen achten",
+      "Gavin Bradys Handhaltung und Dynamik als Vorbild nehmen"
+    ],
+    "isCompleted": false,
+    "listType": "chapters"
+  },
+  {
+    "id": "tz3-gb-44",
+    "bookId": "tastenzauberei-3",
+    "providerName": "Gavin Brady (Chapters)",
+    "title": "The Pink Panther (H. Mancini)",
+    "sequenceIndex": 44,
+    "youtubeVideoId": "FguuYvtOfFk",
+    "startTime": 2375,
+    "endTime": 2442,
+    "checkpoints": [
+      "Schwerpunkt: Quinte",
+      "Auf die genaue Ausführung der Artikulationsbögen achten",
+      "Gavin Bradys Handhaltung und Dynamik als Vorbild nehmen"
+    ],
+    "isCompleted": false,
+    "listType": "chapters"
+  },
+  {
+    "id": "tz3-gb-45",
+    "bookId": "tastenzauberei-3",
+    "providerName": "Gavin Brady (Chapters)",
+    "title": "Blues der Intervalle",
+    "sequenceIndex": 45,
+    "youtubeVideoId": "FguuYvtOfFk",
+    "startTime": 2442,
+    "endTime": 2504,
+    "checkpoints": [
+      "Schwerpunkt: Quinte, Sexte, Septime",
+      "Auf die genaue Ausführung der Artikulationsbögen achten",
+      "Gavin Bradys Handhaltung und Dynamik als Vorbild nehmen"
+    ],
+    "isCompleted": false,
+    "listType": "chapters"
+  },
+  {
+    "id": "tz3-gb-46",
+    "bookId": "tastenzauberei-3",
+    "providerName": "Gavin Brady (Chapters)",
+    "title": "Arabeske (F. Burgmüller)",
+    "sequenceIndex": 46,
+    "youtubeVideoId": "FguuYvtOfFk",
+    "startTime": 2504,
+    "endTime": 2578,
+    "checkpoints": [
+      "Schwerpunkt: Etüde",
+      "Auf die genaue Ausführung der Artikulationsbögen achten",
+      "Gavin Bradys Handhaltung und Dynamik als Vorbild nehmen"
+    ],
+    "isCompleted": false,
+    "listType": "chapters"
+  },
+  {
+    "id": "tz3-gb-47",
+    "bookId": "tastenzauberei-3",
+    "providerName": "Gavin Brady (Chapters)",
+    "title": "Amazing Grace",
+    "sequenceIndex": 47,
+    "youtubeVideoId": "FguuYvtOfFk",
+    "startTime": 2578,
+    "endTime": 2634,
+    "checkpoints": [
+      "Schwerpunkt: Akkordbegleitung",
+      "Auf die genaue Ausführung der Artikulationsbögen achten",
+      "Gavin Bradys Handhaltung und Dynamik als Vorbild nehmen"
+    ],
+    "isCompleted": false,
+    "listType": "chapters"
+  },
+  {
+    "id": "tz3-gb-48",
+    "bookId": "tastenzauberei-3",
+    "providerName": "Gavin Brady (Chapters)",
+    "title": "Menuett (J. Krieger)",
+    "sequenceIndex": 48,
+    "youtubeVideoId": "FguuYvtOfFk",
+    "startTime": 2634,
+    "endTime": 2707,
+    "checkpoints": [
+      "Schwerpunkt: Polyphones Spiel",
+      "Auf die genaue Ausführung der Artikulationsbögen achten",
+      "Gavin Bradys Handhaltung und Dynamik als Vorbild nehmen"
+    ],
+    "isCompleted": false,
+    "listType": "chapters"
+  },
+  {
+    "id": "tz3-gb-49",
+    "bookId": "tastenzauberei-3",
+    "providerName": "Gavin Brady (Chapters)",
+    "title": "Die Clowns (D. Kabalevski)",
+    "sequenceIndex": 49,
+    "youtubeVideoId": "FguuYvtOfFk",
+    "startTime": 2707,
+    "endTime": 2827,
+    "checkpoints": [
+      "Schwerpunkt: Virtuosität & Charakter",
+      "Auf die genaue Ausführung der Artikulationsbögen achten",
+      "Gavin Bradys Handhaltung und Dynamik als Vorbild nehmen"
+    ],
+    "isCompleted": false,
+    "listType": "chapters"
   }
 ];
